@@ -1,29 +1,27 @@
 name: PlatformIO CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        example: [path/to/test/file.c, examples/file.ino, path/to/test/directory]
 
-  on: [push]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
 
-  jobs:
-    build:
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          example: [path/to/test/file.c, examples/file.ino, path/to/test/directory]
-
-      steps:
-        - uses: actions/checkout@v3
-        - uses: actions/cache@v3
-          with:
-            path: |
-              ~/.cache/pip
-              ~/.platformio/.cache
-            key: ${{ runner.os }}-pio
-        - uses: actions/setup-python@v4
-          with:
-            python-version: '3.11'
-        - name: Install PlatformIO Core
-          run: pip install --upgrade platformio
-
-        - name: Build PlatformIO examples
-          run: pio ci --board=esp32doit-devkit-v1
-          env:
-            PLATFORMIO_CI_SRC: ${{ matrix.example }}
+      - name: Build PlatformIO examples
+        run: pio ci --board=esp32doit-devkit-v1
+        env:
+          PLATFORMIO_CI_SRC: ${{ matrix.example }}

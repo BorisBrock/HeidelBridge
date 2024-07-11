@@ -1,0 +1,42 @@
+name: Flawfinder Code Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  flawfinder:
+    name: Run Flawfinder
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install Flawfinder
+        run: |
+          pip install flawfinder
+
+      - name: Run Flawfinder
+        run: |
+          flawfinder . > flawfinder.log
+
+      - name: Upload Flawfinder results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: flawfinder-report
+          path: flawfinder.log
+
+      - name: Display Flawfinder results
+        if: always()
+        run: cat flawfinder.log

@@ -1,0 +1,36 @@
+name: Cppcheck Code Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  cppcheck:
+    name: Run Cppcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Cppcheck
+        run: sudo apt-get install cppcheck
+
+      - name: Run Cppcheck
+        run: |
+          cppcheck --enable=all --inconclusive --xml --xml-version=2 . 2 cppcheck-report.xml
+
+      - name: Upload Cppcheck results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cppcheck-report
+          path: cppcheck-report.xml
+
+      - name: Display Cppcheck results
+        if: always()
+        run: cat cppcheck-report.xml

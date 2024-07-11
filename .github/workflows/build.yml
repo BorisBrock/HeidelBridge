@@ -19,4 +19,4 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build PlatformIO examples
-        run: pio ci --board=esp32doit-devkit-v1
+        run: pio ci --board=esp32doit-devkit-v1 ./

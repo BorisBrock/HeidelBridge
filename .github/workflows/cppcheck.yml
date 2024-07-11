@@ -22,7 +22,7 @@ jobs:
 
       - name: Run Cppcheck
         run: |
-          cppcheck --enable=all --inconclusive --xml --xml-version=2 > cppcheck-report.xml
+          cppcheck --enable=all --inconclusive --xml 2> cppcheck-report.xml
 
       - name: Upload Cppcheck results
         if: always()

@@ -5,7 +5,7 @@
 </div>
 <h1 align="center">Heidelbridge</h1>
 
-Heidelbridge is a firmware for ESP32 microcontrollers. It allows you to bring your Heidelberg wallbox into you local WiFi network. This is done by wrapping the Modbus RTU interface of the wallbox into a OCPP client. This way the wallbox can easily be integrated into home energy management systems, e.g. [evcc](https://github.com/evcc-io/evcc).
+Heidelbridge is a firmware for ESP32 microcontrollers. It allows you to bring your [Heidelberg wallbox](https://www.heidelberg-wallbox.eu) into you local WiFi network. This is done by wrapping the Modbus RTU interface of the wallbox in a OCPP client. This way the wallbox can easily be integrated into home energy management systems, e.g. [evcc](https://github.com/evcc-io/evcc).
 
 ![PlatformIO CI Build](https://github.com/BorisBrock/Heidelbridge/actions/workflows/build.yml/badge.svg)
 ![Flawfinder Code Analysis](https://github.com/BorisBrock/Heidelbridge/actions/workflows/flawfinder.yml/badge.svg)

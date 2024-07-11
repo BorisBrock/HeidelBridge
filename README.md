@@ -10,10 +10,43 @@ Heidelbridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 ![PlatformIO CI Build](https://github.com/BorisBrock/Heidelbridge/actions/workflows/build.yml/badge.svg)
 ![Flawfinder Code Analysis](https://github.com/BorisBrock/Heidelbridge/actions/workflows/flawfinder.yml/badge.svg)
 ![Cppcheck Code Analysis](https://github.com/BorisBrock/Heidelbridge/actions/workflows/cppcheck.yml/badge.svg)
+![GitHub all releases](https://img.shields.io/github/downloads/BorisBrock/Heidelbridge/total?color=blue&style=flat-square)  
 
 ---
 
-Todo
+# Required Hardware
+
+todo
+
+---
+
+# Installation
+
+## Programming the ESP32
+
+todo
+
+## Connecting the Hardware
+
+todo
+
+## Setting Up EVCC
+
+todo
+
+---
+
+# Contribution
+
+todo
+
+---
 
 # Attribution
-- Blueberry logo: <a href="https://www.vecteezy.com/free-vector/blueberry">Blueberry Vectors by Vecteezy</a>
+
+- [Blueberry logo](ttps://www.vecteezy.com/free-vector/blueberry)
+- [eModbus Arduino library](https://github.com/eModbus/eModbus)
+- [Async TCP Arduino library](https://github.com/mathieucarbou/AsyncTCP)
+- [ESP Async Webserver Arduino library](https://github.com/HenkHoldijk/mathieucarbou_ESPAsyncWebServer)
+- [Websockets Arduino library](https://github.com/Links2004/arduinoWebSockets)
+- [MicroOCPP Arduino library](https://github.com/matth-x/MicroOcpp)

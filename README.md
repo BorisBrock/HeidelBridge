@@ -44,7 +44,7 @@ todo
 
 # Attribution
 
-- [Blueberry logo](ttps://www.vecteezy.com/free-vector/blueberry)
+- [Blueberry logo](https://www.vecteezy.com/free-vector/blueberry)
 - [eModbus Arduino library](https://github.com/eModbus/eModbus)
 - [Async TCP Arduino library](https://github.com/mathieucarbou/AsyncTCP)
 - [ESP Async Webserver Arduino library](https://github.com/HenkHoldijk/mathieucarbou_ESPAsyncWebServer)

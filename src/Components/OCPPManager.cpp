@@ -7,6 +7,8 @@
 #define OCPP_CHARGE_BOX_ID "heidelberg-ec"
 
 bool gTempIsCharging = false;
+bool gWasChargingAllowed = false;
+bool gIsOcppRunning = true;
 
 void OCPPManager::Init()
 {
@@ -27,7 +29,12 @@ void OCPPManager::Init()
     setSmartChargingCurrentOutput([](float limit)
                                   {
         //set the SAE J1772 Control Pilot value here
-        Serial.printf("[main] Smart Charging allows maximum charge rate: %.0f\n", limit); });
+        Serial.printf("[main] Smart Charging allows maximum charge current: %.0f\n", limit); });
+
+    setSmartChargingPowerOutput([](float limit)
+                                {
+        //set the SAE J1772 Control Pilot value here
+        Serial.printf("[main] Smart Charging allows maximum charge power: %.0f\n", limit); });
 
     setConnectorPluggedInput([]()
                              {
@@ -37,6 +44,9 @@ void OCPPManager::Init()
 
 void OCPPManager::Loop()
 {
+    if (!gIsOcppRunning)
+        return;
+
     /*
      * Do all OCPP stuff (process WebSocket input, send recorded meter values to Central System, etc.)
      */
@@ -47,14 +57,28 @@ void OCPPManager::Loop()
      */
     if (ocppPermitsCharge())
     {
+        if (!gWasChargingAllowed)
+        {
+            Serial.println("Received request to START CHARGING");
+        }
+
         gTempIsCharging = true;
-        // Serial.println("charge permitted");
-        //  OCPP set up and transaction running. Energize the EV plug here
+        gWasChargingAllowed = true;
     }
     else
     {
+        if (gWasChargingAllowed)
+        {
+            Serial.println("Received request to STOP CHARGING");
+        }
+
         gTempIsCharging = false;
-        // Serial.println("charge NOT permitted");
-        //  No transaction running at the moment. De-energize EV plug
+        gWasChargingAllowed = false;
     }
+}
+
+void OCPPManager::Shutdown()
+{
+    gIsOcppRunning = false;
+    mocpp_deinitialize();
 }

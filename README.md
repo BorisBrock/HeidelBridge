@@ -14,6 +14,12 @@ Heidelbridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 ---
 
+# Project Status
+
+:warning: This project is in a very early development stage. It is not yet ready for productive use.
+
+---
+
 # Required Hardware
 
 todo

@@ -1,45 +1,34 @@
 #include <Arduino.h>
 #include <WiFiClientSecure.h>
 #include <MicroOcpp.h>
+#include "../Configuration/Hems.h"
 #include "OCPPManager.h"
+#include "Wallbox.h"
 
-#define OCPP_BACKEND_URL "ws://192.168.178.90:8887"
-#define OCPP_CHARGE_BOX_ID "heidelberg-ec"
-
-bool gTempIsCharging = false;
 bool gWasChargingAllowed = false;
-bool gIsOcppRunning = true;
+bool gIsOcppRunning = false;
 
 void OCPPManager::Init()
 {
-    mocpp_initialize(OCPP_BACKEND_URL, OCPP_CHARGE_BOX_ID, "My Charging Station", "My company name");
+    mocpp_initialize(OcppServerUrl, "heidelberg-ec", "Heidelberg EC", "Heidelberg");
 
-    /*
-     * Integrate OCPP functionality. You can leave out the following part if your EVSE doesn't need it.
-     */
+    // Input of the electricity meter register in Wh
     setEnergyMeterInput([]()
-                        {
-                            Serial.println(gTempIsCharging);
-        //take the energy register of the main electricity meter and return the value in watt-hours
-        return gTempIsCharging ? millis() : 0; });
+                        { return static_cast<int>(Wallbox::GetEnergyMeterWh()); });
 
+    // Input of the power meter reading in W
     setPowerMeterInput([]()
-                       { return gTempIsCharging ? 123 : 0; });
+                       { return Wallbox::GetPowerMeterW(); });
 
-    setSmartChargingCurrentOutput([](float limit)
-                                  {
-        //set the SAE J1772 Control Pilot value here
-        Serial.printf("[main] Smart Charging allows maximum charge current: %.0f\n", limit); });
+    // Set charging limits
+    setSmartChargingOutput([](float limitWatts, float limitAmps, int numPhases)
+                           { Wallbox::SetChargingLimits(limitWatts, limitAmps, numPhases); });
 
-    setSmartChargingPowerOutput([](float limit)
-                                {
-        //set the SAE J1772 Control Pilot value here
-        Serial.printf("[main] Smart Charging allows maximum charge power: %.0f\n", limit); });
-
+    // Return true if an EV is plugged to this EVSE
     setConnectorPluggedInput([]()
-                             {
-        // return true if an EV is plugged to this EVSE
-        return true; });
+                             { return Wallbox::GetIsVehiclePluggedIn(); });
+
+    gIsOcppRunning = true;
 }
 
 void OCPPManager::Loop()
@@ -47,33 +36,25 @@ void OCPPManager::Loop()
     if (!gIsOcppRunning)
         return;
 
-    /*
-     * Do all OCPP stuff (process WebSocket input, send recorded meter values to Central System, etc.)
-     */
+    // Do all OCPP stuff (process WebSocket input, send recorded meter values to Central System, etc.)
     mocpp_loop();
 
-    /*
-     * Energize EV plug if OCPP transaction is up and running
-     */
+    // Energize EV plug if OCPP transaction is up and running
     if (ocppPermitsCharge())
     {
         if (!gWasChargingAllowed)
         {
-            Serial.println("Received request to START CHARGING");
+            Wallbox::StartCharging();
+            gWasChargingAllowed = true;
         }
-
-        gTempIsCharging = true;
-        gWasChargingAllowed = true;
     }
     else
     {
         if (gWasChargingAllowed)
         {
-            Serial.println("Received request to STOP CHARGING");
+            Wallbox::StopCharging();
+            gWasChargingAllowed = false;
         }
-
-        gTempIsCharging = false;
-        gWasChargingAllowed = false;
     }
 }
 

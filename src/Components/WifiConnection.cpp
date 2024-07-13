@@ -37,6 +37,6 @@ void WifiConnection::Init()
     WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
     // Start Wifi connection
-    Serial.println("Connecting WiFi");
+    Serial.printf("[Connecting to WiFi network '%s'...\n", ssid);
     WiFi.begin(ssid, password);
 }

@@ -12,7 +12,7 @@ bool Wallbox::GetIsVehiclePluggedIn()
 void Wallbox::SetChargingLimits(float limitWatts, float limitAmps, int numPhases)
 {
     // Todo
-    Serial.print("Setting charging limits:");
+    Serial.println("Setting charging limits:");
     Serial.printf(" > Power (Watt): %f\n", limitWatts);
     Serial.printf(" > Current (Ampere): %f\n", limitAmps);
     Serial.printf(" > Phases: %d\n", numPhases);
@@ -41,5 +41,5 @@ float Wallbox::GetEnergyMeterWh()
 float Wallbox::GetPowerMeterW()
 {
     // Todo
-    return millis();
+    return 5000.f;
 }

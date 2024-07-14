@@ -35,11 +35,11 @@ void Wallbox::StopCharging()
 float Wallbox::GetEnergyMeterWh()
 {
     // Todo
-    return gIsCharging ? 123.f : 0.f;
+    return 0.f;
 }
 
 float Wallbox::GetPowerMeterW()
 {
     // Todo
-    return 5000.f;
+    return 0.f;
 }

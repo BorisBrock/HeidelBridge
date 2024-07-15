@@ -7,8 +7,8 @@
 void setup()
 {
   Serial.begin(115200);
-  // Modbus::Init();
   WifiConnection::Init();
+  Modbus::Init();
   OTAUpdater::Init();
   OCPPManager::Init();
 }

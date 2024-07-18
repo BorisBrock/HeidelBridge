@@ -24,7 +24,14 @@ Heidelbridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 You only need two components for this project: an ESP32 microcontroller and a MAX485 module. Both are available in large quantities and at reasonable prices on the Internet. You will also need a breadboard and a few jumper wires. All in all, it shouldn't cost you more than 10$.
 
-Here's what the hardware setup looks like:
+Parts list:
+- ESP32 microcontroller (ESP classic, ESP32 C3, C6, S2 etc.)
+- MAX485 breakout board
+- 6 jumper wires
+- A breadboard
+
+This should be enough for quickly putting together a fully functioning prototype.
+Of course a well designed PCB would be much nicer, but this is still work in progress. Once the design is ready, the schematics will be available *right here*.
 
 ---
 
@@ -34,9 +41,22 @@ Here's what the hardware setup looks like:
 
 todo
 
-## Connecting the Hardware
+## Preparing the Heidelberg Energy Control Wallbox
 
 todo
+
+## Connecting the Hardware Components
+
+The hardware connection is very simple:
+- Connect the ESP32's GND to the MAX485-board's GND
+- Connect the ESP32's 3.3 V to the MAX485-board's VCC
+- Connect ESP32 pin 18 to the MAX485-board's RO pin
+- Connect ESP32 pin 19 to the MAX485-board's DI pin
+- Connect ESP32 pin 21 to the MAX485-board's DE+RE pins
+- Connect the MAX485-board's A terminal to the Heidelberg wallbox' A terminal
+- Connect the MAX485-board's B terminal to the Heidelberg wallbox' B terminal
+
+![Hardware connections](/img/hardware_connections.png)
 
 ## Setting Up evcc
 

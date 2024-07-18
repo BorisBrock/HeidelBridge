@@ -37,11 +37,16 @@ Of course a well designed PCB would be much nicer, but this is still work in pro
 
 # Installation
 
-## Programming the ESP32
+## Step 1: Program the ESP32
 
-todo
+For the initial programming, clone or download this repository. Then compile the project using PlatformIO.
+Now connect your ESP32 via USB and upload the firmware.
 
-## Preparing the Heidelberg Energy Control Wallbox
+Hint: All further updates can now be uploaded via OTA.
+
+On first boot, the ESP32 will open a Wifi network called "HeidelBridge". Connect to that network with any smartphone or laptop. The Wifi password is "heidelbridge". From the landing page, you can now connect to your home network. This connection will be stored permanenetly.
+
+## Step 2: Prepare The Heidelberg Energy Control Wallbox
 
 todo
 

@@ -1,15 +1,14 @@
 #pragma once
 
+#include "ModbusClientRTU.h"
+
 namespace Modbus
 {
     void Init();
 
-    template <typename T>
-    bool ReadInputRegister(T &value);
+    bool ReadInputRegister16(uint16_t address, uint16_t &value);
 
-    template <typename T>
-    bool ReadHoldRegister(T &value);
+    bool ReadHoldRegister16(uint16_t address, uint16_t &value);
 
-    template <typename T>
-    bool WriteHoldRegister(T value);
+    bool WriteHoldRegister16(uint16_t address, uint16_t value);
 };

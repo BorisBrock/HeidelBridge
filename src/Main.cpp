@@ -6,7 +6,10 @@
 
 void setup()
 {
+  // Configure serial communication
   Serial.begin(115200);
+
+  // Initialize all modules
   WifiConnection::Init();
   Modbus::Init();
   OTAUpdater::Init();
@@ -15,7 +18,7 @@ void setup()
 
 void loop()
 {
+  // Update components
   OTAUpdater::Loop();
   OCPPManager::Loop();
-  delay(1);
 }

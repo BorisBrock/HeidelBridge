@@ -2,13 +2,16 @@
 #include <WiFiManager.h>
 #include "WifiConnection.h"
 
-WiFiManager wifiManager;
-
-void WifiConnection::Init()
+namespace WifiConnection
 {
-    wifiManager.setConfigPortalTimeout(180);
-    wifiManager.setTitle("HeidelBridge");
-    wifiManager.setShowInfoUpdate(false);
+    WiFiManager gWifiManager;
 
-    wifiManager.autoConnect("HeidelBridge", "heidelbridge");
-}
+    void Init()
+    {
+        gWifiManager.setConfigPortalTimeout(180);
+        gWifiManager.setTitle("HeidelBridge");
+        gWifiManager.setShowInfoUpdate(false);
+
+        gWifiManager.autoConnect("HeidelBridge", "heidelbridge");
+    }
+};

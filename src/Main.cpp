@@ -4,6 +4,7 @@
 #include "Components/OTAUpdater.h"
 #include "Components/Modbus.h"
 #include "Components/OCPPManager.h"
+#include "Components/Wallbox.h"
 
 void setup()
 {
@@ -17,6 +18,7 @@ void setup()
   WifiConnection::Init();
 
   // Initialize all other modules
+  Wallbox::WriteInitialConfiguration();
   Modbus::Init();
   OTAUpdater::Init();
   OCPPManager::Init();

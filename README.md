@@ -72,7 +72,10 @@ If you need to reset/change the settings of your HeidelBridge ESP32, simply eras
 
 ## Configuring The Heidelberg Wallbox
 
-todo
+1. Disconnect the wallbox from the power supply.
+2. Open the housing.
+3. Set DIP switch S4 pin 4 to 1 (this sets the Modbus ID to 1).
+4. Set DIP switch S6 pin 2 to 1 (this enables the 120 Ohm termination).
 
 ## Connecting the Hardware Components
 

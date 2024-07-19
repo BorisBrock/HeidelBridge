@@ -27,6 +27,11 @@ namespace Constants
         const char *ChargePointModel = "Heidelberg EC";
         const char *ChargePointVendor = "Heidelberg";
         const char *OCPPGUIParameterTitle = "OCPP Server";
-        const char* OCPPGUIParameterInitValue = "ws://192.168.178.90:8887";
+        const char *OCPPGUIParameterInitValue = "ws://192.168.178.90:8887";
+    };
+
+    namespace Wallbox
+    {
+        const float FailSafeCurrentA = 16.0f; // 16 Ampere
     };
 };

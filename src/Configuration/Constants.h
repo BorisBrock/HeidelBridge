@@ -24,4 +24,9 @@ namespace Constants
         extern const char *OCPPGUIParameterTitle;
         extern const char *OCPPGUIParameterInitValue;
     };
+
+    namespace Wallbox
+    {
+        extern const float FailSafeCurrentA;
+    };
 };

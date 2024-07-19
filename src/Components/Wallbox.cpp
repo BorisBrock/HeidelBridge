@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "../Configuration/Constants.h"
 #include "Modbus.h"
 #include "Wallbox.h"
 
@@ -10,6 +11,7 @@ namespace Wallbox
     constexpr uint16_t RegisterPower = 14;
     constexpr uint16_t RegisterEnergyLow = 16;
     constexpr uint16_t RegisterEnergyHigh = 15;
+    constexpr uint16_t RegisterFailsafeCurrent = 262;
 
     // Last wallbox states
     bool gIsVehiclePluggedIn = false;
@@ -17,6 +19,18 @@ namespace Wallbox
     uint16_t gLastCurrentLimit = 160; // 16 Ampere
     float gLastPowerMeterValueW = 0.0f;
     float gLastEnergyMeterValueWh = 0.0f;
+
+    void WriteInitialConfiguration()
+    {
+        Serial.println("Writing initial wallbox configuration via Modbus");
+
+        uint16_t rawCurrent = static_cast<uint16_t>(Constants::Wallbox::FailSafeCurrentA * 10.0f);
+        if (!Modbus::WriteHoldRegister16(RegisterFailsafeCurrent, gLastCurrentLimit))
+        {
+            // Error writing modbus register
+            Serial.println("ERROR: Could not set fail safe current via Modbus");
+        }
+    }
 
     bool GetIsVehiclePluggedIn()
     {
@@ -45,7 +59,7 @@ namespace Wallbox
 
         if (!Modbus::WriteHoldRegister16(RegisterMaximalCurrent, gLastCurrentLimit))
         {
-            // Error reading modbus register
+            // Error writing modbus register
             Serial.println("ERROR: Could not set maximum charging current via Modbus");
         }
     }
@@ -57,7 +71,7 @@ namespace Wallbox
 
         if (!Modbus::WriteHoldRegister16(RegisterMaximalCurrent, gLastCurrentLimit))
         {
-            // Error reading modbus register
+            // Error writing modbus register
             Serial.println("ERROR: Could not set maximum charging current via Modbus");
         }
     }
@@ -70,7 +84,7 @@ namespace Wallbox
         // Set max. charging current to 0 (= off)
         if (!Modbus::WriteHoldRegister16(RegisterMaximalCurrent, 0))
         {
-            // Error reading modbus register
+            // Error writing modbus register
             Serial.println("ERROR: Could not set maximum charging current to 0 via Modbus");
         }
     }
@@ -85,6 +99,8 @@ namespace Wallbox
             {
                 uint32_t totalEnergyWh = static_cast<uint32_t>(registerValueHigh) << 16 | static_cast<uint32_t>(registerValueLow);
                 gLastEnergyMeterValueWh = static_cast<float>(totalEnergyWh);
+
+                Serial.printf("Reading energy meter value via Modbus: %f Wh\n", gLastEnergyMeterValueWh);
             }
             else
             {
@@ -107,6 +123,8 @@ namespace Wallbox
         if (Modbus::ReadInputRegister16(RegisterPower, registerValue))
         {
             gLastPowerMeterValueW = static_cast<float>(registerValue);
+
+            Serial.printf("Reading power meter value via Modbus: %f W\n", gLastPowerMeterValueW);
         }
         else
         {

@@ -25,7 +25,7 @@ Heidelbridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 You only need two components for this project: an ESP32 microcontroller and a MAX485 module. Both are available in large quantities and at reasonable prices on the Internet. You will also need a breadboard and a few jumper wires. All in all, it shouldn't cost you more than 10$.
 
 Parts list:
-- ESP32 microcontroller (ESP classic, ESP32 C3, C6, S2 etc.)
+- ESP32 microcontroller (ESP classic, ESP32 C3, C6, S2 etc.)*
 - MAX485 breakout board
 - 6 jumper wires
 - A breadboard
@@ -33,37 +33,63 @@ Parts list:
 This should be enough for quickly putting together a fully functioning prototype.
 Of course a well designed PCB would be much nicer, but this is still work in progress. Once the design is ready, the schematics will be available *right here*.
 
+> *\* This project is currently based on the ESP32 classic. It has not been built/tested for newer models, lice the S2 and C3. Hopefully this will change soon.*
+
 ---
 
-# Installation
+# Setting Up The ESP32
 
-## Step 1: Program the ESP32
+## Initial Programming
 
 For the initial programming, clone or download this repository. Then compile the project using PlatformIO.
 Now connect your ESP32 via USB and upload the firmware.
 
-Hint: All further updates can now be uploaded via OTA.
+## WiFi Setup
 
-On first boot, the ESP32 will open a Wifi network called "HeidelBridge". Connect to that network with any smartphone or laptop. The Wifi password is "heidelbridge". From the landing page, you can now connect to your home network. This connection will be stored permanenetly.
+On first boot, the ESP32 will open up a Wifi access point. Connect to that network with any smartphone or laptop.
 
-## Step 2: Prepare The Heidelberg Energy Control Wallbox
+- **SSID**: `HeidelBridge`
+- **Password**: `heidelbridge`
+
+From the landing page, you can now connect to your home network. This connection will be stored permanenetly.
+
+> [!IMPORTANT]
+> In addition to the WiFi SSID/password, you also need to enter the address of your OCPP server, e.g. evcc. This address must include the protocol (ws://), the server's IP address and the port (usually :8887). Here's an example: `ws://192.168.178.90:8887`.
+
+## Updating The Firmware
+
+Once the firmware has been uploaded to the ESP32 via USB, it can be updated via OTA (Over The Air). This makes updating the software very convenient because no more physical access to the device is required.
+
+For this purpose, the platformio.ini contains two environments: OTA and USB.
+
+## Resetting Connection Settings
+
+If you need to reset/change the settings of your HeidelBridge ESP32, simply erase its flash memory. With the next reboot you can access the WiFi setup page again and make the required changes.
+
+---
+
+# Hardware Installation
+
+## Configuring The Heidelberg Wallbox
 
 todo
 
 ## Connecting the Hardware Components
 
-The hardware connection is very simple:
-- Connect the ESP32's GND to the MAX485-board's GND
-- Connect the ESP32's 3.3 V to the MAX485-board's VCC
-- Connect ESP32 pin 18 to the MAX485-board's RO pin
-- Connect ESP32 pin 19 to the MAX485-board's DI pin
-- Connect ESP32 pin 21 to the MAX485-board's DE+RE pins
-- Connect the MAX485-board's A terminal to the Heidelberg wallbox' A terminal
-- Connect the MAX485-board's B terminal to the Heidelberg wallbox' B terminal
+The hardware connections are very simple:
+- ESP32's GND to MAX485-board GND
+- ESP32's 3.3 V to MAX485-board VCC
+- ESP32 pin 18 to MAX485-board RO pin
+- ESP32 pin 19 to MAX485-board DI pin
+- ESP32 pin 21 to MAX485-board DE+RE pins
+- MAX485-board A terminal to Heidelberg wallbox A terminal
+- MAX485-board B terminal to Heidelberg wallbox B terminal
 
 ![Hardware connections](/img/hardware_connections.png)
 
-## Setting Up evcc
+---
+
+# Setting Up evcc
 
 > [!IMPORTANT]
 > Please make sure that you set up your HeidelBridge **before** adding it to evcc. Evcc won't start up, if it can't find your HeidelBridge! 
@@ -100,7 +126,9 @@ Start evcc with your new configuration and the HeidelBridge should be there.
 
 ---
 
-# Attribution
+# Used Assets and Libraries
+
+The following assets and libraries are used by this project:
 
 - [Blueberry logo](https://www.vecteezy.com/free-vector/blueberry)
 - [eModbus Arduino library](https://github.com/eModbus/eModbus)

@@ -1,7 +1,8 @@
 #include <Arduino.h>
 #include <WiFiClientSecure.h>
 #include <MicroOcpp.h>
-#include "../Configuration/Hems.h"
+#include "../Configuration/Constants.h"
+#include "../Configuration/PersistentSettings.h"
 #include "OCPPManager.h"
 #include "Wallbox.h"
 
@@ -12,7 +13,18 @@ namespace OCPPManager
 
     void Init()
     {
-        mocpp_initialize(OcppServerUrl, "heidelberg-ec", "Heidelberg EC", "Heidelberg");
+        // Get server address from persistent memory
+        String ocppServer = PersistentSettings::ReadOCPPServer();
+
+        Serial.print("Connecting to OCPP server '");
+        Serial.print(ocppServer);
+        Serial.println("'");
+
+        mocpp_initialize(
+            ocppServer.c_str(),
+            Constants::OCPP::ChargeBoxId,
+            Constants::OCPP::ChargePointModel,
+            Constants::OCPP::ChargePointVendor);
 
         // Input of the electricity meter register in Wh
         setEnergyMeterInput([]()

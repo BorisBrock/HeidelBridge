@@ -1,13 +1,13 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include "HardwareSerial.h"
-#include "../Configuration/Pins.h"
+#include "../Configuration/Constants.h"
 #include "Modbus.h"
 
 namespace Modbus
 {
-    ModbusClientRTU gModbusRTU(PIN_RTS); // Create a ModbusRTU client instance
-    HardwareSerial gRs485Serial(1);      // define a Serial for UART1
+    ModbusClientRTU gModbusRTU(Constants::Pins::PinRTS); // Create a ModbusRTU client instance
+    HardwareSerial gRs485Serial(1);                       // define a Serial for UART1
     constexpr uint8_t gServerId = 1;
 
     void Init()
@@ -15,7 +15,7 @@ namespace Modbus
         // Init serial conneted to the RTU Modbus
         Serial.println("Starting RS485 hardware serial");
         RTUutils::prepareHardwareSerial(gRs485Serial);
-        gRs485Serial.begin(19200, SERIAL_8E1, PIN_RX, PIN_TX);
+        gRs485Serial.begin(19200, SERIAL_8E1, Constants::Pins::PinRX, Constants::Pins::PinTX);
 
         // Start Modbus RTU
         Serial.println("Creating Modbus RTU instance");

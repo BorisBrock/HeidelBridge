@@ -26,8 +26,9 @@ namespace WifiConnection
 
     void Init()
     {
-        gWifiManager.setDebugOutput(false);
+        Serial.print("Starting WiFi Manager");
 
+        gWifiManager.setDebugOutput(false);
         gWifiManager.setConfigPortalTimeout(180);
         gWifiManager.setTitle(Constants::WiFi::CaptivePortalTitle);
 
@@ -43,5 +44,6 @@ namespace WifiConnection
         gWifiManager.autoConnect(Constants::WiFi::HotspotSSID, Constants::WiFi::HotspotPassword);
 
         // If we got here, connection was established successfully
+        Serial.println("WiFi setup completed successfully");
     }
 };

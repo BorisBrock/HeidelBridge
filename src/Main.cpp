@@ -11,6 +11,11 @@ void setup()
   // Configure serial communication
   Serial.begin(115200);
 
+  // Print version info
+  Serial.println("Booting HeidelBridge");
+  Serial.printf("Build date: %s\n", __DATE__);
+  Serial.println("");
+
   // Initialize persistent settings
   PersistentSettings::Init();
 
@@ -18,8 +23,9 @@ void setup()
   WifiConnection::Init();
 
   // Initialize all other modules
-  Wallbox::WriteInitialConfiguration();
   Modbus::Init();
+  Wallbox::PrintWallboxInfo();
+  Wallbox::WriteInitialConfiguration();
   OTAUpdater::Init();
   OCPPManager::Init();
 }
@@ -29,4 +35,5 @@ void loop()
   // Update components
   OTAUpdater::Loop();
   OCPPManager::Loop();
+  delay(1);
 }

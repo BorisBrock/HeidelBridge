@@ -7,17 +7,23 @@ namespace PersistentSettings
     Preferences gPreferences;
 
     // Constants
-    const char* PrefSectionName = "heidelbridge";
-    const char* SettingNameOcpp = "ocpp";
+    const char *PrefSectionName = "heidelbridge";
+    const char *SettingNameOcpp = "ocpp";
 
     void Init()
     {
         // Open up shred prefs in RW mode
-        Serial.println("Initializing persistent settings");
-        gPreferences.begin(PrefSectionName, false);
+        if (gPreferences.begin(PrefSectionName, false))
+        {
+            Serial.println("Persistent settings initialized successfully");
+        }
+        else
+        {
+            Serial.println("Persistent settings initialization failed");
+        }
     }
 
-    void WriteOCPPServer(const String& server)
+    void WriteOCPPServer(const String &server)
     {
         gPreferences.putString(SettingNameOcpp, server);
     }

@@ -20,6 +20,11 @@ namespace Wallbox
     float gLastPowerMeterValueW = 0.0f;
     float gLastEnergyMeterValueWh = 0.0f;
 
+    void PrintWallboxInfo()
+    {
+        // Todo
+    }
+
     void WriteInitialConfiguration()
     {
         Serial.println("Writing initial wallbox configuration via Modbus");
@@ -38,6 +43,8 @@ namespace Wallbox
         if (Modbus::ReadInputRegister16(RegisterChargingState, registerValue))
         {
             gIsVehiclePluggedIn = registerValue >= 4 && registerValue <= 7;
+
+            Serial.printf("Plugged state via Modbus: %d\n", gIsVehiclePluggedIn);
         }
         else
         {

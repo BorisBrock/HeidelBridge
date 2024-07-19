@@ -2,6 +2,7 @@
 
 namespace Wallbox
 {
+    void PrintWallboxInfo();
     void WriteInitialConfiguration();
     bool GetIsVehiclePluggedIn();
     void SetChargingLimits(float limitWatts, float limitAmps, int numPhases);

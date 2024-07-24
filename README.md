@@ -88,7 +88,7 @@ The hardware connections are very simple:
 > [!IMPORTANT]
 > Please make sure that you set up your HeidelBridge **before** adding it to evcc. Evcc won't start up, if it can't find your HeidelBridge! 
 
-Adding your HeidelBerry to evcc is very straight forward.
+Adding your HeidelBridge to evcc is very straight forward.
 Start by defining a new charger:
 
 ```

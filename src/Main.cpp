@@ -20,7 +20,7 @@ void setup()
   // Make sure WiFi connection is up and running
   WifiConnection::Init();
 
-  // Initialize all other modules
+  // Initialize wallbox
 #ifndef DUMMY_WALLBOX
   Serial.println("Starting with Heidelberg wallbox in real mode");
   ModbusRTU::Instance()->Init();
@@ -29,8 +29,9 @@ void setup()
   Serial.println("Starting with dummy wallbox in simulated mode");
   gWallbox = DummyWallbox::Instance();
 #endif
-
   gWallbox->Init();
+
+  // Start Modbus TCP server
   ModbusTCP::Init(gWallbox);
 
   Serial.println("Setup complete");

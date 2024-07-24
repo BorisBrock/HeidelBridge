@@ -2,11 +2,12 @@
 #include <WiFi.h>
 #include "HardwareSerial.h"
 #include "ModbusClientRTU.h"
+#include "../../Configuration/Pins.h"
 #include "../../Configuration/Constants.h"
 #include "ModbusRTU.h"
 
-ModbusClientRTU gModbusRTU(Constants::Pins::PinRTS); // Create a ModbusRTU client instance
-HardwareSerial gRs485Serial(1);                      // Define a Serial for UART1
+ModbusClientRTU gModbusRTU(Pins::PinRTS); // Create a ModbusRTU client instance
+HardwareSerial gRs485Serial(1);           // Define a Serial for UART1
 constexpr uint8_t RegisterSize = 2;
 
 ModbusRTU *ModbusRTU::Instance()
@@ -23,8 +24,8 @@ void ModbusRTU::Init()
     gRs485Serial.begin(
         Constants::HeidelbergWallbox::ModbusBaudrate,
         SERIAL_8E1,
-        Constants::Pins::PinRX,
-        Constants::Pins::PinTX);
+        Pins::PinRX,
+        Pins::PinTX);
 
     // Start Modbus RTU
     Serial.println("Creating Modbus RTU instance");

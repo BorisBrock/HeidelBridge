@@ -1,10 +1,11 @@
 #include <Arduino.h>
-#include "Configuration/PersistentSettings.h"
-#include "Components/WifiConnection.h"
-#include "Components/OTAUpdater.h"
-#include "Components/Modbus.h"
-#include "Components/OCPPManager.h"
-#include "Components/Wallbox.h"
+#include "Components/WiFi/WifiConnection.h"
+#include "Components/Modbus/ModbusRTU.h"
+#include "Components/Modbus/ModbusTCP.h"
+#include "Components/Wallbox/DummyWallbox.h"
+#include "Components/Wallbox/HeidelbergWallbox.h"
+
+IWallbox *gWallbox{nullptr};
 
 void setup()
 {
@@ -16,24 +17,26 @@ void setup()
   Serial.printf("Build date: %s\n", __DATE__);
   Serial.println("");
 
-  // Initialize persistent settings
-  PersistentSettings::Init();
-
   // Make sure WiFi connection is up and running
   WifiConnection::Init();
 
   // Initialize all other modules
-  Modbus::Init();
-  Wallbox::PrintWallboxInfo();
-  Wallbox::WriteInitialConfiguration();
-  OTAUpdater::Init();
-  OCPPManager::Init();
+#ifndef DUMMY_WALLBOX
+  Serial.println("Starting with Heidelberg wallbox in real mode");
+  ModbusRTU::Instance()->Init();
+  gWallbox = HeidelbergWallbox::Instance();
+#else
+  Serial.println("Starting with dummy wallbox in simulated mode");
+  gWallbox = DummyWallbox::Instance();
+#endif
+
+  gWallbox->Init();
+  ModbusTCP::Init(gWallbox);
+
+  Serial.println("Setup complete");
 }
 
 void loop()
 {
-  // Update components
-  OTAUpdater::Loop();
-  OCPPManager::Loop();
   delay(1);
 }

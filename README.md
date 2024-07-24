@@ -5,7 +5,7 @@
 </div>
 <h1 align="center">Heidel<span style="color:#646bafff">Bridge</span></h1>
 
-Heidelbridge is a firmware for ESP32 microcontrollers. It allows you to bring your [Heidelberg wallbox](https://www.heidelberg-wallbox.eu) into you local WiFi network. This is done by turning your wallbox into a [OCPP](https://en.wikipedia.org/wiki/Open_Charge_Point_Protocol) compatible device. This way the wallbox can easily be integrated into home energy management systems, e.g. [evcc](https://github.com/evcc-io/evcc).
+Heidelbridge is a firmware for ESP32 microcontrollers. It allows you to bring your [Heidelberg wallbox](https://www.heidelberg-wallbox.eu) into you local WiFi network. This is done by turning your wallbox into a [Daheimladen](https://www.daheimladen.de/) compatible device. This way the wallbox can easily be integrated into home energy management systems, e.g. [evcc](https://github.com/evcc-io/evcc) (no sponsor token required!).
 
 ![PlatformIO CI Build](https://github.com/BorisBrock/Heidelbridge/actions/workflows/build.yml/badge.svg)
 ![Flawfinder Code Analysis](https://github.com/BorisBrock/Heidelbridge/actions/workflows/flawfinder.yml/badge.svg)
@@ -53,15 +53,6 @@ On first boot, the ESP32 will open up a Wifi access point. Connect to that netwo
 
 From the landing page, you can now connect to your home network. This connection will be stored permanenetly.
 
-> [!IMPORTANT]
-> In addition to the WiFi SSID/password, you also need to enter the address of your OCPP server, e.g. evcc. This address must include the protocol (ws://), the server's IP address and the port (usually :8887). Here's an example: `ws://192.168.178.90:8887`.
-
-## Updating The Firmware
-
-Once the firmware has been uploaded to the ESP32 via USB, it can be updated via OTA (Over The Air). This makes updating the software very convenient because no more physical access to the device is required.
-
-For this purpose, the platformio.ini contains two environments: OTA and USB.
-
 ## Resetting Connection Settings
 
 If you need to reset/change the settings of your HeidelBridge ESP32, simply erase its flash memory. With the next reboot you can access the WiFi setup page again and make the required changes.
@@ -104,8 +95,9 @@ Start by defining a new charger:
 chargers:
   - name: heidelberg_ec
     type: template
-    template: ocpp
-    timeout: 2m # optional
+    template: daheimladen-mb
+    host: 192.168.178.133 # IP address or hostname
+    port: 502 # Port (optional) 
 ```
 
 Next, add a loadpoint:
@@ -138,4 +130,4 @@ The following assets and libraries are used by this project:
 - [Async TCP Arduino library](https://github.com/mathieucarbou/AsyncTCP)
 - [ESP Async Webserver Arduino library](https://github.com/HenkHoldijk/mathieucarbou_ESPAsyncWebServer)
 - [Websockets Arduino library](https://github.com/Links2004/arduinoWebSockets)
-- [MicroOCPP Arduino library](https://github.com/matth-x/MicroOcpp)
+- [Daheimladen Modbus API](https://www.daheimladen.de/post/modbus-api)

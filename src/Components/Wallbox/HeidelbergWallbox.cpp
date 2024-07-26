@@ -12,7 +12,7 @@ HeidelbergWallbox *HeidelbergWallbox::Instance()
 void HeidelbergWallbox::Init()
 {
     uint16_t rawCurrent = static_cast<uint16_t>(Constants::HeidelbergWallbox::FailSafeCurrentA / Constants::HeidelbergWallbox::CurrentFactor);
-    Serial.printf("Heidelberg wallbox: Initializing fail safe current with %d (raw)", rawCurrent);
+    Serial.printf("Heidelberg wallbox: Initializing fail safe current with %d (raw)\n", rawCurrent);
     if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::FailsafeCurrent, rawCurrent))
     {
         // Error writing modbus register
@@ -20,7 +20,7 @@ void HeidelbergWallbox::Init()
     }
 
     uint16_t standbyDisabled = 4;
-    Serial.printf("Heidelberg wallbox: Initializing standby mode with %d (raw)", standbyDisabled);
+    Serial.printf("Heidelberg wallbox: Initializing standby mode with %d (raw)\n", standbyDisabled);
     if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::DisableStandby, standbyDisabled))
     {
         // Error writing modbus register

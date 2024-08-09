@@ -2,14 +2,6 @@
 
 namespace Constants
 {
-    namespace WiFi
-    {
-        constexpr const char *HotspotSSID = "HeidelBridge";
-        constexpr const char *HotspotPassword = "heidelbridge";
-        constexpr const char *CaptivePortalTitle = "WiFi Setup";
-        constexpr const char *HostName = "heidelbridge";
-    };
-
     namespace HeidelbergWallbox
     {
         constexpr float FailSafeCurrentA = 16.0f;

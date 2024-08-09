@@ -8,32 +8,11 @@
    stroke-linejoin="round"
    xml:space="preserve"
    id="svg134"
-   sodipodi:docname="graph.svg"
    width="3386"
    height="905"
-   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:ooo="http://xml.openoffice.org/svg/export"><sodipodi:namedview
-   id="namedview134"
-   pagecolor="#ffffff"
-   bordercolor="#000000"
-   borderopacity="0.25"
-   inkscape:showpageshadow="2"
-   inkscape:pageopacity="0.0"
-   inkscape:pagecheckerboard="0"
-   inkscape:deskcolor="#d1d1d1"
-   inkscape:zoom="0.17178027"
-   inkscape:cx="2276.1635"
-   inkscape:cy="1743.5063"
-   inkscape:window-width="1920"
-   inkscape:window-height="1011"
-   inkscape:window-x="0"
-   inkscape:window-y="0"
-   inkscape:window-maximized="1"
-   inkscape:current-layer="svg134" />
+   xmlns:ooo="http://xml.openoffice.org/svg/export">
  <defs
    class="ClipPathGroup"
    id="defs2">
@@ -57,7 +36,85 @@
    height="19012"
    id="rect2" />
   </clipPath>
- </defs>
+ 
+    
+   
+     
+    <clipPath
+   clipPathUnits="userSpaceOnUse"
+   id="clipPath135"><g
+     id="g136"><rect
+       x="0"
+       y="0"
+       width="33867"
+       height="19050"
+       id="rect135" /></g></clipPath>
+       
+      
+       
+      
+       
+      
+       
+      
+       
+      
+       
+      
+       
+      
+       
+      
+       
+      
+        
+        
+        
+        
+       
+       
+      
+        
+        
+        
+        
+       
+        
+        
+       
+        
+        
+        
+        
+       
+        
+        
+        
+        
+       
+        
+        
+        
+        
+       
+        
+        
+       
+        
+        
+        
+        
+       
+        
+        
+        
+        
+       
+        
+        
+        
+        
+       </defs>
  <defs
    id="defs3">
   <g
@@ -740,21 +797,11 @@
    visibility="hidden"
    id="g133">
    <g
-   id="container-id1">
-    <g
-   id="id1"
-   class="Slide"
-   clip-path="url(#presentation_clip_path)">
-     <g
    ooo:name="page2"
    class="Page"
-   id="g132">
-      <g
-   class="com.sun.star.drawing.CustomShape"
-   id="g95">
-       <g
-   id="id8">
-        <rect
+   id="g132"
+   clip-path="url(#clipPath135)">
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -762,20 +809,17 @@
    y="5073"
    width="5233"
    height="2589"
-   id="rect92" />
-        <path
+   id="rect92" /><path
    fill="#646baf"
    stroke="none"
    d="M 3011,7634 H 422 V 5100 h 5178 v 2534 z"
-   id="path92" />
-        <path
+   id="path92" /><path
    fill="none"
    stroke="#ffffff"
    stroke-width="53"
    stroke-linejoin="miter"
    d="M 3011,7634 H 422 V 5100 h 5178 v 2534 z"
-   id="path93" />
-        <text
+   id="path93" /><text
    class="SVGTextShape"
    id="text95"><tspan
      class="TextParagraph"
@@ -791,14 +835,7 @@
          stroke="none"
          style="white-space:pre"
          id="tspan93">evcc</tspan></tspan></tspan></text>
-       </g>
-      </g>
-      <g
-   class="com.sun.star.drawing.CustomShape"
-   id="g100">
-       <g
-   id="id9">
-        <rect
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -806,20 +843,17 @@
    y="3473"
    width="7316"
    height="5751"
-   id="rect95" />
-        <path
+   id="rect95" /><path
    fill="#646baf"
    stroke="none"
    d="M 29769,9196 H 26138 V 3500 h 7261 v 5696 z"
-   id="path95" />
-        <path
+   id="path95" /><path
    fill="none"
    stroke="#ffffff"
    stroke-width="53"
    stroke-linejoin="miter"
    d="M 29769,9196 H 26138 V 3500 h 7261 v 5696 z"
-   id="path96" />
-        <text
+   id="path96" /><text
    class="SVGTextShape"
    id="text100"><tspan
      class="TextParagraph"
@@ -846,14 +880,7 @@
          stroke="none"
          style="white-space:pre"
          id="tspan98">(Heidelberg Energy Control)</tspan></tspan></tspan></text>
-       </g>
-      </g>
-      <g
-   class="com.sun.star.drawing.CustomShape"
-   id="g103">
-       <g
-   id="id10">
-        <rect
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -861,20 +888,17 @@
    y="2673"
    width="12382"
    height="7355"
-   id="rect100" />
-        <path
+   id="rect100" /><path
    fill="#646baf"
    stroke="none"
    d="M 16523,10000 H 10359 V 2700 h 12327 v 7300 z"
-   id="path100" />
-        <path
+   id="path100" /><path
    fill="none"
    stroke="#ffffff"
    stroke-width="53"
    stroke-linejoin="miter"
    d="M 16523,10000 H 10359 V 2700 h 12327 v 7300 z"
-   id="path101" />
-        <text
+   id="path101" /><text
    class="SVGTextShape"
    id="text103"><tspan
      class="TextParagraph"
@@ -890,14 +914,7 @@
          stroke="none"
          style="white-space:pre"
          id="tspan101">HeidelBridge</tspan></tspan></tspan></text>
-       </g>
-      </g>
-      <g
-   class="com.sun.star.drawing.CustomShape"
-   id="g108">
-       <g
-   id="id11">
-        <rect
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -905,20 +922,17 @@
    y="4759"
    width="4558"
    height="4218"
-   id="rect103" />
-        <path
+   id="rect103" /><path
    fill="#646baf"
    stroke="none"
    d="M 19652,8949 H 17400 V 4786 h 4503 v 4163 z"
-   id="path103" />
-        <path
+   id="path103" /><path
    fill="none"
    stroke="#ffffff"
    stroke-width="53"
    stroke-linejoin="miter"
    d="M 19652,8949 H 17400 V 4786 h 4503 v 4163 z"
-   id="path104" />
-        <text
+   id="path104" /><text
    class="SVGTextShape"
    id="text108"><tspan
      class="TextParagraph"
@@ -945,14 +959,7 @@
          stroke="none"
          style="white-space:pre"
          id="tspan106">Client</tspan></tspan></tspan></text>
-       </g>
-      </g>
-      <g
-   class="com.sun.star.drawing.CustomShape"
-   id="g113">
-       <g
-   id="id12">
-        <rect
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -960,20 +967,17 @@
    y="4759"
    width="4558"
    height="4218"
-   id="rect108" />
-        <path
+   id="rect108" /><path
    fill="#646baf"
    stroke="none"
    d="M 13347,8949 H 11095 V 4786 h 4503 v 4163 z"
-   id="path108" />
-        <path
+   id="path108" /><path
    fill="none"
    stroke="#ffffff"
    stroke-width="53"
    stroke-linejoin="miter"
    d="M 13347,8949 H 11095 V 4786 h 4503 v 4163 z"
-   id="path109" />
-        <text
+   id="path109" /><text
    class="SVGTextShape"
    id="text113"><tspan
      class="TextParagraph"
@@ -1000,14 +1004,7 @@
          stroke="none"
          style="white-space:pre"
          id="tspan111">Server</tspan></tspan></tspan></text>
-       </g>
-      </g>
-      <g
-   class="com.sun.star.drawing.ConnectorShape"
-   id="g115">
-       <g
-   id="id13">
-        <rect
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -1015,32 +1012,22 @@
    y="6709"
    width="1803"
    height="319"
-   id="rect113" />
-        <path
+   id="rect113" /><path
    fill="none"
    stroke="#ffffff"
    stroke-width="106"
    stroke-linejoin="miter"
    d="m 15896,6868 h 1208"
-   id="path113" />
-        <path
+   id="path113" /><path
    fill="#ffffff"
    stroke="none"
    d="m 15599,6868 318,-159 v 318 z"
-   id="path114" />
-        <path
+   id="path114" /><path
    fill="#ffffff"
    stroke="none"
    d="m 17401,6868 -318,159 v -318 z"
    id="path115" />
-       </g>
-      </g>
-      <g
-   class="com.sun.star.drawing.ConnectorShape"
-   id="g118">
-       <g
-   id="id14">
-        <rect
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -1048,32 +1035,22 @@
    y="6192"
    width="4761"
    height="334"
-   id="rect115" />
-        <path
+   id="rect115" /><path
    fill="none"
    stroke="#646baf"
    stroke-width="106"
    stroke-linejoin="miter"
    d="m 5897,6366 4166,-15"
-   id="path116" />
-        <path
+   id="path116" /><path
    fill="#646baf"
    stroke="none"
    d="m 5600,6367 317,-160 2,318 z"
-   id="path117" />
-        <path
+   id="path117" /><path
    fill="#646baf"
    stroke="none"
    d="m 10360,6350 -317,160 -2,-318 z"
    id="path118" />
-       </g>
-      </g>
-      <g
-   class="com.sun.star.drawing.ConnectorShape"
-   id="g121">
-       <g
-   id="id15">
-        <rect
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -1081,32 +1058,22 @@
    y="6189"
    width="3453"
    height="321"
-   id="rect118" />
-        <path
+   id="rect118" /><path
    fill="none"
    stroke="#646baf"
    stroke-width="106"
    stroke-linejoin="miter"
    d="m 22984,6350 2858,-2"
-   id="path119" />
-        <path
+   id="path119" /><path
    fill="#646baf"
    stroke="none"
    d="m 22687,6350 318,-159 v 318 z"
-   id="path120" />
-        <path
+   id="path120" /><path
    fill="#646baf"
    stroke="none"
    d="m 26139,6348 -318,159 v -318 z"
    id="path121" />
-       </g>
-      </g>
-      <g
-   class="com.sun.star.drawing.CustomShape"
-   id="g128">
-       <g
-   id="id16">
-        <rect
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -1114,8 +1081,7 @@
    y="5200"
    width="6004"
    height="2795"
-   id="rect121" />
-        <text
+   id="rect121" /><text
    class="SVGTextShape"
    id="text128"><tspan
      class="TextParagraph"
@@ -1155,14 +1121,7 @@
          stroke="none"
          style="white-space:pre"
          id="tspan126">Daheimladen API</tspan></tspan></tspan></text>
-       </g>
-      </g>
-      <g
-   class="com.sun.star.drawing.CustomShape"
-   id="g131">
-       <g
-   id="id17">
-        <rect
+      <rect
    class="BoundingBox"
    stroke="none"
    fill="none"
@@ -1170,8 +1129,7 @@
    y="5199"
    width="6015"
    height="1016"
-   id="rect128" />
-        <text
+   id="rect128" /><text
    class="SVGTextShape"
    id="text131"><tspan
      class="TextParagraph"
@@ -1187,11 +1145,9 @@
          stroke="none"
          style="white-space:pre"
          id="tspan129">Modbus</tspan></tspan></tspan></text>
-       </g>
-      </g>
      </g>
-    </g>
-   </g>
+   
+  
   </g>
  </g>
  <script

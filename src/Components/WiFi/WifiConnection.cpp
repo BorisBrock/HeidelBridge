@@ -5,27 +5,44 @@
 
 namespace WifiConnection
 {
-    WiFiManager gWifiManager;
+    const char *ssid = "YourSSID";
+    const char *password = "YourPassword";
+
+    void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
+    {
+        Serial.println("Connected to AP successfully!");
+    }
+
+    void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info)
+    {
+        Serial.println("WiFi connected");
+        Serial.println("IP address: ");
+        Serial.println(WiFi.localIP());
+    }
+
+    void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
+    {
+        Serial.println("Disconnected from WiFi access point");
+        Serial.print("WiFi lost connection. Reason: ");
+        Serial.println(info.wifi_sta_disconnected.reason);
+        Serial.println("Trying to reconnect");
+        WiFi.begin(ssid, password);
+    }
 
     void Init()
     {
-        Serial.print("Starting WiFi Manager");
+        // Delete old config
+        Serial.println("Preparing Wifi");
+        WiFi.disconnect(true);
+        delay(100);
 
-        WiFi.hostname(Constants::WiFi::HostName);
-        gWifiManager.setDebugOutput(false);
-        gWifiManager.setConfigPortalTimeout(180);
-        gWifiManager.setTitle(Constants::WiFi::CaptivePortalTitle);
+        // Register WiFi events
+        WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
+        WiFi.onEvent(WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
+        WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
-        // Hide everything except the wifi button
-        std::vector<const char *> menu = {"wifi"};
-        gWifiManager.setMenu(menu);
-
-        // Open up the access point
-        gWifiManager.autoConnect(Constants::WiFi::HotspotSSID, Constants::WiFi::HotspotPassword);
-
-        // If we got here, connection was established successfully
-        Serial.println("WiFi setup completed successfully");
-        Serial.print("Local IP address: ");
-        Serial.println(WiFi.localIP());
+        // Start Wifi connection
+        Serial.println("Connecting WiFi");
+        WiFi.begin(ssid, password);
     }
 };

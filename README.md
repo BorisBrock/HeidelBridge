@@ -14,9 +14,7 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 ---
 
-# Project Status
-
-:warning: This project is in a very early development stage. It is not yet ready for productive use.
+![graph](img/graph.svg)
 
 ---
 
@@ -25,7 +23,7 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 You only need two components for this project: an ESP32 microcontroller and a MAX485 module. Both are available in large quantities and at reasonable prices on the Internet. You will also need a breadboard and a few jumper wires. All in all, it shouldn't cost you more than 10$.
 
 Parts list:
-- ESP32 microcontroller (ESP classic, ESP32 C3, C6, S2 etc.)*
+- ESP32 microcontroller*
 - MAX485 breakout board
 - 6 jumper wires
 - A breadboard
@@ -33,29 +31,18 @@ Parts list:
 This should be enough for quickly putting together a fully functioning prototype.
 Of course a well designed PCB would be much nicer, but this is still work in progress. Once the design is ready, the schematics will be available *right here*.
 
-> *\* This project is currently based on the ESP32 classic. It has not been built/tested for newer models, lice the S2 and C3. Hopefully this will change soon.*
+> *\* This project is currently based on the classic ESP32. It has not been built/tested for newer models, like the S2 and C6.*
 
 ---
 
 # Setting Up The ESP32
 
-## Initial Programming
+## Programming your ESP32
 
-For the initial programming, clone or download this repository. Then compile the project using PlatformIO.
-Now connect your ESP32 via USB and upload the firmware.
-
-## WiFi Setup
-
-On first boot, the ESP32 will open up a Wifi access point. Connect to that network with any smartphone or laptop.
-
-- **SSID**: `HeidelBridge`
-- **Password**: `heidelbridge`
-
-From the landing page, you can now connect to your home network. This connection will be stored permanenetly.
-
-## Resetting Connection Settings
-
-If you need to reset/change the settings of your HeidelBridge ESP32, simply erase its flash memory. With the next reboot you can access the WiFi setup page again and make the required changes.
+- Start by cloning or downloading this repository.
+- Change the SSID and password in `WifiConnection.cpp` to match your home network settings.
+- Compile the project.
+- Now connect your ESP32 via USB and upload the firmware.
 
 ---
 

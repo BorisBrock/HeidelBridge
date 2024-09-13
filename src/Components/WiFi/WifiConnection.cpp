@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <WiFiManager.h>
+#include <WiFi.h>
 #include "../../Configuration/Constants.h"
 #include "WifiConnection.h"
 
@@ -42,7 +42,8 @@ namespace WifiConnection
         WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
         // Start Wifi connection
-        Serial.println("Connecting WiFi");
+        Serial.print("Connecting WiFi, SSID: ");
+        Serial.println(ssid);
         WiFi.begin(ssid, password);
     }
 };

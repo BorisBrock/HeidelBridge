@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "Configuration/Version.h"
 #include "Components/WiFi/WifiConnection.h"
 #include "Components/Modbus/ModbusRTU.h"
 #include "Components/Modbus/ModbusTCP.h"
@@ -14,7 +15,8 @@ void setup()
 
   // Print version info
   Serial.println("Booting HeidelBridge");
-  Serial.printf("Build date: %s\n", __DATE__);
+  Serial.printf("  Version: %d.%d.%d\n", Version::Major, Version::Minor, Version::Patch);
+  Serial.printf("  Build date: %s\n", __DATE__);
   Serial.println("");
 
   // Make sure WiFi connection is up and running

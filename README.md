@@ -13,7 +13,7 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 ---
 
-![graph](img/graph.png)
+![graph](img/graph.svg)
 
 ---
 

@@ -2,12 +2,10 @@
 #include <WiFi.h>
 #include "../../Configuration/Constants.h"
 #include "WifiConnection.h"
+#include "../../Configuration/Credentials.h"
 
 namespace WifiConnection
 {
-    const char *ssid = "YourSSID";
-    const char *password = "YourPassword";
-
     void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
     {
         Serial.println("Connected to AP successfully!");
@@ -26,7 +24,7 @@ namespace WifiConnection
         Serial.print("WiFi lost connection. Reason: ");
         Serial.println(info.wifi_sta_disconnected.reason);
         Serial.println("Trying to reconnect");
-        WiFi.begin(ssid, password);
+        WiFi.begin(Credentials::WiFi_SSID, Credentials::WiFi_Password);
     }
 
     void Init()
@@ -43,7 +41,7 @@ namespace WifiConnection
 
         // Start Wifi connection
         Serial.print("Connecting WiFi, SSID: ");
-        Serial.println(ssid);
-        WiFi.begin(ssid, password);
+        Serial.println(Credentials::WiFi_SSID);
+        WiFi.begin(Credentials::WiFi_SSID, Credentials::WiFi_Password);
     }
 };

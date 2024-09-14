@@ -39,7 +39,8 @@ Of course a well designed PCB would be much nicer, but this is still work in pro
 ## Programming your ESP32
 
 - Start by cloning or downloading this repository.
-- Change the SSID and password in `WifiConnection.cpp` to match your home network settings.
+- Copy the file `Credentials.cpp.template` to `Credentials.cpp`.
+- Change the SSID and password in `Credentials.cpp` to match your home network settings.
 - Compile the project.
 - Now connect your ESP32 via USB and upload the firmware.
 

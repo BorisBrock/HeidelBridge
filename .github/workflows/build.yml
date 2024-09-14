@@ -33,5 +33,9 @@ jobs:
       - name: Installing PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build PlatformIO examples
+      - name: Provide Credentials File
+        run: |
+          cp src/Configuration/Credentials.cpp.template src/Configuration/Credentials.cpp
+
+      - name: Build HeidelBridge
         run: pio ci --project-conf platformio.ini --verbose ./

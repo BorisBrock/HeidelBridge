@@ -2,6 +2,11 @@
 
 namespace Constants
 {
+    namespace ModbusRTU
+    {
+        constexpr uint8_t RegisterSize = 2;
+    };
+
     namespace HeidelbergWallbox
     {
         constexpr float FailSafeCurrentA = 16.0f;
@@ -56,5 +61,18 @@ namespace Constants
         constexpr float VoltageFactor = 10.0f;
         constexpr float CurrentFactor = 10.0f;
         constexpr float EnergyFactor = 10.0f;
+    };
+
+    namespace WiFi
+    {
+        constexpr uint16_t MaxNumWifiClients = 8;
+    };
+
+    namespace MQTT
+    {
+        constexpr bool Enabled = true;
+        constexpr uint16_t Port = 1883;
+        constexpr uint16_t ReconnectIntervalMs = 2000;
+        constexpr uint16_t PublishIntervalMs = 1000;
     };
 };

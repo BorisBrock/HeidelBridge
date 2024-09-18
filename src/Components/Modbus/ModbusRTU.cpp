@@ -8,7 +8,7 @@
 
 ModbusClientRTU gModbusRTU(Pins::PinRTS); // Create a ModbusRTU client instance
 HardwareSerial gRs485Serial(1);           // Define a Serial for UART1
-constexpr uint8_t RegisterSize = 2;
+SemaphoreHandle_t gMutex = nullptr;       // A mutex object for buss access
 
 ModbusRTU *ModbusRTU::Instance()
 {
@@ -18,6 +18,9 @@ ModbusRTU *ModbusRTU::Instance()
 
 void ModbusRTU::Init()
 {
+    // Create the mutex
+    gMutex = xSemaphoreCreateMutex();
+
     // Init serial conneted to the RTU Modbus
     Serial.println("Starting RS485 hardware serial");
     RTUutils::prepareHardwareSerial(gRs485Serial);
@@ -35,51 +38,69 @@ void ModbusRTU::Init()
 
 bool ModbusRTU::ReadRegisters(uint16_t startAddress, uint8_t numValues, uint8_t fc, uint16_t *values)
 {
-    ModbusMessage response = gModbusRTU.syncRequest(
-        0,
-        Constants::HeidelbergWallbox::ModbusServerId,
-        (FunctionCode)fc,
-        startAddress,
-        numValues);
+    // Try to get the mutex
+    if (xSemaphoreTake(gMutex, portMAX_DELAY))
+    {
+        ModbusMessage response = gModbusRTU.syncRequest(
+            0,
+            Constants::HeidelbergWallbox::ModbusServerId,
+            (FunctionCode)fc,
+            startAddress,
+            numValues);
 
-    if (response.getError() == SUCCESS)
-    {
-        constexpr uint16_t startIndex = 3;
-        for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
+        // Free mutex
+        xSemaphoreGive(gMutex);
+
+        if (response.getError() == SUCCESS)
         {
-            response.get(startIndex + wordIndex * RegisterSize, values[wordIndex]);
+            constexpr uint16_t startIndex = 3;
+            for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
+            {
+                response.get(startIndex + wordIndex * Constants::ModbusRTU::RegisterSize, values[wordIndex]);
+            }
+            return true;
         }
-        return true;
-    }
-    else
-    {
-        Serial.print("ModbusRTU read error: ");
-        Serial.println(response.getError());
-        for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
+        else
         {
-            values[wordIndex] = 0;
+            Serial.print("ModbusRTU read error: ");
+            Serial.println(response.getError());
+            for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
+            {
+                values[wordIndex] = 0;
+            }
+            return false;
         }
-        return false;
     }
+
+    return false;
 }
 
 bool ModbusRTU::WriteHoldRegister16(uint16_t address, uint16_t value)
 {
-    ModbusMessage response = gModbusRTU.syncRequest(
-        0,
-        Constants::HeidelbergWallbox::ModbusServerId,
-        WRITE_HOLD_REGISTER,
-        address,
-        value);
+    // Try to get the mutex
+    if (xSemaphoreTake(gMutex, portMAX_DELAY))
+    {
+        ModbusMessage response = gModbusRTU.syncRequest(
+            0,
+            Constants::HeidelbergWallbox::ModbusServerId,
+            WRITE_HOLD_REGISTER,
+            address,
+            value);
 
-    if (response.getError() == SUCCESS)
-    {
-        return true;
+        // Free mutex
+        xSemaphoreGive(gMutex);
+
+        if (response.getError() == SUCCESS)
+        {
+            return true;
+        }
+        else
+        {
+            Serial.print("ModbusRTU write error: ");
+            Serial.println(response.getError());
+            return false;
+        }
     }
-    else
-    {
-        Serial.print("ModbusRTU write error: ");
-        Serial.println(response.getError());
-        return false;
-    }
+
+    return false;
 }

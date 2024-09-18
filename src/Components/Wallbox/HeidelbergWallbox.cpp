@@ -28,7 +28,7 @@ void HeidelbergWallbox::Init()
     }
 }
 
-WallboxState HeidelbergWallbox::GetState()
+VehicleState HeidelbergWallbox::GetState()
 {
     uint16_t registerValue[0];
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::ChargingState, 1, 0x4, registerValue))
@@ -36,15 +36,15 @@ WallboxState HeidelbergWallbox::GetState()
         Serial.printf("Heidelberg wallbox: Read state: %d\n", registerValue[0]);
         if (registerValue[0] <= 3)
         {
-            mState = WallboxState::Standby;
+            mState = VehicleState::Disconnected;
         }
         else if (registerValue[0] <= 5)
         {
-            mState = WallboxState::Connected;
+            mState = VehicleState::Connected;
         }
         else if (registerValue[0] <= 7)
         {
-            mState = WallboxState::Charging;
+            mState = VehicleState::Charging;
         }
     }
     else

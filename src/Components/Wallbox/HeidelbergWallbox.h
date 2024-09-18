@@ -13,7 +13,7 @@ public:
 
 #pragma region IWallbox
     virtual void Init() override;
-    virtual WallboxState GetState() override;
+    virtual VehicleState GetState() override;
     virtual bool SetChargingCurrentLimit(float currentLimitA) override;
     virtual float GetChargingCurrentLimit() override;
     virtual float GetEnergyMeterValue() override;
@@ -24,8 +24,7 @@ public:
 #pragma endregion IWallbox
 
 private:
-    WallboxState mState{WallboxState::Standby};
-    bool mIsChargingAllowed = false;
+    VehicleState mState{VehicleState::Disconnected};
     float mChargingCurrentLimitA{Constants::HeidelbergWallbox::InitialChargingCurrentLimitA};
     float mFailsafeCurrentA{0.0f};
     float mLastPowerMeterValueW{0.0f};

@@ -23,8 +23,9 @@ namespace WifiConnection
         Serial.println("Disconnected from WiFi access point");
         Serial.print("WiFi lost connection. Reason: ");
         Serial.println(info.wifi_sta_disconnected.reason);
+
         Serial.println("Trying to reconnect");
-        WiFi.begin(Credentials::WiFi_SSID, Credentials::WiFi_Password);
+        WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
     }
 
     void Init()
@@ -41,7 +42,7 @@ namespace WifiConnection
 
         // Start Wifi connection
         Serial.print("Connecting WiFi, SSID: ");
-        Serial.println(Credentials::WiFi_SSID);
-        WiFi.begin(Credentials::WiFi_SSID, Credentials::WiFi_Password);
+        Serial.println(Credentials::WiFi::SSID);
+        WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
     }
 };

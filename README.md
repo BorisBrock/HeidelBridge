@@ -101,6 +101,48 @@ Start evcc with your new configuration and the HeidelBridge should be there.
 
 ---
 
+# Setting up Home Assistant
+
+HeidelBridge offers a simple MQTT API (see below). Via this API, HeidelBridge can easily be added to Home Assistant.
+To do so, add the following to your `configuration.yaml`:
+
+```
+mqtt: !include mqtt.yaml
+```
+
+Also create a new file called `mqtt.yaml` and paste the example code from [here](doc/mqtt.yaml) into that file.
+Now Home Assistant should have all the entities provided by the HeidelBridge MQTT API.
+
+GUI Example:
+
+![graph](img/home_assistant.png)
+
+---
+
+# MQTT API
+
+The following topics are published by HeidelBridge:
+
+| Topic                                | Unit | Data Type | Description                                                             |
+| ------------------------------------ | ---- | --------- | ----------------------------------------------------------------------- |
+| heidelbridge/version                 | -    | String    | The version of the HeidelBridge firmware (e.g. 1.0.0).                  |
+| heidelbridge/build_date              | -    | String    | Build date of the HeidelBridge firmware.                                |
+| heidelbridge/is_vehicle_connected    | -    | Integer   | Boolean (0 or 1) indicating if a vehicle is connected.                  |
+| heidelbridge/is_vehicle_charging     | -    | Integer   | Boolean (0 or 1) indicating if a vehicle is charging.                   |
+| heidelbridge/vehicle_state           | -    | String    | 'disconnected', 'connected' or 'charging'.                              |
+| heidelbridge/charging_current_limit  | A    | Float     | Charging current limit in Ampere.                                       |
+| heidelbridge/charging_power          | W    | Float     | Momentary charging power in Watt.                                       |
+| heidelbridge/failsafe_current        | A    | Float     | Current the wallbox will fall back to in case of a communication error. |
+| heidelbridge/energy_meter            | Wh   | Float     | Total charged energy so far.                                            |
+| heidelbridge/charging_current/phase1 | A    | Float     | Momentary charging current on phase 1.                                  |
+| heidelbridge/charging_current/phase2 | A    | Float     | Momentary charging current on phase 2.                                  |
+| heidelbridge/charging_current/phase3 | A    | Float     | Momentary charging current on phase 3.                                  |
+| heidelbridge/charging_voltage/phase1 | V    | Float     | Momentary charging voltage on phase 1.                                  |
+| heidelbridge/charging_voltage/phase2 | V    | Float     | Momentary charging voltage on phase 2.                                  |
+| heidelbridge/charging_voltage/phase3 | V    | Float     | Momentary charging voltage on phase 3.                                  |
+
+---
+
 # Contribution
 
 :heart: Help is welcome! Do you own a Heidelberg Energy Control wallbox? Are you a Modbus expert? Do you have ideas for improvements? Did you find a bug? Feel free to review the code, create pull requests, open issues or contact me directly.
@@ -116,4 +158,5 @@ The following assets and libraries are used by this project:
 - [Async TCP Arduino library](https://github.com/mathieucarbou/AsyncTCP)
 - [ESP Async Webserver Arduino library](https://github.com/HenkHoldijk/mathieucarbou_ESPAsyncWebServer)
 - [Websockets Arduino library](https://github.com/Links2004/arduinoWebSockets)
+- [Async MQTT Client](https://github.com/marvinroger/async-mqtt-client)
 - [Daheimladen Modbus API](https://www.daheimladen.de/post/modbus-api)

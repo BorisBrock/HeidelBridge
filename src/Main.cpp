@@ -1,10 +1,12 @@
 #include <Arduino.h>
+#include "Configuration/Constants.h"
 #include "Configuration/Version.h"
 #include "Components/WiFi/WifiConnection.h"
 #include "Components/Modbus/ModbusRTU.h"
 #include "Components/Modbus/ModbusTCP.h"
 #include "Components/Wallbox/DummyWallbox.h"
 #include "Components/Wallbox/HeidelbergWallbox.h"
+#include "Components/MQTT/MQTTManager.h"
 
 IWallbox *gWallbox{nullptr};
 
@@ -35,6 +37,12 @@ void setup()
 
   // Start Modbus TCP server
   ModbusTCP::Init(gWallbox);
+
+  // Set up MQTT
+  if (Constants::MQTT::Enabled)
+  {
+    MQTTManager::Init(gWallbox);
+  }
 
   Serial.println("Setup complete");
 }

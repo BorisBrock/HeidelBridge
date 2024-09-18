@@ -13,17 +13,17 @@ void DummyWallbox::Init()
     Serial.println("Dummy wallbox: initializing");
 }
 
-WallboxState DummyWallbox::GetState()
+VehicleState DummyWallbox::GetState()
 {
     if (mChargingCurrentLimitA > 0.0f)
     {
         Serial.println("Dummy wallbox: returning state CHARGING");
-        return WallboxState::Charging;
+        return VehicleState::Charging;
     }
     else
     {
         Serial.println("Dummy wallbox: returning state CONNECTED");
-        return WallboxState::Connected;
+        return VehicleState::Connected;
     }
 }
 

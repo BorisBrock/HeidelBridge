@@ -82,17 +82,21 @@ namespace MQTTManager
                 break;
             case (MqttPublishedValues::ChargingCurrent):
                 float c1, c2, c3;
-                gWallbox->GetChargingCurrents(c1, c2, c3);
-                gMqttClient.publish("heidelbridge/charging_current/phase1", 0, false, String(c1).c_str());
-                gMqttClient.publish("heidelbridge/charging_current/phase2", 0, false, String(c2).c_str());
-                gMqttClient.publish("heidelbridge/charging_current/phase3", 0, false, String(c3).c_str());
+                if (gWallbox->GetChargingCurrents(c1, c2, c3))
+                {
+                    gMqttClient.publish("heidelbridge/charging_current/phase1", 0, false, String(c1).c_str());
+                    gMqttClient.publish("heidelbridge/charging_current/phase2", 0, false, String(c2).c_str());
+                    gMqttClient.publish("heidelbridge/charging_current/phase3", 0, false, String(c3).c_str());
+                }
                 break;
             case (MqttPublishedValues::ChargingVoltage):
                 float v1, v2, v3;
-                gWallbox->GetChargingVoltages(v1, v2, v3);
-                gMqttClient.publish("heidelbridge/charging_voltage/phase1", 0, false, String(v1).c_str());
-                gMqttClient.publish("heidelbridge/charging_voltage/phase2", 0, false, String(v2).c_str());
-                gMqttClient.publish("heidelbridge/charging_voltage/phase3", 0, false, String(v3).c_str());
+                if (gWallbox->GetChargingVoltages(v1, v2, v3))
+                {
+                    gMqttClient.publish("heidelbridge/charging_voltage/phase1", 0, false, String(v1).c_str());
+                    gMqttClient.publish("heidelbridge/charging_voltage/phase2", 0, false, String(v2).c_str());
+                    gMqttClient.publish("heidelbridge/charging_voltage/phase3", 0, false, String(v3).c_str());
+                }
                 break;
             }
             gCurValueIndex = (gCurValueIndex + 1) % NumMqttPublishedValues;

@@ -35,6 +35,10 @@ namespace WifiConnection
         WiFi.disconnect(true);
         delay(100);
 
+        // Set host name
+        WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+        WiFi.setHostname("HeidelBridge");
+
         // Register WiFi events
         WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
         WiFi.onEvent(WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);

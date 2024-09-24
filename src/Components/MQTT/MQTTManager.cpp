@@ -21,6 +21,9 @@ namespace MQTTManager
     IWallbox *gWallbox = nullptr;
     uint8_t gCurValueIndex = 0;
 
+    // Topics
+    String ChargingCurrentControl = "heidelbridge/control/charging_current_limit";
+
     constexpr uint16_t NumMqttPublishedValues = 7;
     enum MqttPublishedValues
     {
@@ -107,6 +110,9 @@ namespace MQTTManager
     {
         Serial.println("Connected to MQTT");
 
+        // Subscribe to control topics
+        gMqttClient.subscribe(ChargingCurrentControl.c_str(), 2);
+
         // Publish version information
         String versionString = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
         gMqttClient.publish("heidelbridge/version", 0, true, versionString.c_str());
@@ -120,7 +126,12 @@ namespace MQTTManager
 
     void OnMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
     {
-        // Ignore incoming messages for now
+        if (ChargingCurrentControl == topic)
+        {
+            float current = String(payload, len).toFloat();
+            Serial.printf("Received MQTT control command: charging current limit = %f\n", current);
+            gWallbox->SetChargingCurrentLimit(current);
+        }
     }
 
     void OnMqttPublish(uint16_t packetId)

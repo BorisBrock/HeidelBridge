@@ -141,6 +141,12 @@ The following topics are published by HeidelBridge:
 | heidelbridge/charging_voltage/phase2 | V    | Float     | Momentary charging voltage on phase 2.                                  |
 | heidelbridge/charging_voltage/phase3 | V    | Float     | Momentary charging voltage on phase 3.                                  |
 
+The following topics are subscribed by HeidelBridge. Use these to control your wallbox:
+
+| Topic                                        | Unit | Data Type | Description                                                             |
+| -------------------------------------------- | ---- | --------- | ----------------------------------------------------------------------- |
+| heidelbridge/control/charging_current_limit  | A    | Float     | Charging current limit in Ampere.                                       |
+
 ---
 
 # Contribution

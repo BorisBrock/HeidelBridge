@@ -19,6 +19,7 @@ public:
     virtual float GetEnergyMeterValue() override;
     virtual float GetFailsafeCurrent() override;
     virtual float GetChargingPower() override;
+    virtual float GetTemperature() override;
     virtual bool GetChargingCurrents(float &c1A, float &c2A, float &c3A) override;
     virtual bool GetChargingVoltages(float &v1V, float &v2V, float &v3V) override;
 #pragma endregion IWallbox

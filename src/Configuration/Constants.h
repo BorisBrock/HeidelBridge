@@ -12,6 +12,7 @@ namespace Constants
         constexpr float FailSafeCurrentA = 16.0f;
         constexpr float CurrentFactor = 0.1f;
         constexpr float VoltageFactor = 1.0f;
+        constexpr float TemperatureFactor = 0.1f;
         constexpr float InitialChargingCurrentLimitA = 16.0f;
         constexpr uint8_t ModbusServerId = 1;
         constexpr uint16_t ModbusBaudrate = 19200;
@@ -28,6 +29,7 @@ namespace Constants
         constexpr uint16_t FailsafeCurrent = 262;
         constexpr uint16_t Currents = 6;
         constexpr uint16_t Voltages = 10;
+        constexpr uint16_t PcbTemperature = 9;
     };
 
     namespace DummyWallbox
@@ -36,6 +38,7 @@ namespace Constants
         constexpr uint8_t NumPhases = 3;
         constexpr float MaxChargingCurrentA = 16.0;
         constexpr float FailSafeCurrentA = 16.0f;
+        constexpr float TemperatureDegCel = 23.4f;
     };
 
     namespace DaheimladenRegisters

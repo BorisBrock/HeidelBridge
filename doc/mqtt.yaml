@@ -56,3 +56,12 @@
     device:
       name: HeidelBridge
       identifiers: heidelbridge
+
+  - name: "Temperature"
+    state_topic: "heidelbridge/temperature"
+    unique_id: "temperature"
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    device:
+      name: HeidelBridge
+      identifiers: heidelbridge

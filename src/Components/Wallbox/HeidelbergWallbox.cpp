@@ -190,3 +190,18 @@ bool HeidelbergWallbox::GetChargingVoltages(float &v1V, float &v2V, float &v3V)
         return false;
     }
 }
+
+float HeidelbergWallbox::GetTemperature()
+{
+    uint16_t registerValue[0];
+    if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::PcbTemperature, 1, 0x4, registerValue))
+    {
+        return static_cast<float>(registerValue[0]) * Constants::HeidelbergWallbox::TemperatureFactor;
+    }
+    else
+    {
+        // Error reading modbus register
+        Serial.println("Heidelberg wallbox: ERROR: Could not read PCB temperature");
+        return 0.0f;
+    }
+}

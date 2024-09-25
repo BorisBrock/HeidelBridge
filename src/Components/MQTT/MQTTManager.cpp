@@ -24,7 +24,7 @@ namespace MQTTManager
     // Topics
     String ChargingCurrentControl = "heidelbridge/control/charging_current_limit";
 
-    constexpr uint16_t NumMqttPublishedValues = 7;
+    constexpr uint16_t NumMqttPublishedValues = 8;
     enum MqttPublishedValues
     {
         VehicleState,
@@ -33,7 +33,8 @@ namespace MQTTManager
         FailsafeCurrent,
         EnergyMeter,
         ChargingCurrent,
-        ChargingVoltage
+        ChargingVoltage,
+        Temperature
     };
 
     void ConnectToMqtt()
@@ -100,6 +101,9 @@ namespace MQTTManager
                     gMqttClient.publish("heidelbridge/charging_voltage/phase2", 0, false, String(v2).c_str());
                     gMqttClient.publish("heidelbridge/charging_voltage/phase3", 0, false, String(v3).c_str());
                 }
+                break;
+            case (MqttPublishedValues::Temperature):
+                gMqttClient.publish("heidelbridge/temperature", 0, false, String(gWallbox->GetTemperature()).c_str());
                 break;
             }
             gCurValueIndex = (gCurValueIndex + 1) % NumMqttPublishedValues;

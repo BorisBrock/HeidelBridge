@@ -20,6 +20,7 @@ public:
     virtual float GetEnergyMeterValue() = 0;
     virtual float GetFailsafeCurrent() = 0;
     virtual float GetChargingPower() = 0;
+    virtual float GetTemperature() = 0;
     virtual bool GetChargingCurrents(float &c1A, float &c2A, float &c3A) = 0;
     virtual bool GetChargingVoltages(float &v1V, float &v2V, float &v3V) = 0;
 

@@ -81,3 +81,8 @@ bool DummyWallbox::GetChargingVoltages(float &v1V, float &v2V, float &v3V)
     Serial.printf("Dummy wallbox: returning charging voltages %f, %f and %f A\n", v1V, v2V, v3V);
     return true;
 }
+
+float DummyWallbox::GetTemperature()
+{
+    return Constants::DummyWallbox::TemperatureDegCel;
+}

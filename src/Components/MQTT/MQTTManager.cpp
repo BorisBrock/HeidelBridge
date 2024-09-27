@@ -9,7 +9,6 @@ extern "C"
 #include <AsyncMqttClient.h>
 #include "../../Configuration/Version.h"
 #include "../../Configuration/Constants.h"
-#include "../../Configuration/Credentials.h"
 #include "../Wallbox/IWallbox.h"
 #include "MQTTManager.h"
 
@@ -146,7 +145,7 @@ namespace MQTTManager
     void Init(IWallbox *wallbox)
     {
         Serial.println("Initializing MQTT");
-
+/*
         gWallbox = wallbox;
 
         // Register event callbacks
@@ -179,5 +178,6 @@ namespace MQTTManager
             (void *)0,
             reinterpret_cast<TimerCallbackFunction_t>(PublishMessages));
         xTimerStart(gMqttPublishTimer, pdMS_TO_TICKS(Constants::MQTT::PublishIntervalMs));
+        */
     }
 }

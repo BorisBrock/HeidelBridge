@@ -166,4 +166,5 @@ The following assets and libraries are used by this project:
 - [ESP Async Webserver Arduino library](https://github.com/HenkHoldijk/mathieucarbou_ESPAsyncWebServer)
 - [Websockets Arduino library](https://github.com/Links2004/arduinoWebSockets)
 - [Async MQTT Client](https://github.com/marvinroger/async-mqtt-client)
+- [WiFiProvisioner](https://github.com/SanteriLindfors/WiFiProvisioner)
 - [Daheimladen Modbus API](https://www.daheimladen.de/post/modbus-api)

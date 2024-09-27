@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiProvisioner.h>
 #include "../../Configuration/Constants.h"
 #include "WifiConnection.h"
-#include "../../Configuration/Credentials.h"
 
 namespace WifiConnection
 {
+    WiFiProvisioner::WiFiProvisioner gWiFiProvisioner;
+
     void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
     {
         Serial.println("Connected to AP successfully!");
@@ -24,17 +26,12 @@ namespace WifiConnection
         Serial.print("WiFi lost connection. Reason: ");
         Serial.println(info.wifi_sta_disconnected.reason);
 
-        Serial.println("Trying to reconnect");
-        WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
+        // Serial.println("Trying to reconnect");
+        // WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
     }
 
     void Init()
     {
-        // Delete old config
-        Serial.println("Preparing Wifi");
-        WiFi.disconnect(true);
-        delay(100);
-
         // Set host name
         WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
         WiFi.setHostname("HeidelBridge");
@@ -45,8 +42,11 @@ namespace WifiConnection
         WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
         // Start Wifi connection
-        Serial.print("Connecting WiFi, SSID: ");
-        Serial.println(Credentials::WiFi::SSID);
-        WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
+        gWiFiProvisioner.resetCredentials();
+        gWiFiProvisioner.enableSerialDebug(true);
+        gWiFiProvisioner.PROJECT_TITLE = "HeidelBridge";
+        gWiFiProvisioner.AP_NAME = "HeidelBridge";
+
+        gWiFiProvisioner.connectToWiFi();
     }
 };

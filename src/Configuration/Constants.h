@@ -34,9 +34,9 @@ namespace Constants
 
     namespace DummyWallbox
     {
-        constexpr float ChargingVoltageV = 230.0;
+        constexpr float ChargingVoltageV = 230.0f;
         constexpr uint8_t NumPhases = 3;
-        constexpr float MaxChargingCurrentA = 16.0;
+        constexpr float MaxChargingCurrentA = 16.0f;
         constexpr float FailSafeCurrentA = 16.0f;
         constexpr float TemperatureDegCel = 23.4f;
     };

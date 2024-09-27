@@ -36,10 +36,16 @@ Of course a well designed PCB would be much nicer, but this is still work in pro
 
 # Setting Up The ESP32
 
+## Development Environment
+
+To compile this project you will need to install VS Code and the PlatformIO extension. Both are available for free for Linux, MacOS and Windows.
+
 ## Programming your ESP32
 
 - Start by cloning or downloading this repository.
+- Copy the file `Credentials.cpp.template` to `Credentials.cpp`.
 - Change the SSID and password in `Credentials.cpp` to match your home network settings.
+- If you want to use MQTT, also insert your MQTT server's address and your user name / password (can be left empty if not required).
 - Compile the project.
 - Now connect your ESP32 via USB and upload the firmware.
 

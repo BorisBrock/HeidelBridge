@@ -82,7 +82,7 @@ namespace MQTTManager
                 gMqttClient.publish("heidelbridge/failsafe_current", 0, false, String(gWallbox->GetFailsafeCurrent()).c_str());
                 break;
             case (MqttPublishedValues::EnergyMeter):
-                gMqttClient.publish("heidelbridge/energy_meter", 0, false, String(gWallbox->GetEnergyMeterValue()).c_str());
+                gMqttClient.publish("heidelbridge/energy_meter", 0, false, String(gWallbox->GetEnergyMeterValue() * Constants::General::FactorWhToKWh).c_str());
                 break;
             case (MqttPublishedValues::ChargingCurrent):
                 float c1, c2, c3;

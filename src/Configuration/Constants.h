@@ -2,6 +2,11 @@
 
 namespace Constants
 {
+    namespace General
+    {
+        constexpr float FactorWhToKWh = 0.001f;
+    };
+
     namespace ModbusRTU
     {
         constexpr uint8_t RegisterSize = 2;

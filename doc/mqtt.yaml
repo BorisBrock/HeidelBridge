@@ -51,7 +51,7 @@
   - name: "Energy meter"
     state_topic: "heidelbridge/energy_meter"
     unique_id: "energy_meter"
-    unit_of_measurement: "Wh"
+    unit_of_measurement: "kWh"
     device_class: "energy"
     device:
       name: HeidelBridge

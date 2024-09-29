@@ -139,7 +139,7 @@ The following topics are published by HeidelBridge:
 | heidelbridge/charging_current_limit  | A    | Float     | Charging current limit in Ampere.                                       |
 | heidelbridge/charging_power          | W    | Float     | Momentary charging power in Watt.                                       |
 | heidelbridge/failsafe_current        | A    | Float     | Current the wallbox will fall back to in case of a communication error. |
-| heidelbridge/energy_meter            | Wh   | Float     | Total charged energy so far.                                            |
+| heidelbridge/energy_meter            | kWh  | Float     | Total charged energy so far.                                            |
 | heidelbridge/temperature             | °C   | Float     | Current wallbox PCB temperature.                                        |
 | heidelbridge/charging_current/phase1 | A    | Float     | Momentary charging current on phase 1.                                  |
 | heidelbridge/charging_current/phase2 | A    | Float     | Momentary charging current on phase 2.                                  |

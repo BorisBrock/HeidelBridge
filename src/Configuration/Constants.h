@@ -65,7 +65,7 @@ namespace Constants
         constexpr uint8_t ServerId = 0xFF;
         constexpr uint16_t TCPPort = 502;
         constexpr uint8_t MaxClients = 8;
-        constexpr uint32_t Timeout = 2000;
+        constexpr uint32_t TimeoutMs = 2000;
         constexpr float VoltageFactor = 10.0f;
         constexpr float CurrentFactor = 10.0f;
         constexpr float EnergyFactor = 10.0f;

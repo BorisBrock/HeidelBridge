@@ -43,6 +43,7 @@ To compile this project you will need to install VS Code and the PlatformIO exte
 ## Programming your ESP32
 
 - Start by cloning or downloading this repository.
+- Change `board = ...` in platformio.ini to match the ESP32 board you are actually using.
 - Copy the file `Credentials.cpp.template` to `Credentials.cpp`.
 - Change the SSID and password in `Credentials.cpp` to match your home network settings.
 - If you want to use MQTT, also insert your MQTT server's address and your user name / password (can be left empty if not required).

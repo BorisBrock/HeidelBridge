@@ -207,7 +207,7 @@ namespace ModbusTCP
         gModbusServer.start(
             Constants::DaheimladenWallbox::TCPPort,
             Constants::DaheimladenWallbox::MaxClients,
-            Constants::DaheimladenWallbox::Timeout);
+            Constants::DaheimladenWallbox::TimeoutMs);
 
         gModbusServer.registerWorker(Constants::DaheimladenWallbox::ServerId, READ_INPUT_REGISTER, ReadInputRegister);
         gModbusServer.registerWorker(Constants::DaheimladenWallbox::ServerId, READ_HOLD_REGISTER, ReadHoldRegister);

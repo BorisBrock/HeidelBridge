@@ -3,35 +3,34 @@
 #include "../../Configuration/Constants.h"
 #include "WifiConnection.h"
 #include "../../Configuration/Credentials.h"
+#include "../Logger/Logger.h"
 
 namespace WifiConnection
 {
     void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
     {
-        Serial.println("Connected to AP successfully!");
+        Logger::Info("Connected to AP successfully!");
     }
 
     void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info)
     {
-        Serial.println("WiFi connected");
-        Serial.println("IP address: ");
-        Serial.println(WiFi.localIP());
+        Logger::Info("WiFi connected");
+        Logger::Info("IP address: %s", WiFi.localIP().toString().c_str());
     }
 
     void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
     {
-        Serial.println("Disconnected from WiFi access point");
-        Serial.print("WiFi lost connection. Reason: ");
-        Serial.println(info.wifi_sta_disconnected.reason);
+        Logger::Warning("Disconnected from WiFi access point");
+        Logger::Warning("WiFi lost connection. Reason: %d", info.wifi_sta_disconnected.reason);
+        Logger::Warning("Trying to reconnect");
 
-        Serial.println("Trying to reconnect");
         WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
     }
 
     void Init()
     {
         // Delete old config
-        Serial.println("Preparing Wifi");
+        Logger::Trace("Preparing Wifi");
         WiFi.disconnect(true);
         delay(100);
 
@@ -45,8 +44,7 @@ namespace WifiConnection
         WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
         // Start Wifi connection
-        Serial.print("Connecting WiFi, SSID: ");
-        Serial.println(Credentials::WiFi::SSID);
+        Logger::Info("Connecting to WiFi SSID '%s'", Credentials::WiFi::SSID);
         WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
     }
 };

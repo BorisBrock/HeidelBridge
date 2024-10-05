@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "Configuration/Constants.h"
 #include "Configuration/Version.h"
+#include "Components/Logger/Logger.h"
 #include "Components/WiFi/WifiConnection.h"
 #include "Components/Modbus/ModbusRTU.h"
 #include "Components/Modbus/ModbusTCP.h"
@@ -15,22 +16,30 @@ void setup()
   // Configure serial communication
   Serial.begin(115200);
 
-  // Print version info
-  Serial.println("Booting HeidelBridge");
-  Serial.printf("  Version: %d.%d.%d\n", Version::Major, Version::Minor, Version::Patch);
-  Serial.printf("  Build date: %s\n", __DATE__);
-  Serial.println("");
+  // Print startup information
+  Logger::Print("Booting HeidelBridge");
+  Logger::Print("  Version: %d.%d.%d", Version::Major, Version::Minor, Version::Patch);
+  Logger::Print("  Build date: %s", __DATE__);
+  Logger::Print("");
+  Logger::Print("Logging level: %s", Logger::GetLogLevel());
+  Logger::Print("");
+#ifndef DUMMY_WALLBOX
+  Logger::Print("Wallbox mode: real hardware (Heidelberg)");
+#else
+  Logger::Print("Wallbox mode: simulated (dummy)");
+#endif
+  Logger::Print("");
 
   // Make sure WiFi connection is up and running
   WifiConnection::Init();
 
   // Initialize wallbox
 #ifndef DUMMY_WALLBOX
-  Serial.println("Starting with Heidelberg wallbox in real mode");
+  Logger::Info("Starting with Heidelberg wallbox in real mode");
   ModbusRTU::Instance()->Init();
   gWallbox = HeidelbergWallbox::Instance();
 #else
-  Serial.println("Starting with dummy wallbox in simulated mode");
+  Logger::Info("Starting with dummy wallbox in simulated mode");
   gWallbox = DummyWallbox::Instance();
 #endif
   gWallbox->Init();
@@ -44,7 +53,7 @@ void setup()
     MQTTManager::Init(gWallbox);
   }
 
-  Serial.println("Setup complete");
+  Logger::Info("Setup complete");
 }
 
 void loop()

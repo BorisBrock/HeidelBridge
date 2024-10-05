@@ -7,6 +7,7 @@ extern "C"
 #include "freertos/timers.h"
 }
 #include <AsyncMqttClient.h>
+#include "../Logger/Logger.h"
 #include "../../Configuration/Version.h"
 #include "../../Configuration/Constants.h"
 #include "../../Configuration/Credentials.h"
@@ -41,7 +42,7 @@ namespace MQTTManager
     {
         if (!gMqttClient.connected())
         {
-            Serial.println("Connecting to MQTT...");
+            Logger::Info("Connecting to MQTT broker...");
             gMqttClient.connect();
         }
     }
@@ -112,7 +113,7 @@ namespace MQTTManager
 
     void OnMqttConnect(bool sessionPresent)
     {
-        Serial.println("Connected to MQTT");
+        Logger::Info("Connected to MQTT");
 
         // Subscribe to control topics
         gMqttClient.subscribe(ChargingCurrentControl.c_str(), 2);
@@ -125,7 +126,7 @@ namespace MQTTManager
 
     void OnMqttDisconnect(AsyncMqttClientDisconnectReason reason)
     {
-        Serial.println("Disconnected from MQTT");
+        Logger::Warning("Disconnected from MQTT");
     }
 
     void OnMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
@@ -133,7 +134,7 @@ namespace MQTTManager
         if (ChargingCurrentControl == topic)
         {
             float current = String(payload, len).toFloat();
-            Serial.printf("Received MQTT control command: charging current limit = %f\n", current);
+            Logger::Trace("Received MQTT control command: charging current limit = %f\n", current);
             gWallbox->SetChargingCurrentLimit(current);
         }
     }
@@ -145,7 +146,7 @@ namespace MQTTManager
 
     void Init(IWallbox *wallbox)
     {
-        Serial.println("Initializing MQTT");
+        Logger::Info("Initializing MQTT");
 
         gWallbox = wallbox;
 

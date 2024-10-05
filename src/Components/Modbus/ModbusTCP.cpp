@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include "../Logger/Logger.h"
 #include "ModbusServerWiFi.h"
 #include "../../Configuration/Constants.h"
 #include "../Wallbox/IWallbox.h"
@@ -13,13 +14,13 @@ namespace ModbusTCP
     ModbusMessage ReadInputRegister(ModbusMessage msg)
     {
         // For debugging
-        Serial.println("\nMB TCP request received: READ_INPUT_REGISTER:");
-        Serial.printf(" > Size: %d\n", msg.size());
-        Serial.printf(" > FC: %d\n", msg.getFunctionCode());
-        Serial.println(" > Data:");
+        Logger::Trace("Modbus TCP request received: READ_INPUT_REGISTER:");
+        Logger::Trace(" > Size: %d", msg.size());
+        Logger::Trace(" > FC: %d", msg.getFunctionCode());
+        Logger::Trace(" > Data:");
         for (uint8_t i = 0; i < msg.size(); ++i)
         {
-            Serial.printf("   > %d\n", msg[i]);
+            Logger::Trace("   > %d", msg[i]);
         }
         return ModbusMessage{};
     }
@@ -31,7 +32,7 @@ namespace ModbusTCP
         uint16_t numWords = 0;
         request.get(2, startAddress);
         request.get(4, numWords);
-        Serial.printf("\nModbusTCP request received: READ_HOLD_REGISTER %d words at reg. %d\n", numWords, startAddress);
+        Logger::Trace("ModbusTCP request received: READ_HOLD_REGISTER %d words at reg. %d", numWords, startAddress);
 
         // Respond properly
         ModbusMessage response;
@@ -40,7 +41,7 @@ namespace ModbusTCP
         {
         case (Constants::DaheimladenRegisters::Status):
         {
-            Serial.println(" -> Responding with wallbox status");
+            Logger::Trace(" -> Responding with wallbox status");
             responseLengthBytes = 2;
             const uint16_t rawState = static_cast<uint16_t>(gWallbox->GetState());
             response.add(request.getServerID(), fc, responseLengthBytes);
@@ -49,7 +50,7 @@ namespace ModbusTCP
         }
         case (Constants::DaheimladenRegisters::LimitChargingCurrent):
         {
-            Serial.println(" -> Responding with charging current limit");
+            Logger::Trace(" -> Responding with charging current limit");
             responseLengthBytes = 2;
             uint16_t rawCurrent = static_cast<uint16_t>(gWallbox->GetChargingCurrentLimit() * Constants::DaheimladenWallbox::CurrentFactor);
             response.add(request.getServerID(), fc, responseLengthBytes);
@@ -58,7 +59,7 @@ namespace ModbusTCP
         }
         case (Constants::DaheimladenRegisters::ConnectionTimeoutTime):
         {
-            Serial.println(" -> Responding with connection timeout time");
+            Logger::Trace(" -> Responding with connection timeout time");
             responseLengthBytes = 2;
             const uint16_t dummyValue = 60;
             response.add(request.getServerID(), fc, responseLengthBytes);
@@ -67,7 +68,7 @@ namespace ModbusTCP
         }
         case (Constants::DaheimladenRegisters::EnergyMeter):
         {
-            Serial.println(" -> Responding with energy meter value");
+            Logger::Trace(" -> Responding with energy meter value");
             responseLengthBytes = 4;
             const uint32_t rawEnergy01kWh = static_cast<uint32_t>(gWallbox->GetEnergyMeterValue() * Constants::DaheimladenWallbox::EnergyFactor);
             response.add(request.getServerID(), fc, responseLengthBytes);
@@ -76,7 +77,7 @@ namespace ModbusTCP
         }
         case (Constants::DaheimladenRegisters::MaxChargingCurrentAfterConnectionLoss):
         {
-            Serial.println(" -> Responding with connection loss current");
+            Logger::Trace(" -> Responding with connection loss current");
             responseLengthBytes = 2;
             uint16_t rawCurrent = static_cast<uint16_t>(gWallbox->GetFailsafeCurrent() * Constants::DaheimladenWallbox::CurrentFactor);
             response.add(request.getServerID(), fc, responseLengthBytes);
@@ -85,7 +86,7 @@ namespace ModbusTCP
         }
         case (Constants::DaheimladenRegisters::TotalChargingPower):
         {
-            Serial.println(" -> Responding with total charging power");
+            Logger::Trace(" -> Responding with total charging power");
             responseLengthBytes = 4;
             const uint32_t powerW = static_cast<uint32_t>(gWallbox->GetChargingPower());
             response.add(request.getServerID(), fc, responseLengthBytes);
@@ -94,7 +95,7 @@ namespace ModbusTCP
         }
         case (Constants::DaheimladenRegisters::ChargeCurrents):
         {
-            Serial.println(" -> Responding with charging currents");
+            Logger::Trace(" -> Responding with charging currents");
             responseLengthBytes = 12;
 
             float c1, c2, c3;
@@ -111,7 +112,7 @@ namespace ModbusTCP
         }
         case (Constants::DaheimladenRegisters::ChargeVoltages):
         {
-            Serial.println(" -> Responding with charging voltages");
+            Logger::Trace(" -> Responding with charging voltages");
             responseLengthBytes = 12;
 
             float v1, v2, v3;
@@ -129,7 +130,7 @@ namespace ModbusTCP
         case (Constants::DaheimladenRegisters::RfidStationId):
         case (Constants::DaheimladenRegisters::RfidCardId):
         {
-            Serial.println(" -> Responding with ID");
+            Logger::Trace(" -> Responding with ID");
             responseLengthBytes = 32;
             const uint32_t dummyValue = 0;
             response.add(request.getServerID(), fc, responseLengthBytes);
@@ -139,7 +140,7 @@ namespace ModbusTCP
         }
         default:
         {
-            Serial.println(" -> Responding with error ILLEGAL_DATA_ADDRESS");
+            Logger::Error(" -> Responding with error ILLEGAL_DATA_ADDRESS");
             response.setError(request.getServerID(), fc, Modbus::Error::ILLEGAL_DATA_ADDRESS);
             break;
         }
@@ -151,13 +152,13 @@ namespace ModbusTCP
     ModbusMessage WriteHoldRegister(ModbusMessage msg)
     {
         // For debugging only
-        Serial.println("\nMB TCP request received: WRITE_HOLD_REGISTER");
-        Serial.printf(" > Size: %d\n", msg.size());
-        Serial.printf(" > FC: %d\n", msg.getFunctionCode());
-        Serial.println(" > Data:");
+        Logger::Trace("Modbus TCP request received: WRITE_HOLD_REGISTER");
+        Logger::Trace(" > Size: %d", msg.size());
+        Logger::Trace(" > FC: %d", msg.getFunctionCode());
+        Logger::Trace(" > Data:");
         for (uint8_t i = 0; i < msg.size(); ++i)
         {
-            Serial.printf("   > %d\n", msg[i]);
+            Logger::Trace("   > %d", msg[i]);
         }
         return msg; // Echo back request
     }
@@ -169,7 +170,7 @@ namespace ModbusTCP
         uint16_t numWords = 0;
         request.get(2, startAddress);
         request.get(4, numWords);
-        Serial.printf("\nModbusTCP request received: WRITE_MULT_REGISTERS %d words to reg. %d\n", numWords, startAddress);
+        Logger::Trace("ModbusTCP request received: WRITE_MULT_REGISTERS %d words to reg. %d", numWords, startAddress);
 
         // Respond properly
         switch (startAddress)
@@ -178,13 +179,13 @@ namespace ModbusTCP
         {
             uint16_t currentLimit = 0;
             request.get(7, currentLimit);
-            Serial.printf(" -> Writing charging current limit: %d\n", currentLimit);
+            Logger::Trace(" -> Writing charging current limit: %d", currentLimit);
             gWallbox->SetChargingCurrentLimit(static_cast<float>(currentLimit * 0.1f));
             break;
         }
         default:
         {
-            Serial.println(" -> Responding with error ILLEGAL_DATA_ADDRESS");
+            Logger::Error(" -> Responding with error ILLEGAL_DATA_ADDRESS");
             ModbusMessage response;
             response.setError(request.getServerID(), fc, Modbus::Error::ILLEGAL_DATA_ADDRESS);
             return response;
@@ -200,7 +201,7 @@ namespace ModbusTCP
 
     void Init(IWallbox *wallbox)
     {
-        Serial.println("Initializing Modbus TCP server");
+        Logger::Info("Initializing Modbus TCP server");
 
         gWallbox = wallbox;
 

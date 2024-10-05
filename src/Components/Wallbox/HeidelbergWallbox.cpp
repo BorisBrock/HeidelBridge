@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "../Logger/Logger.h"
 #include "../Modbus/ModbusRTU.h"
 #include "../../Configuration/Constants.h"
 #include "HeidelbergWallbox.h"
@@ -12,19 +13,19 @@ HeidelbergWallbox *HeidelbergWallbox::Instance()
 void HeidelbergWallbox::Init()
 {
     uint16_t rawCurrent = static_cast<uint16_t>(Constants::HeidelbergWallbox::FailSafeCurrentA / Constants::HeidelbergWallbox::CurrentFactor);
-    Serial.printf("Heidelberg wallbox: Initializing fail safe current with %d (raw)\n", rawCurrent);
+    Logger::Debug("Heidelberg wallbox: Initializing fail safe current with %d (raw)", rawCurrent);
     if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::FailsafeCurrent, rawCurrent))
     {
         // Error writing modbus register
-        Serial.println("ERROR: Could not set fail safe current");
+        Logger::Error("ERROR: Could not set fail safe current");
     }
 
     uint16_t standbyDisabled = 4;
-    Serial.printf("Heidelberg wallbox: Initializing standby mode with %d (raw)\n", standbyDisabled);
+    Logger::Debug("Heidelberg wallbox: Initializing standby mode with %d (raw)", standbyDisabled);
     if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::DisableStandby, standbyDisabled))
     {
         // Error writing modbus register
-        Serial.println("ERROR: Could not disable standby");
+        Logger::Error("ERROR: Could not disable standby");
     }
 }
 
@@ -33,7 +34,7 @@ VehicleState HeidelbergWallbox::GetState()
     uint16_t registerValue[0];
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::ChargingState, 1, 0x4, registerValue))
     {
-        Serial.printf("Heidelberg wallbox: Read state: %d\n", registerValue[0]);
+        Logger::Debug("Heidelberg wallbox: Read state: %d", registerValue[0]);
         if (registerValue[0] <= 3)
         {
             mState = VehicleState::Disconnected;
@@ -50,7 +51,7 @@ VehicleState HeidelbergWallbox::GetState()
     else
     {
         // Error reading modbus register
-        Serial.println("Heidelberg wallbox: ERROR: Could not read plugged state");
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read plugged state");
     }
 
     return mState;
@@ -59,13 +60,13 @@ VehicleState HeidelbergWallbox::GetState()
 bool HeidelbergWallbox::SetChargingCurrentLimit(float currentLimitA)
 {
     mChargingCurrentLimitA = currentLimitA;
-    Serial.printf("Heidelberg wallbox: setting charging current limit to %f A\n", mChargingCurrentLimitA);
+    Logger::Debug("Heidelberg wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
 
     uint16_t rawCurrent = static_cast<uint16_t>(mChargingCurrentLimitA / Constants::HeidelbergWallbox::CurrentFactor);
     if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::MaximalCurrent, rawCurrent))
     {
         // Error writing modbus register
-        Serial.println("Heidelberg wallbox: ERROR: Could not set maximum charging current");
+        Logger::Error("Heidelberg wallbox: ERROR: Could not set maximum charging current");
     }
 
     return true;
@@ -77,13 +78,13 @@ float HeidelbergWallbox::GetChargingCurrentLimit()
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::MaximalCurrent, 1, 0x3, registerValue))
     {
         mChargingCurrentLimitA = static_cast<float>(registerValue[0] * Constants::HeidelbergWallbox::CurrentFactor);
-        Serial.printf("Heidelberg wallbox: Read max. charging current: %d\n", mChargingCurrentLimitA);
+        Logger::Debug("Heidelberg wallbox: Read max. charging current: %d", mChargingCurrentLimitA);
         return mChargingCurrentLimitA;
     }
     else
     {
         // Error reading modbus register
-        Serial.println("Heidelberg wallbox: ERROR: Could not read max. charging current");
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read max. charging current");
         return mChargingCurrentLimitA; // Return last valid value
     }
 }
@@ -101,11 +102,11 @@ float HeidelbergWallbox::GetEnergyMeterValue()
         uint32_t totalEnergyWh = static_cast<uint32_t>(rawEnergy[0]) << 16 | static_cast<uint32_t>(rawEnergy[1]);
         mLastEnergyMeterValueWh = static_cast<float>(totalEnergyWh);
 
-        Serial.printf("Heidelberg wallbox: Read energy meter value: %f Wh\n", mLastEnergyMeterValueWh);
+        Logger::Debug("Heidelberg wallbox: Read energy meter value: %f Wh", mLastEnergyMeterValueWh);
     }
     else
     {
-        Serial.println("Heidelberg wallbox: ERROR: Could not read energy meter value");
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read energy meter value");
     }
 
     return mLastEnergyMeterValueWh;
@@ -117,12 +118,12 @@ float HeidelbergWallbox::GetFailsafeCurrent()
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::FailsafeCurrent, 1, 0x3, registerValue))
     {
         mFailsafeCurrentA = static_cast<float>(registerValue[0] * Constants::HeidelbergWallbox::CurrentFactor);
-        Serial.printf("Read Heidelberg failsafe current: %f\n", mFailsafeCurrentA);
+        Logger::Debug("Read Heidelberg failsafe current: %f", mFailsafeCurrentA);
     }
     else
     {
         // Error reading modbus register
-        Serial.println("Heidelberg wallbox: ERROR: Could not read failsafe current");
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read failsafe current");
     }
 
     return mFailsafeCurrentA;
@@ -134,12 +135,12 @@ float HeidelbergWallbox::GetChargingPower()
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::Power, 1, 0x4, registerValue))
     {
         mLastPowerMeterValueW = static_cast<float>(registerValue[0]);
-        Serial.printf("Reading power meter value: %f W\n", mLastPowerMeterValueW);
+        Logger::Debug("Reading power meter value: %f W", mLastPowerMeterValueW);
     }
     else
     {
         // Error reading modbus register
-        Serial.println("Heidelberg wallbox: ERROR: Could not read last power meter value");
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read last power meter value");
     }
 
     return mLastPowerMeterValueW;
@@ -158,12 +159,12 @@ bool HeidelbergWallbox::GetChargingCurrents(float &c1A, float &c2A, float &c3A)
         c1A = static_cast<float>(rawCurrents[0] * Constants::HeidelbergWallbox::CurrentFactor);
         c2A = static_cast<float>(rawCurrents[1] * Constants::HeidelbergWallbox::CurrentFactor);
         c3A = static_cast<float>(rawCurrents[2] * Constants::HeidelbergWallbox::CurrentFactor);
-        Serial.printf("Reading currents: %f %f %f A\n", c1A, c2A, c3A);
+        Logger::Debug("Reading currents: %f %f %f A", c1A, c2A, c3A);
         return true;
     }
     else
     {
-        Serial.println("Heidelberg wallbox: ERROR: Could not read currents");
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read currents");
         return false;
     }
 }
@@ -181,12 +182,12 @@ bool HeidelbergWallbox::GetChargingVoltages(float &v1V, float &v2V, float &v3V)
         v1V = static_cast<float>(rawVoltages[0] * Constants::HeidelbergWallbox::VoltageFactor);
         v2V = static_cast<float>(rawVoltages[1] * Constants::HeidelbergWallbox::VoltageFactor);
         v3V = static_cast<float>(rawVoltages[2] * Constants::HeidelbergWallbox::VoltageFactor);
-        Serial.printf("Reading voltages: %f %f %f V\n", v1V, v2V, v3V);
+        Logger::Debug("Reading voltages: %f %f %f V", v1V, v2V, v3V);
         return true;
     }
     else
     {
-        Serial.println("Heidelberg wallbox: ERROR: Could not read voltages");
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read voltages");
         return false;
     }
 }
@@ -201,7 +202,7 @@ float HeidelbergWallbox::GetTemperature()
     else
     {
         // Error reading modbus register
-        Serial.println("Heidelberg wallbox: ERROR: Could not read PCB temperature");
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read PCB temperature");
         return 0.0f;
     }
 }

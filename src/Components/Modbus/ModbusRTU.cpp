@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <WiFi.h>
+#include "../Logger/Logger.h"
 #include "HardwareSerial.h"
 #include "ModbusClientRTU.h"
 #include "../../Configuration/Pins.h"
@@ -22,7 +22,7 @@ void ModbusRTU::Init()
     gMutex = xSemaphoreCreateMutex();
 
     // Init serial conneted to the RTU Modbus
-    Serial.println("Starting RS485 hardware serial");
+    Logger::Info("Starting RS485 hardware serial");
     RTUutils::prepareHardwareSerial(gRs485Serial);
     gRs485Serial.begin(
         Constants::HeidelbergWallbox::ModbusBaudrate,
@@ -31,7 +31,7 @@ void ModbusRTU::Init()
         Pins::PinTX);
 
     // Start Modbus RTU
-    Serial.println("Creating Modbus RTU instance");
+    Logger::Trace("Creating Modbus RTU instance");
     gModbusRTU.setTimeout(Constants::HeidelbergWallbox::ModbusTimeoutMs);
     gModbusRTU.begin(gRs485Serial); // Start ModbusRTU background task
 }
@@ -62,8 +62,7 @@ bool ModbusRTU::ReadRegisters(uint16_t startAddress, uint8_t numValues, uint8_t 
         }
         else
         {
-            Serial.print("ModbusRTU read error: ");
-            Serial.println(response.getError());
+            Logger::Error("ModbusRTU read error: %d", response.getError());
             for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
             {
                 values[wordIndex] = 0;
@@ -96,8 +95,7 @@ bool ModbusRTU::WriteHoldRegister16(uint16_t address, uint16_t value)
         }
         else
         {
-            Serial.print("ModbusRTU write error: ");
-            Serial.println(response.getError());
+            Logger::Error("ModbusRTU write error: %d", response.getError());
             return false;
         }
     }

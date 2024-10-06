@@ -4,6 +4,7 @@
 #include "WifiConnection.h"
 #include "../../Configuration/Credentials.h"
 #include "../Logger/Logger.h"
+#include "../Statistics/Statistics.h"
 
 namespace WifiConnection
 {
@@ -23,6 +24,8 @@ namespace WifiConnection
         Logger::Warning("Disconnected from WiFi access point");
         Logger::Warning("WiFi lost connection. Reason: %d", info.wifi_sta_disconnected.reason);
         Logger::Warning("Trying to reconnect");
+
+        gStatistics.NumWifiDisconnects++;
 
         WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
     }
@@ -46,5 +49,6 @@ namespace WifiConnection
         // Start Wifi connection
         Logger::Info("Connecting to WiFi SSID '%s'", Credentials::WiFi::SSID);
         WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
+        gStatistics.NumWifiDisconnects = 0;
     }
 };

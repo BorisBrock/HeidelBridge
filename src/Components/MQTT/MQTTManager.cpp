@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <WiFi.h>
 extern "C"
 {
 #include "freertos/FreeRTOS.h"
@@ -8,6 +7,7 @@ extern "C"
 }
 #include <AsyncMqttClient.h>
 #include "../Logger/Logger.h"
+#include "../Statistics/Statistics.h"
 #include "../../Configuration/Version.h"
 #include "../../Configuration/Constants.h"
 #include "../../Configuration/Credentials.h"
@@ -35,7 +35,7 @@ namespace MQTTManager
         EnergyMeter,
         ChargingCurrent,
         ChargingVoltage,
-        Temperature
+        Temperature,
     };
 
     void ConnectToMqtt()
@@ -108,6 +108,13 @@ namespace MQTTManager
                 break;
             }
             gCurValueIndex = (gCurValueIndex + 1) % NumMqttPublishedValues;
+
+            // Always publish internals
+            gMqttClient.publish("heidelbridge/internal/uptime", 0, false, String(gStatistics.UptimeS).c_str());
+            gMqttClient.publish("heidelbridge/internal/wifi_disconnects", 0, false, String(gStatistics.NumWifiDisconnects).c_str());
+            gMqttClient.publish("heidelbridge/internal/mqtt_disconnects", 0, false, String(gStatistics.NumMqttDisconnects).c_str());
+            gMqttClient.publish("heidelbridge/internal/modbus_read_rrors", 0, false, String(gStatistics.NumModbusReadErrors).c_str());
+            gMqttClient.publish("heidelbridge/internal/modbus_write_errors", 0, false, String(gStatistics.NumModbusWriteErrors).c_str());
         }
     }
 
@@ -122,11 +129,13 @@ namespace MQTTManager
         String versionString = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
         gMqttClient.publish("heidelbridge/version", 0, true, versionString.c_str());
         gMqttClient.publish("heidelbridge/build_date", 0, true, __DATE__);
+        gMqttClient.publish("heidelbridge/ip_address", 0, true, WiFi.localIP().toString().c_str());
     }
 
     void OnMqttDisconnect(AsyncMqttClientDisconnectReason reason)
     {
         Logger::Warning("Disconnected from MQTT");
+        gStatistics.NumMqttDisconnects++;
     }
 
     void OnMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)

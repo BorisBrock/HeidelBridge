@@ -2,6 +2,7 @@
 #include "Configuration/Constants.h"
 #include "Configuration/Version.h"
 #include "Components/Logger/Logger.h"
+#include "Components/Statistics/Statistics.h"
 #include "Components/WiFi/WifiConnection.h"
 #include "Components/Modbus/ModbusRTU.h"
 #include "Components/Modbus/ModbusTCP.h"
@@ -58,5 +59,6 @@ void setup()
 
 void loop()
 {
-  delay(1);
+  delay(1000);
+  gStatistics.UptimeS++;
 }

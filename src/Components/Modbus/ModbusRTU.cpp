@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "../Logger/Logger.h"
+#include "../Statistics/Statistics.h"
 #include "HardwareSerial.h"
 #include "ModbusClientRTU.h"
 #include "../../Configuration/Pins.h"
@@ -63,6 +64,7 @@ bool ModbusRTU::ReadRegisters(uint16_t startAddress, uint8_t numValues, uint8_t 
         else
         {
             Logger::Error("ModbusRTU read error: %d", response.getError());
+            gStatistics.NumModbusReadErrors++;
             for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
             {
                 values[wordIndex] = 0;
@@ -96,6 +98,7 @@ bool ModbusRTU::WriteHoldRegister16(uint16_t address, uint16_t value)
         else
         {
             Logger::Error("ModbusRTU write error: %d", response.getError());
+            gStatistics.NumModbusWriteErrors++;
             return false;
         }
     }

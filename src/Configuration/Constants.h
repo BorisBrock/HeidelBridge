@@ -10,6 +10,9 @@ namespace Constants
     namespace ModbusRTU
     {
         constexpr uint8_t RegisterSize = 2;
+        constexpr uint16_t NumReadRetries = 3;
+        constexpr uint16_t NumWriteRetries = 5;
+        constexpr uint16_t RetryDelayMs = 25;
     };
 
     namespace HeidelbergWallbox

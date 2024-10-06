@@ -39,69 +39,91 @@ void ModbusRTU::Init()
 
 bool ModbusRTU::ReadRegisters(uint16_t startAddress, uint8_t numValues, uint8_t fc, uint16_t *values)
 {
-    // Try to get the mutex
-    if (xSemaphoreTake(gMutex, portMAX_DELAY))
+    uint16_t numTries = 1 + Constants::ModbusRTU::NumReadRetries;
+    uint8_t lastError = 0;
+
+    while (numTries > 0)
     {
-        ModbusMessage response = gModbusRTU.syncRequest(
-            0,
-            Constants::HeidelbergWallbox::ModbusServerId,
-            (FunctionCode)fc,
-            startAddress,
-            numValues);
-
-        // Free mutex
-        xSemaphoreGive(gMutex);
-
-        if (response.getError() == SUCCESS)
+        // Try to get the mutex
+        if (xSemaphoreTake(gMutex, portMAX_DELAY))
         {
-            constexpr uint16_t startIndex = 3;
-            for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
+            ModbusMessage response = gModbusRTU.syncRequest(
+                0,
+                Constants::HeidelbergWallbox::ModbusServerId,
+                (FunctionCode)fc,
+                startAddress,
+                numValues);
+
+            // Free mutex
+            xSemaphoreGive(gMutex);
+
+            if (response.getError() == SUCCESS)
             {
-                response.get(startIndex + wordIndex * Constants::ModbusRTU::RegisterSize, values[wordIndex]);
+                constexpr uint16_t startIndex = 3;
+                for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
+                {
+                    response.get(startIndex + wordIndex * Constants::ModbusRTU::RegisterSize, values[wordIndex]);
+                }
+                return true;
             }
-            return true;
-        }
-        else
-        {
-            Logger::Error("ModbusRTU read error: %d", response.getError());
-            gStatistics.NumModbusReadErrors++;
-            for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
+            else
             {
-                values[wordIndex] = 0;
+                // Read failed
+                lastError = response.getError();
+                Logger::Warning("ModbusRTU read attempt failed: %d", lastError);
+                delay(Constants::ModbusRTU::RetryDelayMs);
             }
-            return false;
         }
     }
 
+    // All read attempts failed
+    Logger::Error("ModbusRTU read error: %d", lastError);
+    gStatistics.NumModbusReadErrors++;
+    for (uint8_t wordIndex = 0; wordIndex < numValues; ++wordIndex)
+    {
+        values[wordIndex] = 0;
+    }
     return false;
 }
 
 bool ModbusRTU::WriteHoldRegister16(uint16_t address, uint16_t value)
 {
-    // Try to get the mutex
-    if (xSemaphoreTake(gMutex, portMAX_DELAY))
+    uint16_t numTries = 1 + Constants::ModbusRTU::NumWriteRetries;
+    uint8_t lastError = 0;
+
+    while (numTries > 0)
     {
-        ModbusMessage response = gModbusRTU.syncRequest(
-            0,
-            Constants::HeidelbergWallbox::ModbusServerId,
-            WRITE_HOLD_REGISTER,
-            address,
-            value);
-
-        // Free mutex
-        xSemaphoreGive(gMutex);
-
-        if (response.getError() == SUCCESS)
+        // Try to get the mutex
+        if (xSemaphoreTake(gMutex, portMAX_DELAY))
         {
-            return true;
+            ModbusMessage response = gModbusRTU.syncRequest(
+                0,
+                Constants::HeidelbergWallbox::ModbusServerId,
+                WRITE_HOLD_REGISTER,
+                address,
+                value);
+
+            // Free mutex
+            xSemaphoreGive(gMutex);
+
+            if (response.getError() == SUCCESS)
+            {
+                return true;
+            }
+            else
+            {
+                // Write failed
+                lastError = response.getError();
+                Logger::Warning("ModbusRTU write attempt failed: %d", lastError);
+                delay(Constants::ModbusRTU::RetryDelayMs);
+            }
         }
-        else
-        {
-            Logger::Error("ModbusRTU write error: %d", response.getError());
-            gStatistics.NumModbusWriteErrors++;
-            return false;
-        }
+
+        numTries--;
     }
 
+    // All write attempts failed
+    Logger::Error("ModbusRTU write error: %d", lastError);
+    gStatistics.NumModbusWriteErrors++;
     return false;
 }

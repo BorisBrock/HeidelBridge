@@ -60,7 +60,7 @@ VehicleState HeidelbergWallbox::GetState()
 bool HeidelbergWallbox::SetChargingCurrentLimit(float currentLimitA)
 {
     mChargingCurrentLimitA = currentLimitA;
-    Logger::Debug("Heidelberg wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
+    Logger::Info("Heidelberg wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
 
     uint16_t rawCurrent = static_cast<uint16_t>(mChargingCurrentLimitA / Constants::HeidelbergWallbox::CurrentFactor);
     if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::MaximalCurrent, rawCurrent))

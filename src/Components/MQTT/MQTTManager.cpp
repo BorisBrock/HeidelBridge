@@ -118,6 +118,18 @@ namespace MQTTManager
         }
     }
 
+    void PublishHomeAssistantDiscovery()
+    {
+        // Publish Home Assistant MQTT discovery messages
+        gMqttClient.publish("homeassistant/binary_sensor/HeidelBridge/is_vehicle_connected/config", 1, false, R"({"name":"Vehicle connected","device_class":"plug","state_topic":"heidelbridge/is_vehicle_connected","payload_on":"1","payload_off":"0","unique_id":"is_vehicle_connected","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
+        gMqttClient.publish("homeassistant/binary_sensor/HeidelBridge/is_vehicle_charging/config", 1, false, R"({"name":"Vehicle charging","device_class":"battery_charging","state_topic":"heidelbridge/is_vehicle_charging","payload_on":"1","payload_off":"0","unique_id":"is_vehicle_charging","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
+        gMqttClient.publish("homeassistant/sensor/HeidelBridge/charging_power/config", 1, false, R"({"name":"Charging power","device_class":"power","state_topic":"heidelbridge/charging_power","unique_id":"charging_power","unit_of_measurement":"W","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
+        gMqttClient.publish("homeassistant/sensor/HeidelBridge/charging_current/config", 1, false, R"({"name":"Charging current","device_class":"current","state_topic":"heidelbridge/charging_current/phase1","unique_id":"charging_current","unit_of_measurement":"A","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
+        gMqttClient.publish("homeassistant/sensor/HeidelBridge/charging_current_limit/config", 1, false, R"({"name":"Charging current limit","device_class":"current","state_topic":"heidelbridge/charging_current_limit","unique_id":"charging_current_limit","unit_of_measurement":"A","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
+        gMqttClient.publish("homeassistant/sensor/HeidelBridge/energy_meter/config", 1, false, R"({"name":"Energy meter","device_class":"energy","state_topic":"heidelbridge/energy_meter","unique_id":"energy_meter","unit_of_measurement":"kWh","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
+        gMqttClient.publish("homeassistant/sensor/HeidelBridge/temperature/config", 1, false, R"({"name":"Temperature","device_class":"temperature","state_topic":"heidelbridge/temperature","unique_id":"temperature","unit_of_measurement":"°C","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
+    }
+
     void OnMqttConnect(bool sessionPresent)
     {
         Logger::Info("Connected to MQTT");
@@ -130,6 +142,9 @@ namespace MQTTManager
         gMqttClient.publish("heidelbridge/version", 0, true, versionString.c_str());
         gMqttClient.publish("heidelbridge/build_date", 0, true, __DATE__);
         gMqttClient.publish("heidelbridge/ip_address", 0, true, WiFi.localIP().toString().c_str());
+
+        // Publish discovery data
+        PublishHomeAssistantDiscovery();
     }
 
     void OnMqttDisconnect(AsyncMqttClientDisconnectReason reason)

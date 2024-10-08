@@ -110,15 +110,11 @@ Start evcc with your new configuration and the HeidelBridge should be there.
 
 # Setting up Home Assistant
 
-HeidelBridge offers a simple MQTT API (see below). Via this API, HeidelBridge can easily be added to Home Assistant.
-To do so, add the following to your `configuration.yaml`:
-
-```
-mqtt: !include mqtt.yaml
-```
-
-Also create a new file called `mqtt.yaml` and paste the example code from [here](doc/mqtt.yaml) into that file.
-Now Home Assistant should have all the entities provided by the HeidelBridge MQTT API.
+HeidelBridge offers a simple MQTT API (see below). It also supports Home Assistant's MQTT auto discovery feature.
+This way HeidelBridge can easily be added to Home Assistant:
+ - Make sure the MQTT integration in Home Assistant is enabled.
+ - Power on your HeidelBridge.
+ - The HeidelBridge should immediately show up as an MQTT device.
 
 GUI Example:
 

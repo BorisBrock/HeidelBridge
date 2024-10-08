@@ -113,7 +113,7 @@ namespace MQTTManager
             gMqttClient.publish("heidelbridge/internal/uptime", 0, false, String(gStatistics.UptimeS).c_str());
             gMqttClient.publish("heidelbridge/internal/wifi_disconnects", 0, false, String(gStatistics.NumWifiDisconnects).c_str());
             gMqttClient.publish("heidelbridge/internal/mqtt_disconnects", 0, false, String(gStatistics.NumMqttDisconnects).c_str());
-            gMqttClient.publish("heidelbridge/internal/modbus_read_rrors", 0, false, String(gStatistics.NumModbusReadErrors).c_str());
+            gMqttClient.publish("heidelbridge/internal/modbus_read_errors", 0, false, String(gStatistics.NumModbusReadErrors).c_str());
             gMqttClient.publish("heidelbridge/internal/modbus_write_errors", 0, false, String(gStatistics.NumModbusWriteErrors).c_str());
         }
     }

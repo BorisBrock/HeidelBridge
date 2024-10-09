@@ -186,23 +186,16 @@ namespace MQTTManager
         // Set credentials
         if (strlen(Credentials::MQTT::UserName) > 0)
             gMqttClient.setCredentials(Credentials::MQTT::UserName, Credentials::MQTT::Password);
+    }
 
-        // Create the reconnection timer
-        gMqttReconnectTimer = xTimerCreate(
-            "mqttConnect",
-            pdMS_TO_TICKS(Constants::MQTT::ReconnectIntervalMs),
-            pdTRUE,
-            (void *)0,
-            reinterpret_cast<TimerCallbackFunction_t>(ConnectToMqtt));
-        xTimerStart(gMqttReconnectTimer, 0);
+    void Update()
+    {
+        Logger::Trace("Publishing MQTT messages");
 
-        // Create the publish timer
-        gMqttPublishTimer = xTimerCreate(
-            "mqttPublish",
-            pdMS_TO_TICKS(Constants::MQTT::PublishIntervalMs),
-            pdTRUE,
-            (void *)0,
-            reinterpret_cast<TimerCallbackFunction_t>(PublishMessages));
-        xTimerStart(gMqttPublishTimer, pdMS_TO_TICKS(Constants::MQTT::PublishIntervalMs));
+        // Ensure MQTT is still connecte
+        ConnectToMqtt();
+
+        // Publish data set
+        PublishMessages();
     }
 }

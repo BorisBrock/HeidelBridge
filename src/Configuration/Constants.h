@@ -5,6 +5,7 @@ namespace Constants
     namespace General
     {
         constexpr float FactorWhToKWh = 0.001f;
+        constexpr uint32_t MillisPerSecond = 1000;
     };
 
     namespace ModbusRTU
@@ -83,7 +84,6 @@ namespace Constants
     {
         constexpr bool Enabled = true;
         constexpr uint16_t Port = 1883;
-        constexpr uint16_t ReconnectIntervalMs = 2000;
         constexpr uint16_t PublishIntervalMs = 1000;
     };
 };

@@ -9,8 +9,11 @@
 #include "Components/Wallbox/DummyWallbox.h"
 #include "Components/Wallbox/HeidelbergWallbox.h"
 #include "Components/MQTT/MQTTManager.h"
+#include "Components/AsyncDelay/AsyncDelay.h"
 
 IWallbox *gWallbox{nullptr};
+AsyncDelay gUptimeCounter(Constants::General::MillisPerSecond);
+AsyncDelay gMqttUpdater(Constants::MQTT::PublishIntervalMs);
 
 void setup()
 {
@@ -54,11 +57,26 @@ void setup()
     MQTTManager::Init(gWallbox);
   }
 
+  // Start async delays
+  gUptimeCounter.Restart();
+  gMqttUpdater.Restart();
+
   Logger::Info("Setup complete");
 }
 
 void loop()
 {
-  delay(1000);
-  gStatistics.UptimeS++;
+  if (gUptimeCounter.IsElapsed())
+  {
+    gUptimeCounter.Restart();
+    gStatistics.UptimeS++;
+  }
+
+  if (Constants::MQTT::Enabled && gMqttUpdater.IsElapsed())
+  {
+    gMqttUpdater.Restart();
+    MQTTManager::Update();
+  }
+
+  yield();
 }

@@ -3,20 +3,21 @@
 
 namespace Logger
 {
-    const char *GetLogLevel()
-    {
+        // Logs a message with the specified level, format and arguments
+        const char *getLogLevel()
+        {
 #ifdef LOGGING_LEVEL_ERROR
-        return "Error";
+                return "Error";
 #elif defined(LOGGING_LEVEL_WARNING)
-        return "Warning";
+                return "Warning";
 #elif defined(LOGGING_LEVEL_INFO)
-        return "Info";
+                return "Info";
 #elif defined(LOGGING_LEVEL_DEBUG)
-        return "Debug";
+                return "Debug";
 #elif defined(LOGGING_LEVEL_TRACE)
-        return "Trace";
+                return "Trace";
 #else
-        return "Undefined";
+                return "Undefined";
 #endif
-    }
-};
+        }
+}; // namespace Logger

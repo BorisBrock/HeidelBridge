@@ -26,10 +26,13 @@ namespace Constants
         constexpr uint8_t ModbusServerId = 1;
         constexpr uint16_t ModbusBaudrate = 19200;
         constexpr uint16_t ModbusTimeoutMs = 2000;
+        constexpr uint16_t WatchdogTimeoutS = 0;
+        constexpr bool AllowStandby = false;
     };
 
     namespace HeidelbergRegisters
     {
+        constexpr uint16_t WatchdogTimeout = 257;
         constexpr uint16_t DisableStandby = 258;
         constexpr uint16_t ChargingState = 5;
         constexpr uint16_t MaximalCurrent = 261;

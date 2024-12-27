@@ -20,12 +20,21 @@ void HeidelbergWallbox::Init()
         Logger::Error("ERROR: Could not set fail safe current");
     }
 
-    uint16_t standbyDisabled = 4;
-    Logger::Debug("Heidelberg wallbox: Initializing standby mode with %d (raw)", standbyDisabled);
+    // Disable standby
+    uint16_t standbyDisabled = Constants::HeidelbergWallbox::AllowStandby ? 0 : 4;
+    Logger::Debug("Heidelberg wallbox: Initializing standby mode with %d", standbyDisabled);
     if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::DisableStandby, standbyDisabled))
     {
         // Error writing modbus register
-        Logger::Error("ERROR: Could not disable standby");
+        Logger::Error("ERROR: Could not configure standby");
+    }
+
+    // Disable watchdog
+    Logger::Debug("Heidelberg wallbox: Setting watch dog timeout to %d s", Constants::HeidelbergWallbox::WatchdogTimeoutS);
+    if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::WatchdogTimeout, Constants::HeidelbergWallbox::WatchdogTimeoutS))
+    {
+        // Error writing modbus register
+        Logger::Error("ERROR: Could not set watchdog timeout");
     }
 }
 

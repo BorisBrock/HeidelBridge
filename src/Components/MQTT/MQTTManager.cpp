@@ -63,8 +63,11 @@ namespace MQTTManager
         gMqttClient.publish("homeassistant/sensor/HeidelBridge/temperature/config", 1, false, R"({"name":"Temperature","device_class":"temperature","state_topic":"heidelbridge/temperature","unique_id":"temperature","unit_of_measurement":"°C","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
     }
 
-    // Publishes a MQTT status message based on the current value index
-    void PublishMessages()
+    // Publishes various MQTT status messages based on the current value index.
+    // This function cycles through different types of data (e.g., vehicle state, charging current, temperature)
+    // and publishes the corresponding values to the MQTT broker. It ensures that all relevant data points
+    // are periodically updated and sent to the MQTT broker for monitoring and control purposes.
+    void PublishStatusMessages()
     {
         if (gMqttClient.connected())
         {
@@ -135,6 +138,8 @@ namespace MQTTManager
                 PublishHomeAssistantDiscovery();
                 break;
             }
+
+            // Increment the current value index and wrap around if it exceeds the number of published values
             gCurValueIndex = (gCurValueIndex + 1) % NumMqttPublishedValues;
 
             // These values are published every cycle
@@ -214,6 +219,6 @@ namespace MQTTManager
         ConnectToMqtt();
 
         // Publish data set
-        PublishMessages();
+        PublishStatusMessages();
     }
 }

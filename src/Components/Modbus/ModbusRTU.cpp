@@ -11,12 +11,14 @@ ModbusClientRTU gModbusRTU(Pins::PinRTS); // Create a ModbusRTU client instance
 HardwareSerial gRs485Serial(1);           // Define a Serial for UART1
 SemaphoreHandle_t gMutex = nullptr;       // A mutex object for buss access
 
+// Returns the singleton instance of ModbusRTU
 ModbusRTU *ModbusRTU::Instance()
 {
     static ModbusRTU instance;
     return &instance;
 }
 
+// Initializes the ModbusRTU instance
 void ModbusRTU::Init()
 {
     // Create the mutex
@@ -37,6 +39,7 @@ void ModbusRTU::Init()
     gModbusRTU.begin(gRs485Serial); // Start ModbusRTU background task
 }
 
+// Reads multiple registers starting from the specified address
 bool ModbusRTU::ReadRegisters(uint16_t startAddress, uint8_t numValues, uint8_t fc, uint16_t *values)
 {
     uint16_t numTries = 1 + Constants::ModbusRTU::NumReadRetries;
@@ -86,6 +89,7 @@ bool ModbusRTU::ReadRegisters(uint16_t startAddress, uint8_t numValues, uint8_t 
     return false;
 }
 
+// Writes a single 16 bit holding register at the specified address
 bool ModbusRTU::WriteHoldRegister16(uint16_t address, uint16_t value)
 {
     uint16_t numTries = 1 + Constants::ModbusRTU::NumWriteRetries;

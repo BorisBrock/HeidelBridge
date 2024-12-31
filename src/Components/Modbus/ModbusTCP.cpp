@@ -11,6 +11,7 @@ namespace ModbusTCP
     ModbusServerWiFi gModbusServer;
     IWallbox *gWallbox = nullptr;
 
+    // Reads a single input register
     ModbusMessage ReadInputRegister(ModbusMessage msg)
     {
         // For debugging
@@ -25,6 +26,7 @@ namespace ModbusTCP
         return ModbusMessage{};
     }
 
+    // Reads a single holding register
     ModbusMessage ReadHoldRegister(ModbusMessage request)
     {
         uint8_t fc = request.getFunctionCode();
@@ -149,6 +151,7 @@ namespace ModbusTCP
         return response;
     }
 
+    // Writes a single holding register
     ModbusMessage WriteHoldRegister(ModbusMessage msg)
     {
         // For debugging only
@@ -163,6 +166,7 @@ namespace ModbusTCP
         return msg; // Echo back request
     }
 
+    // Writes multiple holding registers
     ModbusMessage WriteMultipleRegisters(ModbusMessage request)
     {
         uint8_t fc = request.getFunctionCode();
@@ -199,6 +203,7 @@ namespace ModbusTCP
         return response;
     }
 
+    // Initializes the ModbusTCP server
     void Init(IWallbox *wallbox)
     {
         Logger::Info("Initializing Modbus TCP server");

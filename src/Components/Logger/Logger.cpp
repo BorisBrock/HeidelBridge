@@ -4,7 +4,7 @@
 namespace Logger
 {
         // Logs a message with the specified level, format and arguments
-        const char *getLogLevel()
+        const char *GetLogLevel()
         {
 #ifdef LOGGING_LEVEL_ERROR
                 return "Error";

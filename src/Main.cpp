@@ -25,7 +25,7 @@ void setup()
   Logger::Print("  Version: %d.%d.%d", Version::Major, Version::Minor, Version::Patch);
   Logger::Print("  Build date: %s", __DATE__);
   Logger::Print("");
-  Logger::Print("Logging level: %s", Logger::getLogLevel());
+  Logger::Print("Logging level: %s", Logger::GetLogLevel());
   Logger::Print("");
 #ifndef DUMMY_WALLBOX
   Logger::Print("Wallbox mode: real hardware (Heidelberg)");

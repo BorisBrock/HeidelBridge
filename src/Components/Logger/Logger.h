@@ -65,5 +65,5 @@ namespace Logger
     }
 
     // Returns the current logging level as a string
-    const char *getLogLevel();
+    const char *GetLogLevel();
 };

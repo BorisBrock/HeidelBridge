@@ -40,6 +40,7 @@ namespace MQTTManager
         Discovery
     };
 
+    // Connects to the MQTT broker if not already connected
     void ConnectToMqtt()
     {
         if (!gMqttClient.connected())
@@ -49,6 +50,7 @@ namespace MQTTManager
         }
     }
 
+    // Publishes MQTT discovery messages for Home Assistant integration
     void PublishHomeAssistantDiscovery()
     {
         // Publish Home Assistant MQTT discovery messages
@@ -61,6 +63,7 @@ namespace MQTTManager
         gMqttClient.publish("homeassistant/sensor/HeidelBridge/temperature/config", 1, false, R"({"name":"Temperature","device_class":"temperature","state_topic":"heidelbridge/temperature","unique_id":"temperature","unit_of_measurement":"°C","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
     }
 
+    // Publishes a MQTT status message based on the current value index
     void PublishMessages()
     {
         if (gMqttClient.connected())
@@ -139,6 +142,7 @@ namespace MQTTManager
         }
     }
 
+    // Callback for MQTT connection
     void OnMqttConnect(bool sessionPresent)
     {
         Logger::Info("Connected to MQTT");
@@ -156,12 +160,14 @@ namespace MQTTManager
         PublishHomeAssistantDiscovery();
     }
 
+    // Callback for MQTT disconnection
     void OnMqttDisconnect(AsyncMqttClientDisconnectReason reason)
     {
         Logger::Warning("Disconnected from MQTT");
         gStatistics.NumMqttDisconnects++;
     }
 
+    // Callback for MQTT messages
     void OnMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
     {
         if (ChargingCurrentControl == topic)
@@ -172,11 +178,13 @@ namespace MQTTManager
         }
     }
 
+    // Callback for MQTT publish
     void OnMqttPublish(uint16_t packetId)
     {
         // Message was sent successfully
     }
 
+    // Initializes the MQTT manager with the provided wallbox instance and sets up MQTT client configurations and event callbacks
     void Init(IWallbox *wallbox)
     {
         Logger::Info("Initializing MQTT");
@@ -197,11 +205,12 @@ namespace MQTTManager
             gMqttClient.setCredentials(Credentials::MQTT::UserName, Credentials::MQTT::Password);
     }
 
+    // Updates the MQTT connection and publishes messages
     void Update()
     {
         Logger::Trace("Publishing MQTT messages");
 
-        // Ensure MQTT is still connecte
+        // Ensure MQTT is still connected
         ConnectToMqtt();
 
         // Publish data set

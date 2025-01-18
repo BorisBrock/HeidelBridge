@@ -39,6 +39,7 @@ namespace WifiConnection
 
         // Set host name
         WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+        WiFi.mode(WIFI_MODE_NULL);
         WiFi.setHostname("HeidelBridge");
 
         // Register WiFi events

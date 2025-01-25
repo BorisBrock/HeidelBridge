@@ -17,6 +17,15 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 ---
 
+# Roadmap
+
+For the upcoming version **2.0** some nice enhancements are planned:
+- :star: Pre-built binaries: no need to clone and compile the repositoiry yourself
+- :star: OTA updates: simply update your HeidelBridge via WiFi
+- :star: Wifi provisioning: easily integrate HeidelBridge into your home network
+
+The new version is planned to be released in 2025. Stay tuned!
+
 # Required Hardware
 
 You only need two components for this project: an ESP32 microcontroller and a MAX485 module. Both are available in large quantities and at reasonable prices on the Internet. You will also need a breadboard and a few jumper wires. All in all, it shouldn't cost you more than 10$.

@@ -38,4 +38,4 @@ jobs:
           cp src/Configuration/Credentials.cpp.template src/Configuration/Credentials.cpp
 
       - name: Build HeidelBridge
-        run: pio ci --project-conf platformio.ini --verbose ./
+        run: pio ci --project-conf platformio.ini ./

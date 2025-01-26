@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark" />
+    <link rel="stylesheet" href="css/pico.min.css">
+    <link rel="stylesheet" href="css/pico.colors.min.css" />
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+    <title>Lasertag</title>
+</head>
+
+<body>
+    <div class="grid">
+        <div>
+            <main class="container">
+
+                <article>
+                    <button class="primary" onclick="buttonPressStartGame()">Spiel starten</button>
+                    <button class="secondary" onclick="buttonPressStopGame()">Spiel stoppen</button>
+                </article>
+
+                <article>
+                    <summary>
+                        <h2 class="pico-color-lime-100">Punktestand</h2>
+                    </summary>
+                    <table id="table-hs" class="small">
+                        <thead>
+                            <tr>
+                                <th>Platz</th>
+                                <th>Spieler</th>
+                                <th>Punkte</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </article>
+
+                <article>
+                    <summary>
+                        <h2 class="pico-color-lime-100">Status</h2>
+                    </summary>
+
+                    <h3 id="player_name_title_1">Spieler 1</h3>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="img/gun.svg" width="16" height="16" /></td>
+                                <td id="player_shots_1">-</td>
+                                <td><img src="img/crosshairs.svg" width="16" height="16" /></td>
+                                <td id="player_hits_dealt_1">-</td>
+                                <td><img src="img/skull.svg" width="16" height="16" /></td>
+                                <td id="player_hits_taken_1">-</td>
+                            </tr>
+                            <tr>
+                                <td><img src="img/glasses.svg" width="16" height="16" /></td>
+                                <td id="player_accuracy_1">-</td>
+                                <td class="pico-color-lime-100"><b>KD</b></td>
+                                <td id="player_kd_1">-</td>
+                                <td><img src="img/battery.svg" width="16" height="16" /></td>
+                                <td id="player_battery_1">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="player_name_title_2">Spieler 2</h3>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="img/gun.svg" width="16" height="16" /></td>
+                                <td id="player_shots_2">-</td>
+                                <td><img src="img/crosshairs.svg" width="16" height="16" /></td>
+                                <td id="player_hits_dealt_2">-</td>
+                                <td><img src="img/skull.svg" width="16" height="16" /></td>
+                                <td id="player_hits_taken_2">-</td>
+                            </tr>
+                            <tr>
+                                <td><img src="img/glasses.svg" width="16" height="16" /></td>
+                                <td id="player_accuracy_2">-</td>
+                                <td class="pico-color-lime-100"><b>KD</b></td>
+                                <td id="player_kd_2">-</td>
+                                <td><img src="img/battery.svg" width="16" height="16" /></td>
+                                <td id="player_battery_2">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="player_name_title_3">Spieler 3</h3>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="img/gun.svg" width="16" height="16" /></td>
+                                <td id="player_shots_3">-</td>
+                                <td><img src="img/crosshairs.svg" width="16" height="16" /></td>
+                                <td id="player_hits_dealt_3">-</td>
+                                <td><img src="img/skull.svg" width="16" height="16" /></td>
+                                <td id="player_hits_taken_3">-</td>
+                            </tr>
+                            <tr>
+                                <td><img src="img/glasses.svg" width="16" height="16" /></td>
+                                <td id="player_accuracy_3">-</td>
+                                <td class="pico-color-lime-100"><b>KD</b></td>
+                                <td id="player_kd_3">-</td>
+                                <td><img src="img/battery.svg" width="16" height="16" /></td>
+                                <td id="player_battery_3">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </article>
+
+                <article>
+                    <summary>
+                        <h2 class="pico-color-lime-100">Log</h2>
+                    </summary>
+                    <textarea name="read-only" id="game_log" rows="12" cols="48" readonly>
+                      </textarea>
+                </article>
+
+            </main>
+        </div>
+
+        <div>
+            <main class="container">
+
+                <article>
+                    <summary>
+                        <h2 class="pico-color-lime-100">Einstellungen</h2>
+                    </summary>
+
+                    <h3>Spieler 1</h3>
+                    <div class="grid">
+                        <div> <label for="player1_name">Name</label>
+                            <input class="fullwidth" placeholder="Player 1" value="Player 1" id="player1_name"
+                                type="text">
+                        </div>
+                        <div> <label for="player1_team">Team</label>
+                            <select id="player1_team">
+                                <optgroup label="Teamfarben">
+                                    <option selected>Rot</option>
+                                    <option>Blau</option>
+                                    <option>Grün</option>
+                                    <option>Gelb</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3>Spieler 2</h3>
+                    <div class="grid">
+                        <div> <label for="player2_name">Name</label>
+                            <input class="fullwidth" placeholder="Player 2" value="Player 2" id="player2_name"
+                                type="text">
+                        </div>
+
+                        <div><label for="player2_team">Team</label>
+                            <select id="player2_team">
+                                <optgroup label="Teamfarben">
+                                    <option>Rot</option>
+                                    <option selected>Blau</option>
+                                    <option>Grün</option>
+                                    <option>Gelb</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3>Spieler 3</h3>
+                    <div class="grid">
+                        <div> <label for="player3_name">Name</label>
+                            <input class="fullwidth" placeholder="Player 3" value="Player 3" id="player3_name"
+                                type="text">
+                        </div>
+                        <div> <label for="player3_team">Team</label>
+                            <select id="player3_team">
+                                <optgroup label="Teamfarben">
+                                    <option>Rot</option>
+                                    <option>Blau</option>
+                                    <option selected>Grün</option>
+                                    <option>Gelb</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h2>Zeit</h2>
+                    <fieldset id="time_form">
+                        <p>
+                            <input id="time_limit" type="checkbox" class="switch" checked>
+                            <label for="time_limit">Spieldauer begrenzen</label>
+                        </p>
+                        <p>
+                            <label for="time_limit_duration">Spieldauer (s)</label>
+                            <input class="fullwidth" placeholder="180" value="180" id="time_limit_duration"
+                                type="number">
+                        </p>
+                    </fieldset>
+
+                    <h2>Leben</h2>
+                    <fieldset id="health_form">
+                        <p>
+                            <input id="health_limit_active" type="checkbox" class="switch" checked>
+                            <label for="health_limit_active">Leben begrenzen</label>
+                        </p>
+                        <p>
+                            <label for="health">Anzahl Leben</label>
+                            <input class="fullwidth" placeholder="10" value="10" id="health" type="number">
+                        </p>
+                        <p>
+                            <input id="friendly_fire_active" type="checkbox" class="switch">
+                            <label for="friendly_fire_active">Friendly-Fire</label>
+                        </p>
+                    </fieldset>
+
+                    <h2>Munition</h2>
+                    <fieldset id="ammo_form">
+                        <p>
+                            <input id="ammo_limit_active" type="checkbox" class="switch" checked>
+                            <label for="ammo_limit_active">Munition begrenzen</label>
+                        </p>
+                        <p>
+                            <label for="ammo">Munition</label>
+                            <input class="fullwidth" placeholder="10" value="10" id="ammo" type="number">
+                        </p>
+                        <p>
+                            <label for="ammo_trigger_type">Feuermodus</label>
+                            <select id="ammo_trigger_type" selected="Einzelschuss">
+                                <optgroup label="Feuermodi">
+                                    <option>Deaktiviert</option>
+                                    <option selected>Einzelschuss</option>
+                                    <option>Burst (3x)</option>
+                                    <option>Vollautomatisch</option>
+                                </optgroup>
+                            </select>
+                        </p>
+                    </fieldset>
+
+                    <h2>Sonstiges</h2>
+                    <fieldset id="General_form">
+                        <p>
+                            <label for="audio_volume">Lautstärke</label>
+                            <input class="fullwidth" placeholder="0.4" value="0.4" min="0.0" max="1.0" step="0.1"
+                                id="audio_volume" type="number">
+                        </p>
+                    </fieldset>
+
+                    <button class="primary" onclick="buttonPressConfigure()">Einstellungen übernehmen</button>
+                </article>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="js/stats.js"></script>
+    <script src="js/config_writer.js"></script>
+    <script src="js/logger.js"></script>
+    <script src="js/websock.js"></script>
+</body>
+
+</html>

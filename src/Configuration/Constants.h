@@ -83,6 +83,12 @@ namespace Constants
         constexpr uint16_t MaxNumWifiClients = 8;
     };
 
+    namespace WebServer
+    {
+        constexpr bool Enabled = true;
+        constexpr uint16_t Port = 80;
+    };
+
     namespace MQTT
     {
         constexpr bool Enabled = true;

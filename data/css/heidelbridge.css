@@ -1,0 +1,21 @@
+.hb-block-button {
+    display: block;
+    width: 100%;
+    padding: 14px 28px;
+    text-align: center;
+  }
+
+  .hb-banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-top: 16px;
+    margin-left: 8px;
+  }
+
+  .hb-banner-headline {
+    font-size: 2.0em;
+    font-weight: lighter;
+    margin-left: 12px;
+  }

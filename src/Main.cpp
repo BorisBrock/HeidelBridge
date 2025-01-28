@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "Configuration/Constants.h"
+#include "Configuration/Settings.h"
 #include "Configuration/Version.h"
 #include "Components/Logger/Logger.h"
 #include "Components/Statistics/Statistics.h"
@@ -35,8 +36,12 @@ void setup()
 #endif
   Logger::Print("");
 
+  // Read persistent settings
+  Settings::Instance()->Init();
+  Settings::Instance()->ReadFromPersistentMemory();
+
   // Make sure WiFi connection is up and running
-  WifiManager::Start();
+  WifiManager::Instance()->Start();
 
   // Initialize wallbox
 #ifndef DUMMY_WALLBOX
@@ -53,7 +58,7 @@ void setup()
   ModbusTCP::Init(gWallbox);
 
   // Set up MQTT
-  if (Constants::MQTT::Enabled)
+  if (Settings::Instance()->IsMqttEnabled)
   {
     MQTTManager::Init(gWallbox);
   }
@@ -73,7 +78,7 @@ void loop()
     gStatistics.UptimeS++;
   }
 
-  if (Constants::MQTT::Enabled && gMqttUpdater.IsElapsed())
+  if (Settings::Instance()->IsMqttEnabled && gMqttUpdater.IsElapsed())
   {
     gMqttUpdater.Restart();
     MQTTManager::Update();

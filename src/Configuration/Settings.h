@@ -12,12 +12,15 @@ public:
     // Initializes the settings
     void Init();
 
-    // Checks if the device has been configured with WiFi credentials
-    bool HasWifiCredentials();
+    // Read all settings from SPIFFS
+    void ReadFromPersistentMemory();
 
-    // Gets the configured WiFi SSID
-    String GetWifiSsid();
-
-    // Gets the configured WiFi password
-    String GetWifiPassword();
+public:
+    String WifiSsid{};
+    String WifiPassword{};
+    bool IsMqttEnabled;
+    String MqttServer{};
+    uint16_t MqttPort{1833};
+    String MqttUser{};
+    String MqttPassword{};
 };

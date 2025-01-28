@@ -18,20 +18,14 @@ void Settings::Init()
     gPreferences.begin("heidelbridge", false);
 }
 
-// Checks if the device has been configured with WiFi credentials
-bool Settings::HasWifiCredentials()
+// Read all settings from SPIFFS
+void Settings::ReadFromPersistentMemory()
 {
-    return gPreferences.getString("wifi_ssid") != "" && gPreferences.getString("wifi_password") != "";
-}
-
-// Gets the configured WiFi SSID
-String Settings::GetWifiSsid()
-{
-    return gPreferences.getString("wifi_ssid");
-}
-
-// Gets the configured WiFi password
-String Settings::GetWifiPassword()
-{
-    return gPreferences.getString("wifi_password");
+    WifiSsid = gPreferences.getString("wifi_ssid");
+    WifiPassword = gPreferences.getString("wifi_password");
+    IsMqttEnabled = gPreferences.getBool("mqtt_port");
+    MqttPort = gPreferences.getUShort("mqtt_port", 1833);
+    MqttServer = gPreferences.getString("mqtt_server");
+    MqttUser = gPreferences.getString("mqtt_user");
+    MqttPassword = gPreferences.getString("mqtt_password");
 }

@@ -10,7 +10,7 @@ extern "C"
 #include "../Statistics/Statistics.h"
 #include "../../Configuration/Version.h"
 #include "../../Configuration/Constants.h"
-#include "../../Configuration/Credentials.h"
+#include "../../Configuration/Settings.h"
 #include "../Wallbox/IWallbox.h"
 #include "MQTTManager.h"
 
@@ -203,11 +203,11 @@ namespace MQTTManager
         gMqttClient.onPublish(OnMqttPublish);
 
         // Configure the server
-        gMqttClient.setServer(Credentials::MQTT::Server, Constants::MQTT::Port);
+        gMqttClient.setServer(Settings::Instance()->MqttServer.c_str(), Settings::Instance()->MqttPort);
 
         // Set credentials
-        if (strlen(Credentials::MQTT::UserName) > 0)
-            gMqttClient.setCredentials(Credentials::MQTT::UserName, Credentials::MQTT::Password);
+        if (Settings::Instance()->MqttUser.length() > 0)
+            gMqttClient.setCredentials(Settings::Instance()->MqttUser.c_str(), Settings::Instance()->MqttPassword.c_str());
     }
 
     // Updates the MQTT connection and publishes messages

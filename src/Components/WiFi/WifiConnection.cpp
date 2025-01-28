@@ -1,8 +1,9 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <DNSServer.h>
 #include "../../Configuration/Constants.h"
+#include "../../Configuration/Settings.h"
 #include "WifiConnection.h"
-#include "../../Configuration/Credentials.h"
 #include "../Logger/Logger.h"
 #include "../Statistics/Statistics.h"
 
@@ -30,11 +31,11 @@ namespace WifiConnection
 
         gStatistics.NumWifiDisconnects++;
 
-        WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
+        WiFi.begin(Settings::Instance()->WifiSsid, Settings::Instance()->WifiPassword);
     }
 
     // Connects to the given SSID with the given password
-    void ConnectToSsid(const String &ssid, const String &password);
+    void ConnectToSsid(const String &ssid, const String &password)
     {
         // Delete old config
         Logger::Trace("Preparing Wifi");
@@ -60,17 +61,19 @@ namespace WifiConnection
     // Starts the captive portal
     void StartCaptivePortal()
     {
-        Logger::Info("Starting DNS server");
-        gDnsServer.start(53, "*", WiFi.softAPIP());
+        Logger::Info("Starting captive portal");
+
         WiFi.softAP("HeidelBridge Setup");
+ 
         gDnsServer.setErrorReplyCode(DNSReplyCode::NoError);
         gDnsServer.setTTL(300);
         gDnsServer.start(53, "*", WiFi.softAPIP());
+
         gIsCaptivePortalActive = true;
     }
 
     // Cyclic processing
-    void Loop()
+    void Update()
     {
         if (gIsCaptivePortalActive)
         {

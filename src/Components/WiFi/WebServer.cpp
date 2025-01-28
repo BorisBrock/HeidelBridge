@@ -2,15 +2,20 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <DNSServer.h>
 #include "SPIFFS.h"
 #include "../../Configuration/Constants.h"
 #include "../../Configuration/Settings.h"
-#include "../Wifi/WifiConnection.h"
+#include "WifiConnection.h"
 #include "../Logger/Logger.h"
 #include "WebServer.h"
 
 AsyncWebServer gWebServer(Constants::WebServer::Port);
+
+WebServer *WebServer::Instance()
+{
+    static WebServer instance;
+    return &instance;
+}
 
 // Initializes the asynchronous web server
 void WebServer::Init()
@@ -31,10 +36,10 @@ void WebServer::Init()
     Logger::Info("Initializing web server");
 
     // Serve static files from SPIFFS
-    server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+    gWebServer.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
     // Handle API requests
-    server.on("/api/data", HTTP_GET, [](AsyncWebServerRequest *request)
+    gWebServer.on("/api/data", HTTP_GET, [](AsyncWebServerRequest *request)
               {
     // Example JSON response
     String jsonResponse = "{\"message\": \"Hello, this is your API response!\", \"status\": \"success\"}";

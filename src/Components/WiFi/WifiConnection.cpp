@@ -61,8 +61,6 @@ namespace WifiConnection
     // Starts the captive portal
     void StartCaptivePortal()
     {
-        Logger::Info("Starting captive portal");
-
         WiFi.softAP("HeidelBridge Setup");
  
         gDnsServer.setErrorReplyCode(DNSReplyCode::NoError);

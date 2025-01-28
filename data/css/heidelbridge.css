@@ -5,20 +5,22 @@
     width: 100%;
     padding: 14px 28px;
     text-align: center;
+    background-color: #3f398d;
+    border-color: #8b90c7;
   }
   
   .hb-block-button .line1 {
-    font-size: 16px;
-    font-weight: bold;
+    font-size: 26px;
+    font-weight: 400;
   }
   
   .hb-block-button .line2 {
-    font-size: 12px;
-    color: #808080;
+    font-size: 16px;
+    color: #8b90c7;
   }
 
-  .hb-block-button:hover .line2 {
-    color: #A0A0A0;
+  .hb-block-button:hover {
+    background-color: #646baf;
   }
 
   .hb-banner {
@@ -30,11 +32,12 @@
   }
 
   .hb-banner-headline {
-    color: #9a6ada;
-    font-size: 2.0em;
-    font-weight: bold;
+    color: #646baf;
+    font-size: 2.4em;
+    font-weight: 400;
     margin-left: 10px;
-    margin-top: 8px;
+    margin-top: 12px;
+    margin-right: 6px;
   }
 
   .hb-banner-image {

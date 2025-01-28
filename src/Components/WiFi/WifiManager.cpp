@@ -35,6 +35,7 @@ void WifiManager::Start()
 void WifiManager::StartCaptivePortal()
 {
     Logger::Info("Starting captive portal");
+
     WifiConnection::StartCaptivePortal();
 }
 
@@ -42,5 +43,6 @@ void WifiManager::StartCaptivePortal()
 void WifiManager::ConnectToWifiNetwork()
 {
     Logger::Info("Connecting to configured WiFi network");
+    
     WifiConnection::ConnectToSsid(Settings::Instance()->WifiSsid, Settings::Instance()->WifiPassword);
 }

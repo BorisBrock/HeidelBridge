@@ -14,4 +14,10 @@ public:
 
     // Checks if the device has been configured with WiFi credentials
     bool HasWifiCredentials();
+
+    // Gets the configured WiFi SSID
+    String GetWifiSsid();
+
+    // Gets the configured WiFi password
+    String GetWifiPassword();
 };

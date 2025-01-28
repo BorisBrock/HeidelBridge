@@ -8,6 +8,9 @@
 
 namespace WifiConnection
 {
+    bool gIsCaptivePortalActive = false;
+    DNSServer gDnsServer;
+
     void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
     {
         Logger::Info("Connected to AP successfully!");
@@ -30,7 +33,8 @@ namespace WifiConnection
         WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
     }
 
-    void Init()
+    // Connects to the given SSID with the given password
+    void ConnectToSsid(const String &ssid, const String &password);
     {
         // Delete old config
         Logger::Trace("Preparing Wifi");
@@ -48,8 +52,29 @@ namespace WifiConnection
         WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
         // Start Wifi connection
-        Logger::Info("Connecting to WiFi SSID '%s'", Credentials::WiFi::SSID);
-        WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
+        Logger::Info("Connecting to WiFi SSID '%s'", ssid);
+        WiFi.begin(ssid, password);
         gStatistics.NumWifiDisconnects = 0;
+    }
+
+    // Starts the captive portal
+    void StartCaptivePortal()
+    {
+        Logger::Info("Starting DNS server");
+        gDnsServer.start(53, "*", WiFi.softAPIP());
+        WiFi.softAP("HeidelBridge Setup");
+        gDnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+        gDnsServer.setTTL(300);
+        gDnsServer.start(53, "*", WiFi.softAPIP());
+        gIsCaptivePortalActive = true;
+    }
+
+    // Cyclic processing
+    void Loop()
+    {
+        if (gIsCaptivePortalActive)
+        {
+            gDnsServer.processNextRequest();
+        }
     }
 };

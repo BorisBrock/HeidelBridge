@@ -4,6 +4,7 @@
 #include "Components/Logger/Logger.h"
 #include "Components/Statistics/Statistics.h"
 #include "Components/WiFi/WifiConnection.h"
+#include "Components/WiFi/WifiManager.h"
 #include "Components/Modbus/ModbusRTU.h"
 #include "Components/Modbus/ModbusTCP.h"
 #include "Components/Wallbox/DummyWallbox.h"
@@ -35,7 +36,7 @@ void setup()
   Logger::Print("");
 
   // Make sure WiFi connection is up and running
-  WifiConnection::Init();
+  WifiManager::Start();
 
   // Initialize wallbox
 #ifndef DUMMY_WALLBOX
@@ -77,6 +78,8 @@ void loop()
     gMqttUpdater.Restart();
     MQTTManager::Update();
   }
+
+  WifiConnection::Update();
 
   yield();
 }

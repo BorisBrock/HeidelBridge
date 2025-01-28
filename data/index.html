@@ -14,19 +14,30 @@
 </head>
 
 <body>
-    <div class="grid">
 
-        <div class="hb-banner">
-            <img src="img/blueberry.svg" width="30px" height="30px" alt="bluberry" />
+        <div class="container hb-banner">
+            <img class="hb-banner-image" src="img/blueberry.svg" />
             <h1 class="hb-banner-headline">HeidelBridge</h1>
         </div>
 
         <main class="container">
-            <p><button class="outline primary hb-block-button" onclick="buttonPressConfigure()">WiFi Settings</button></p>
-            <p><button class="outline primary hb-block-button" onclick="buttonPressConfigure()">MQTT Settings</button></p>
-            <p><button class="outline primary hb-block-button" onclick="buttonPressConfigure()">Firmware Update</button></p>
+            <p><button class="outline primary hb-block-button" onclick="buttonPressConfigure()">
+                    <span class="line1">WiFi Network</span>
+                    <span class="line2">Wifi status is currently unknown</span>
+                </button></p>
+            <p><button class="outline primary hb-block-button" onclick="buttonPressConfigure()">
+                    <span class="line1">MQTT Connection</span>
+                    <span class="line2">MQTT connection status is unknown</span>
+                </button></p>
+            <p><button class="outline primary hb-block-button" onclick="buttonPressConfigure()">
+                    <span class="line1">Firmware Update</span>
+                    <span class="line2">Current firmware version is unknown</span>
+                </button></p>
+            <p><button class="outline primary hb-block-button" onclick="buttonPressConfigure()">
+                    <span class="line1">System</span>
+                    <span class="line2">System status and advanced functions</span>
+                </button></p>
         </main>
-    </div>
 
     <script src="index.js"></script>
 </body>

@@ -1,13 +1,28 @@
 .hb-block-button {
-    display: block;
+    display: inline-flex;
+    flex-direction: column; /* Stack lines vertically */
+    align-items: center;    /* Center-align text */
     width: 100%;
     padding: 14px 28px;
     text-align: center;
   }
+  
+  .hb-block-button .line1 {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .hb-block-button .line2 {
+    font-size: 12px;
+    color: #808080;
+  }
+
+  .hb-block-button:hover .line2 {
+    color: #A0A0A0;
+  }
 
   .hb-banner {
     display: flex;
-    justify-content: center;
     align-items: center;
     margin-bottom: 20px;
     margin-top: 16px;
@@ -15,7 +30,15 @@
   }
 
   .hb-banner-headline {
+    color: #9a6ada;
     font-size: 2.0em;
-    font-weight: lighter;
-    margin-left: 12px;
+    font-weight: bold;
+    margin-left: 10px;
+    margin-top: 8px;
+  }
+
+  .hb-banner-image {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
   }

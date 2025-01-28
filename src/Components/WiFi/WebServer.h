@@ -1,10 +1,8 @@
 #pragma once
 
-namespace WebServer
+class WebServer
 {
+public:
     // Initializes the asynchronous web server
     void Init();
-
-    // Updates the web/DNS server
-    void Update();
 };

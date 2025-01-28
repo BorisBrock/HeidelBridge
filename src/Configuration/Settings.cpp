@@ -23,3 +23,15 @@ bool Settings::HasWifiCredentials()
 {
     return gPreferences.getString("wifi_ssid") != "" && gPreferences.getString("wifi_password") != "";
 }
+
+// Gets the configured WiFi SSID
+String Settings::GetWifiSsid()
+{
+    return gPreferences.getString("wifi_ssid");
+}
+
+// Gets the configured WiFi password
+String Settings::GetWifiPassword()
+{
+    return gPreferences.getString("wifi_password");
+}

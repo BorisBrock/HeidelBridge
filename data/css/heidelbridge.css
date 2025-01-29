@@ -23,6 +23,14 @@
     background-color: #646baf;
   }
 
+  .hb-page-headline {
+    display: flex;
+    width: 100%;
+    font-size: 1.4em;
+    justify-content: center;
+    align-items: center;
+  }
+
   .hb-banner {
     display: flex;
     width: 100%;

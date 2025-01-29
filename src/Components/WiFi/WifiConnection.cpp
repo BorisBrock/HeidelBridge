@@ -61,11 +61,19 @@ namespace WifiConnection
     // Starts the captive portal
     void StartCaptivePortal()
     {
+        // Local IP used in captive portal mode
+        const IPAddress localIp(4, 3, 2, 1);
+        const IPAddress gatewayIp(4, 3, 2, 1);
+        const IPAddress subnetMask(255, 255, 255, 0);
+
+        // Configure the soft access point with a specific IP and subnet mask
+        WiFi.softAPConfig(localIp, gatewayIp, subnetMask);
+
         WiFi.softAP(Constants::WebServer::CaptivePortalName);
- 
+
         gDnsServer.setErrorReplyCode(DNSReplyCode::NoError);
         gDnsServer.setTTL(300);
-        gDnsServer.start(53, "*", WiFi.softAPIP());
+        gDnsServer.start(53, "*", localIp);
 
         gIsCaptivePortalActive = true;
     }

@@ -38,6 +38,27 @@ void WebServer::Init()
 
     Logger::Info("Initializing web server");
 
+    // Required
+    gWebServer.on("/connecttest.txt", [](AsyncWebServerRequest *request)
+                  { request->redirect("http://logout.net"); }); // windows 11 captive portal workaround
+    gWebServer.on("/wpad.dat", [](AsyncWebServerRequest *request)
+                  { request->send(404); }); // Honestly don't understand what this is but a 404 stops win 10 keep calling this repeatedly and panicking the esp32 :)
+
+    // Background responses: Probably not all are Required, but some are. Others might speed things up?
+    // A Tier (commonly used by modern systems)
+    gWebServer.on("/generate_204", [](AsyncWebServerRequest *request)
+                  { request->redirect(Constants::WebServer::LocalIpUrl); }); // android captive portal redirect
+    gWebServer.on("/redirect", [](AsyncWebServerRequest *request)
+                  { request->redirect(Constants::WebServer::LocalIpUrl); }); // microsoft redirect
+    gWebServer.on("/hotspot-detect.html", [](AsyncWebServerRequest *request)
+                  { request->redirect(Constants::WebServer::LocalIpUrl); }); // apple call home
+    gWebServer.on("/canonical.html", [](AsyncWebServerRequest *request)
+                  { request->redirect(Constants::WebServer::LocalIpUrl); }); // firefox captive portal call home
+    gWebServer.on("/success.txt", [](AsyncWebServerRequest *request)
+                  { request->send(200); }); // firefox captive portal call home
+    gWebServer.on("/ncsi.txt", [](AsyncWebServerRequest *request)
+                  { request->redirect(Constants::WebServer::LocalIpUrl); }); // windows call home
+
     // Serve static files from SPIFFS
     gWebServer.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 

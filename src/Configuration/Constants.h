@@ -88,6 +88,7 @@ namespace Constants
         constexpr bool Enabled = true;
         constexpr uint16_t Port = 80;
         extern const char* CaptivePortalName;
+        extern const char* LocalIpUrl;
     };
 
     namespace MQTT

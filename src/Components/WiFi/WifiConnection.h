@@ -10,4 +10,7 @@ namespace WifiConnection
 
     // Cyclic processing
     void Update();
+
+    // Checks if the device is connected to a WiFi network
+    bool IsConnectedToWifi();
 };

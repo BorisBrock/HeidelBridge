@@ -78,4 +78,10 @@ namespace WifiConnection
             gDnsServer.processNextRequest();
         }
     }
+
+    // Checks if the device is connected to a WiFi network
+    bool IsConnectedToWifi()
+    {
+        return WiFi.status() == WL_CONNECTED;
+    }
 };

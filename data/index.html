@@ -15,29 +15,25 @@
 
 <body>
 
-        <div class="container hb-banner">
-            <img class="hb-banner-image" src="img/blueberry.svg" />
-            <h1 class="hb-banner-headline">HeidelBridge</h1>    
-        </div>
+    <div class="hb-banner">
+        <img class="hb-banner-image" src="img/blueberry.svg" />
+        <h1 class="hb-banner-headline">HeidelBridge</h1>
+    </div>
 
-        <main class="container">
-            <p><button class="hb-block-button" onclick="buttonPressConfigure()">
-                    <span class="line1">WiFi Network</span>
-                    <span class="line2">Wifi status is currently unknown</span>
-                </button></p>
-            <p><button class="hb-block-button" onclick="buttonPressConfigure()">
-                    <span class="line1">MQTT Connection</span>
-                    <span class="line2">MQTT connection status is unknown</span>
-                </button></p>
-            <p><button class="hb-block-button" onclick="buttonPressConfigure()">
-                    <span class="line1">Firmware Update</span>
-                    <span class="line2">Current firmware version is unknown</span>
-                </button></p>
-            <p><button class="hb-block-button" onclick="buttonPressConfigure()">
-                    <span class="line1">System Settings</span>
-                    <span class="line2">System status and advanced functions</span>
-                </button></p>
-        </main>
+    <main class="container">
+        <p><button class="hb-block-button" onclick="window.location.href='wifi.html';">
+                <span class="line1">WiFi Network</span>
+                <span class="line2">Configure the wireless networking</span>
+            </button></p>
+        <p><button class="hb-block-button" onclick="buttonPressConfigure()">
+                <span class="line1">MQTT Connection</span>
+                <span class="line2">Configure the connection to a MQTT server</span>
+            </button></p>
+        <p><button class="hb-block-button" onclick="buttonPressConfigure()">
+                <span class="line1">Firmware Update</span>
+                <span class="line2">Update the device firmware wirelessly</span>
+            </button></p>
+    </main>
 
     <script src="index.js"></script>
 </body>

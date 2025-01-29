@@ -221,4 +221,10 @@ namespace MQTTManager
         // Publish data set
         PublishStatusMessages();
     }
+
+    // Checks if MQTT is actually connected
+    bool IsConnected()
+    {
+        return gMqttClient.connected();
+    }
 }

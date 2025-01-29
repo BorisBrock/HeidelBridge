@@ -1,5 +1,7 @@
 #pragma once
 
+class IWallbox;
+
 namespace MQTTManager
 {
     // Initializes the MQTT manager
@@ -7,4 +9,7 @@ namespace MQTTManager
 
     // Updates the MQTT manager
     void Update();
+
+    // Checks if MQTT is actually connected
+    bool IsConnected();
 };

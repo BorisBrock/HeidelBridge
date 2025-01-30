@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <DNSServer.h>
+#include <ArduinoJson.h>
 #include "../../Configuration/Constants.h"
 #include "../../Configuration/Settings.h"
 #include "WifiConnection.h"
@@ -69,6 +70,7 @@ namespace WifiConnection
         // Configure the soft access point with a specific IP and subnet mask
         WiFi.softAPConfig(localIp, gatewayIp, subnetMask);
 
+        WiFi.mode(WIFI_AP_STA);
         WiFi.softAP(Constants::WebServer::CaptivePortalName);
 
         gDnsServer.setErrorReplyCode(DNSReplyCode::NoError);
@@ -91,5 +93,40 @@ namespace WifiConnection
     bool IsConnectedToWifi()
     {
         return WiFi.status() == WL_CONNECTED;
+    }
+
+    // Scans for available WiFi networks
+    void StartNetworkScan()
+    {
+        if (WiFi.scanComplete() == WIFI_SCAN_FAILED)
+        {
+            WiFi.scanNetworks(true); // Start async scan
+        }
+    }
+
+    // Checks if the scan has finished
+    bool IsNetworkScanFinished()
+    {
+        return WiFi.scanComplete() >= 0;
+    }
+
+    // Gets the network scan results
+    void GetNetworkScanResults(JsonDocument &jsonDoc)
+    {
+        if (WiFi.scanComplete() <= 0)
+        {
+            return;
+        }
+
+        JsonArray networks = jsonDoc.createNestedArray("networks");
+
+        for (int32_t i = 0; i < WiFi.scanComplete(); i++)
+        {
+            JsonObject network = networks.createNestedObject();
+            network["ssid"] = WiFi.SSID(i);
+            network["rssi"] = WiFi.RSSI(i);
+        }
+
+        WiFi.scanDelete(); // Clear scan results
     }
 };

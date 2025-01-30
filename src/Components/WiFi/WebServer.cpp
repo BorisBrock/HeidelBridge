@@ -63,8 +63,10 @@ void WebServer::Init()
     gWebServer.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
     // Handle API requests
-    gWebServer.on("/api/index", HTTP_GET, [this](AsyncWebServerRequest *request)
-                  { request->send(200, "application/json", HandleIndexApiRequest()); });
+    gWebServer.on("/api/wifi_scan", HTTP_GET, [this](AsyncWebServerRequest *request)
+                  { request->send(200, "application/json", HandleApiRequestWifiScan()); });
+    gWebServer.on("/api/wifi_status", HTTP_GET, [this](AsyncWebServerRequest *request)
+                  { request->send(200, "application/json", HandleApiRequestWifiStatus()); });
 
     // handle 404 errors
     gWebServer.onNotFound([&](AsyncWebServerRequest *request)
@@ -73,17 +75,27 @@ void WebServer::Init()
     gWebServer.begin();
 }
 
-// Handles the index API request
-String WebServer::HandleIndexApiRequest()
+// Handles the API request
+String WebServer::HandleApiRequestWifiScan()
+{
+    WifiConnection::StartNetworkScan();
+
+    JsonDocument doc;
+    doc["status"] = "ok";
+
+    String jsonResponse;
+    serializeJson(doc, jsonResponse);
+    return jsonResponse;
+}
+
+// Handles the API request
+String WebServer::HandleApiRequestWifiStatus()
 {
     JsonDocument doc;
 
-    doc["wifi_ssid"] = Settings::Instance()->WifiSsid;
-    doc["wifi_connected"] = WifiConnection::IsConnectedToWifi();
-    doc["mqtt_server"] = Settings::Instance()->MqttServer;
-    doc["mqtt_enabled"] = Settings::Instance()->IsMqttEnabled;
-    doc["mqtt_connected"] = MQTTManager::IsConnected();
-    doc["version"] = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
+    doc["status"] = WifiConnection::IsNetworkScanFinished() ? "ok" : "scanning";
+
+    WifiConnection::GetNetworkScanResults(doc);
 
     String jsonResponse;
     serializeJson(doc, jsonResponse);

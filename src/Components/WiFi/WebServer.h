@@ -10,6 +10,9 @@ public:
     void Init();
 
 private:
-    // Handles the index API request
-    String HandleIndexApiRequest();
+    // Handles the API request
+    String HandleApiRequestWifiStatus();
+
+    // Handles the API request
+    String HandleApiRequestWifiScan();
 };

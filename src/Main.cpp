@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include "Configuration/Constants.h"
 #include "Configuration/Settings.h"
 #include "Configuration/Version.h"

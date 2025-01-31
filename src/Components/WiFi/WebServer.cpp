@@ -93,7 +93,7 @@ String WebServer::HandleApiRequestWifiStatus()
 {
     JsonDocument doc;
 
-    doc["status"] = WifiConnection::IsNetworkScanFinished() ? "ok" : "scanning";
+    doc["status"] = WifiConnection::IsNetworkScanRunning() ? "scanning" : "idle";
 
     WifiConnection::GetNetworkScanResults(doc);
 

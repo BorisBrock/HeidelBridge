@@ -98,16 +98,18 @@ namespace WifiConnection
     // Scans for available WiFi networks
     void StartNetworkScan()
     {
+        Logger::Trace("Network scan requested");
         if (WiFi.scanComplete() == WIFI_SCAN_FAILED)
         {
+            Logger::Trace("Starting network scan");
             WiFi.scanNetworks(true); // Start async scan
         }
     }
 
     // Checks if the scan has finished
-    bool IsNetworkScanFinished()
+    bool IsNetworkScanRunning()
     {
-        return WiFi.scanComplete() >= 0;
+        return WiFi.scanComplete() < 0;
     }
 
     // Gets the network scan results
@@ -115,14 +117,15 @@ namespace WifiConnection
     {
         if (WiFi.scanComplete() <= 0)
         {
+            Logger::Trace("WiFi scan not yet finished");
             return;
         }
 
-        JsonArray networks = jsonDoc.createNestedArray("networks");
+        JsonArray networks = jsonDoc["networks"].to<JsonArray>();
 
         for (int32_t i = 0; i < WiFi.scanComplete(); i++)
         {
-            JsonObject network = networks.createNestedObject();
+            JsonObject network = networks.add<JsonObject>();
             network["ssid"] = WiFi.SSID(i);
             network["rssi"] = WiFi.RSSI(i);
         }

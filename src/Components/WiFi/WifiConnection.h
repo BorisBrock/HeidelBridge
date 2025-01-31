@@ -2,14 +2,6 @@
 
 namespace WifiConnection
 {
-    enum class NetworkScanStatus
-    {
-        None,
-        Scanning,
-        Completed
-    };
-
-
     // Connects to the given SSID with the given password
     void ConnectToSsid(const String &ssid, const String &password);
 
@@ -26,7 +18,7 @@ namespace WifiConnection
     void StartNetworkScan();
 
     // Checks if the scan has finished
-    bool IsNetworkScanFinished();
+    bool IsNetworkScanRunning();
 
     // Gets the network scan results
     void GetNetworkScanResults(JsonDocument &jsonDoc);

@@ -45,11 +45,11 @@ float DummyWallbox::GetEnergyMeterValue()
 {
     if (mChargingCurrentLimitA > 0.0f)
     {
-        mEnergyMeterKWh += 0.1f;
+        mEnergyMeterWh += 100.0f;
     }
 
-    Logger::Debug("Dummy wallbox: returning energy meter value %f kWh", mEnergyMeterKWh);
-    return mEnergyMeterKWh;
+    Logger::Debug("Dummy wallbox: returning energy meter value %f kWh", mEnergyMeterWh);
+    return mEnergyMeterWh;
 }
 
 float DummyWallbox::GetFailsafeCurrent()

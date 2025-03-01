@@ -27,5 +27,5 @@ public:
 private:
     float mChargingCurrentLimitA{Constants::DummyWallbox::MaxChargingCurrentA};
     float mFailsafeCurrentA{Constants::DummyWallbox::FailSafeCurrentA};
-    float mEnergyMeterKWh{0.0f};
+    float mEnergyMeterWh{0.0f};
 };

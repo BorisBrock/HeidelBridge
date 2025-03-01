@@ -7,8 +7,7 @@
 #include "../../Configuration/Constants.h"
 #include "../../Configuration/Settings.h"
 #include "../../Configuration/Version.h"
-#include "WifiConnection.h"
-#include "../MQTT/MQTTManager.h"
+#include "NetworkScanner.h"
 #include "../Logger/Logger.h"
 #include "WebServer.h"
 
@@ -78,7 +77,7 @@ void WebServer::Init()
 // Handles the API request
 String WebServer::HandleApiRequestWifiScan()
 {
-    WifiConnection::StartNetworkScan();
+    NetworkScanner::StartNetworkScan();
 
     JsonDocument doc;
     doc["status"] = "ok";
@@ -93,9 +92,9 @@ String WebServer::HandleApiRequestWifiStatus()
 {
     JsonDocument doc;
 
-    doc["status"] = WifiConnection::IsNetworkScanRunning() ? "scanning" : "idle";
+    doc["status"] = NetworkScanner::IsNetworkScanRunning() ? "scanning" : "idle";
 
-    WifiConnection::GetNetworkScanResults(doc);
+    NetworkScanner::GetNetworkScanResults(doc);
 
     String jsonResponse;
     serializeJson(doc, jsonResponse);

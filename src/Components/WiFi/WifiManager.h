@@ -14,7 +14,7 @@ private:
     WifiManager() {};
 
     // Connects to a known WiFi network
-    void ConnectToWifiNetwork();
+    bool ConnectToWifiNetwork();
 
     // Starts the captive portal
     void StartCaptivePortal();

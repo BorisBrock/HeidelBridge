@@ -7,6 +7,7 @@
 #include "Components/Statistics/Statistics.h"
 #include "Components/WiFi/WifiConnection.h"
 #include "Components/WiFi/WifiManager.h"
+#include "Components/WiFi/CaptivePortal.h"
 #include "Components/Modbus/ModbusRTU.h"
 #include "Components/Modbus/ModbusTCP.h"
 #include "Components/Wallbox/DummyWallbox.h"
@@ -85,7 +86,7 @@ void loop()
     MQTTManager::Update();
   }
 
-  WifiConnection::Update();
+  CaptivePortal::Update();
 
   yield();
 }

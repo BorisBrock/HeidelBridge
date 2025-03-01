@@ -81,6 +81,7 @@ namespace Constants
     namespace WiFi
     {
         constexpr uint16_t MaxNumWifiClients = 8;
+        constexpr uint32_t ConnectionTimeoutMs = 30000;
     };
 
     namespace WebServer

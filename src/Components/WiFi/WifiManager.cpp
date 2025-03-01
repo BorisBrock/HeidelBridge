@@ -4,6 +4,7 @@
 #include "../../Configuration/Settings.h"
 #include "../Logger/Logger.h"
 #include "WifiConnection.h"
+#include "CaptivePortal.h"
 #include "WebServer.h"
 #include "WifiManager.h"
 
@@ -17,12 +18,15 @@ void WifiManager::Start()
 {
     Logger::Info("Starting WiFi manager");
 
-    // Check if WiFi credentials are available
+    // Check if WiFi credentials are available and try to connect
+    bool isConnectedToWifi = false;
     if (Settings::Instance()->WifiSsid.length() > 0)
     {
-        ConnectToWifiNetwork();
+        isConnectedToWifi = ConnectToWifiNetwork();
     }
-    else
+
+    // Fallback in case no WiFi connection could be established
+    if(!isConnectedToWifi)
     {
         // Start captive portal
         StartCaptivePortal();
@@ -37,13 +41,28 @@ void WifiManager::StartCaptivePortal()
 {
     Logger::Info("Starting captive portal");
 
-    WifiConnection::StartCaptivePortal();
+    CaptivePortal::Start();
 }
 
 // Connects to a known WiFi network
-void WifiManager::ConnectToWifiNetwork()
+bool WifiManager::ConnectToWifiNetwork()
 {
     Logger::Info("Connecting to configured WiFi network");
     
-    WifiConnection::ConnectToSsid(Settings::Instance()->WifiSsid, Settings::Instance()->WifiPassword);
+    WifiConnection::Connect(Settings::Instance()->WifiSsid, Settings::Instance()->WifiPassword);
+
+    // Wait for connection
+    uint32_t startTimeMs = millis();
+    while (!WifiConnection::IsConnected())
+    {
+        delay(100);
+        if (millis() - startTimeMs > Constants::WiFi::ConnectionTimeoutMs)
+        {
+            Logger::Error(" -> Failed to connect to WiFi network");
+            return false;
+        }
+    }
+
+    Logger::Trace(" -> WiFi connection established");
+    return true;
 }

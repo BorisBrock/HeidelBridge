@@ -37,7 +37,7 @@ namespace Constants
         constexpr uint16_t ChargingState = 5;
         constexpr uint16_t MaximalCurrent = 261;
         constexpr uint16_t Power = 14;
-        constexpr uint16_t Energy = 15;
+        constexpr uint16_t Energy = 17;
         constexpr uint16_t FailsafeCurrent = 262;
         constexpr uint16_t Currents = 6;
         constexpr uint16_t Voltages = 10;

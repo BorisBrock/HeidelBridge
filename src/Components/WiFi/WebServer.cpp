@@ -62,6 +62,8 @@ void WebServer::Init()
     gWebServer.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
     // Handle API requests
+    gWebServer.on("/api/version", HTTP_GET, [this](AsyncWebServerRequest *request)
+    { request->send(200, "application/json", HandleApiRequestVersion()); });
     gWebServer.on("/api/wifi_scan", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestWifiScan()); });
     gWebServer.on("/api/wifi_status", HTTP_GET, [this](AsyncWebServerRequest *request)
@@ -72,6 +74,18 @@ void WebServer::Init()
                           { request->send(404, "text/plain", "This resource does not exist"); });
 
     gWebServer.begin();
+}
+
+// Handles the API request
+String WebServer::HandleApiRequestVersion()
+{
+    JsonDocument doc;
+    doc["version"] = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
+    doc["build_date"] = __DATE__;
+
+    String jsonResponse;
+    serializeJson(doc, jsonResponse);
+    return jsonResponse;
 }
 
 // Handles the API request

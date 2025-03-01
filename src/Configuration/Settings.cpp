@@ -21,6 +21,8 @@ void Settings::Init()
 // Read all settings from SPIFFS
 void Settings::ReadFromPersistentMemory()
 {
+    Logger::Trace("Reading settings from persistent memory");
+
     WifiSsid = gPreferences.getString("wifi_ssid");
     WifiPassword = gPreferences.getString("wifi_password");
     IsMqttEnabled = gPreferences.getBool("mqtt_port");

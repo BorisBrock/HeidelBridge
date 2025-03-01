@@ -18,7 +18,7 @@ public:
 public:
     String WifiSsid{};
     String WifiPassword{};
-    bool IsMqttEnabled;
+    bool IsMqttEnabled{false};
     String MqttServer{};
     uint16_t MqttPort{1833};
     String MqttUser{};

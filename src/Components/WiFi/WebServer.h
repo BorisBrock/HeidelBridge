@@ -11,6 +11,9 @@ public:
 
 private:
     // Handles the API request
+    String HandleApiRequestVersion();
+
+    // Handles the API request
     String HandleApiRequestWifiStatus();
 
     // Handles the API request

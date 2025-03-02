@@ -1,19 +1,44 @@
+var IsScanRunning = false;
+
 document.addEventListener("DOMContentLoaded", async function () {
-    try {
-        // Call the API on the same server
-        const response = await fetch("/api/index");
-
-        // Ensure the request was successful
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        // Parse JSON response
-        const data = await response.json();
-        
-        // Update the HTML
-        //document.getElementById("lbl_firmware_state").textContent = `Current firmware version is ${data["version"]}`;
-    } catch (error) {
-        console.error(`Error: ${error.message}`);
-    }
+    startNetworkScan();
 });
+
+async function startNetworkScan() {
+    if(IsScanRunning) {
+        return;
+    }
+    IsScanRunning = true;
+
+    // Disable the button
+    document.getElementById("button-scan").setAttribute("disabled", "disabled");
+
+    // Clear the list
+    document.getElementById("wifi-list").innerHTML = "Scanning for networks...";
+
+    // Send the API request
+    await fetch("/api/wifi_scan_start");
+    checkScanResults();
+}
+
+async function checkScanResults() {
+    let response = await fetch('/api/wifi_scan_status');
+    let data = await response.json();
+
+    let list = document.getElementById("wifi-list");
+    
+    if (data.status === "scanning") {
+        // Try again in 250 ms
+        setTimeout(checkScanResults, 250);
+    } else {
+        // Enable the button
+        document.getElementById("button-scan").removeAttribute("disabled");
+        IsScanRunning = false;
+
+        // Update list
+        data.networks.forEach(net => {
+            //let icon = getSignalIcon(net.rssi);
+            list.innerHTML += `<li>${net.ssid} (${net.rssi} dBm)</li>`;
+        });
+    }
+}

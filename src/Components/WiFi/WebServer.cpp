@@ -64,9 +64,9 @@ void WebServer::Init()
     // Handle API requests
     gWebServer.on("/api/version", HTTP_GET, [this](AsyncWebServerRequest *request)
     { request->send(200, "application/json", HandleApiRequestVersion()); });
-    gWebServer.on("/api/wifi_scan", HTTP_GET, [this](AsyncWebServerRequest *request)
+    gWebServer.on("/api/wifi_scan_start", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestWifiScan()); });
-    gWebServer.on("/api/wifi_status", HTTP_GET, [this](AsyncWebServerRequest *request)
+    gWebServer.on("/api/wifi_scan_status", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestWifiStatus()); });
 
     // handle 404 errors
@@ -79,6 +79,8 @@ void WebServer::Init()
 // Handles the API request
 String WebServer::HandleApiRequestVersion()
 {
+    Logger::Debug("Received REST API request: get version");
+
     JsonDocument doc;
     doc["version"] = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
     doc["build_date"] = __DATE__;
@@ -91,6 +93,8 @@ String WebServer::HandleApiRequestVersion()
 // Handles the API request
 String WebServer::HandleApiRequestWifiScan()
 {
+    Logger::Debug("Received REST API request: start WiFi scan");
+
     NetworkScanner::StartNetworkScan();
 
     JsonDocument doc;
@@ -104,10 +108,9 @@ String WebServer::HandleApiRequestWifiScan()
 // Handles the API request
 String WebServer::HandleApiRequestWifiStatus()
 {
+    Logger::Debug("Received REST API request: get WiFi scan status");
+
     JsonDocument doc;
-
-    doc["status"] = NetworkScanner::IsNetworkScanRunning() ? "scanning" : "idle";
-
     NetworkScanner::GetNetworkScanResults(doc);
 
     String jsonResponse;

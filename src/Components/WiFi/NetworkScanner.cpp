@@ -27,15 +27,20 @@ namespace NetworkScanner
     // Checks if the scan has finished
     bool IsNetworkScanRunning()
     {
-        return WiFi.scanComplete()!= WIFI_SCAN_RUNNING;
+        Logger::Debug("Current WiFi scanning status: %i", WiFi.scanComplete());
+
+        return WiFi.scanComplete() == WIFI_SCAN_RUNNING;
     }
 
     // Gets the network scan results
     void GetNetworkScanResults(JsonDocument &jsonDoc)
     {
-        if (IsNetworkScanRunning())
+        bool isScanning = NetworkScanner::IsNetworkScanRunning();
+
+        jsonDoc["status"] = isScanning ? "scanning" : "idle";
+
+        if (isScanning)
         {
-            Logger::Trace("WiFi scan not yet finished");
             return;
         }
 

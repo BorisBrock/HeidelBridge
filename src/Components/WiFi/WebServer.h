@@ -1,5 +1,7 @@
 #pragma once
 
+class AsyncWebServerRequest;
+
 class WebServer
 {
 public:
@@ -11,11 +13,14 @@ public:
 
 private:
     // Handles the API request
-    String HandleApiRequestVersion();
+    String HandleApiRequestGetVersion();
 
     // Handles the API request
-    String HandleApiRequestWifiStatus();
+    String HandleApiRequestGetWifiScanStatus();
 
     // Handles the API request
-    String HandleApiRequestWifiScan();
+    String HandleApiRequestStartWifiScan();
+
+    // Handles the API request
+    String HandleApiRequestConnectWifi(AsyncWebServerRequest *request);
 };

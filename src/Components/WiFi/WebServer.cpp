@@ -63,11 +63,13 @@ void WebServer::Init()
 
     // Handle API requests
     gWebServer.on("/api/version", HTTP_GET, [this](AsyncWebServerRequest *request)
-    { request->send(200, "application/json", HandleApiRequestVersion()); });
+                  { request->send(200, "application/json", HandleApiRequestGetVersion()); });
     gWebServer.on("/api/wifi_scan_start", HTTP_GET, [this](AsyncWebServerRequest *request)
-                  { request->send(200, "application/json", HandleApiRequestWifiScan()); });
+                  { request->send(200, "application/json", HandleApiRequestStartWifiScan()); });
     gWebServer.on("/api/wifi_scan_status", HTTP_GET, [this](AsyncWebServerRequest *request)
-                  { request->send(200, "application/json", HandleApiRequestWifiStatus()); });
+                  { request->send(200, "application/json", HandleApiRequestGetWifiScanStatus()); });
+    gWebServer.on("/api/wifi_connect", HTTP_GET, [this](AsyncWebServerRequest *request)
+                  { request->send(200, "application/json", HandleApiRequestConnectWifi(request)); });
 
     // handle 404 errors
     gWebServer.onNotFound([&](AsyncWebServerRequest *request)
@@ -77,7 +79,7 @@ void WebServer::Init()
 }
 
 // Handles the API request
-String WebServer::HandleApiRequestVersion()
+String WebServer::HandleApiRequestGetVersion()
 {
     Logger::Debug("Received REST API request: get version");
 
@@ -91,7 +93,7 @@ String WebServer::HandleApiRequestVersion()
 }
 
 // Handles the API request
-String WebServer::HandleApiRequestWifiScan()
+String WebServer::HandleApiRequestStartWifiScan()
 {
     Logger::Debug("Received REST API request: start WiFi scan");
 
@@ -106,7 +108,7 @@ String WebServer::HandleApiRequestWifiScan()
 }
 
 // Handles the API request
-String WebServer::HandleApiRequestWifiStatus()
+String WebServer::HandleApiRequestGetWifiScanStatus()
 {
     Logger::Debug("Received REST API request: get WiFi scan status");
 
@@ -116,4 +118,28 @@ String WebServer::HandleApiRequestWifiStatus()
     String jsonResponse;
     serializeJson(doc, jsonResponse);
     return jsonResponse;
+}
+
+// Handles the API request
+String WebServer::HandleApiRequestConnectWifi(AsyncWebServerRequest *request)
+{
+    Logger::Debug("Received REST API request: connect to WiFi");
+
+    if(!request->hasParam("ssid"))
+    {
+        Logger::Error("Parameter 'ssid' is missing");
+        return R"({"status": "error"})";
+    }
+
+    if(!request->hasParam("password"))
+    {
+        Logger::Error("Parameter 'password' is missing");
+        return R"({"status": "error"})";
+    }
+
+    Logger::Info("Connecting to WiFi '%s'", request->getParam("ssid")->value());
+    
+    // Todo
+
+    return R"({"status": "ok"})";
 }

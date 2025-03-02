@@ -6,21 +6,13 @@
     padding: 14px 28px;
     text-align: center;
     background-color: #3f398d;
-    border-color: #8b90c7;
-  }
-  
-  .hb-block-button .line1 {
-    font-size: 26px;
-    font-weight: 400;
-  }
-  
-  .hb-block-button .line2 {
-    font-size: 16px;
-    color: #8b90c7;
+    border-color: #3f398d;
+    border-radius: 10px;
   }
 
   .hb-block-button:hover {
     background-color: #646baf;
+    border-color: #646baf;
   }
 
   .hb-page-headline {

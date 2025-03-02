@@ -17,3 +17,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.error(`Error: ${error.message}`);
     }
 });
+
+function updateFirmware() {
+    // Show file browser
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const info = `File Name: ${file.name} <br> File Size: ${file.size} bytes<br> File Type: ${file.type}`;
+        //document.getElementById('fileInfo').innerHTML = info;
+    });
+}

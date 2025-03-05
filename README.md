@@ -52,10 +52,11 @@ To compile this project you will need to install VS Code and the PlatformIO exte
 ## Programming your ESP32
 
 - Start by cloning or downloading this repository.
-- Change `board = ...` in platformio.ini to match the ESP32 board you are actually using.
-- Copy the file `Credentials.cpp.template` to `Credentials.cpp`.
-- Change the SSID and password in `Credentials.cpp` to match your home network settings.
-- If you want to use MQTT, also insert your MQTT server's address and your user name / password (can be left empty if not required).
+- Optional: change `board = ...` in platformio.ini to match the ESP32 board you are actually using.
+- Modify `Configuration/Configuration.cpp`:
+  - Change the WiFi SSID and password to match your home network settings.
+  - If you want to use MQTT, also insert your MQTT server's address and your user name / password (can be left empty if authorization is not required). Also set `Enabled` to `true`.
+  - If you want to use multiple HeidelBridges in the same network, change the `DeviceName` to make it unique for each node.
 - Compile the project.
 - Now connect your ESP32 via USB and upload the firmware.
 

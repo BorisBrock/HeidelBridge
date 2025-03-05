@@ -19,7 +19,7 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 # Roadmap
 
-For the upcoming version **2.0** some nice enhancements are planned:
+For the upcoming version **3.0** some nice enhancements are planned:
 - :star: Pre-built binaries: no need to clone and compile the repositoiry yourself
 - :star: OTA updates: simply update your HeidelBridge via WiFi
 - :star: Wifi provisioning: easily integrate HeidelBridge into your home network

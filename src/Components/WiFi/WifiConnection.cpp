@@ -2,7 +2,7 @@
 #include <WiFi.h>
 #include "../../Configuration/Constants.h"
 #include "WifiConnection.h"
-#include "../../Configuration/Credentials.h"
+#include "../../Configuration/Configuration.h"
 #include "../Logger/Logger.h"
 #include "../Statistics/Statistics.h"
 
@@ -27,7 +27,7 @@ namespace WifiConnection
 
         gStatistics.NumWifiDisconnects++;
 
-        WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
+        WiFi.begin(Configuration::WiFi::SSID, Configuration::WiFi::Password);
     }
 
     void Init()
@@ -40,7 +40,7 @@ namespace WifiConnection
         // Set host name
         WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
         WiFi.mode(WIFI_MODE_NULL);
-        WiFi.setHostname("HeidelBridge");
+        WiFi.setHostname(Configuration::General::DeviceName);
 
         // Register WiFi events
         WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
@@ -48,8 +48,8 @@ namespace WifiConnection
         WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
         // Start Wifi connection
-        Logger::Info("Connecting to WiFi SSID '%s'", Credentials::WiFi::SSID);
-        WiFi.begin(Credentials::WiFi::SSID, Credentials::WiFi::Password);
+        Logger::Info("Connecting to WiFi SSID '%s'", Configuration::WiFi::SSID);
+        WiFi.begin(Configuration::WiFi::SSID, Configuration::WiFi::Password);
         gStatistics.NumWifiDisconnects = 0;
     }
 };

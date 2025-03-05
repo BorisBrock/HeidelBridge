@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "Configuration/Constants.h"
+#include "Configuration/Configuration.h"
 #include "Configuration/Version.h"
 #include "Components/Logger/Logger.h"
 #include "Components/Statistics/Statistics.h"
@@ -52,7 +53,7 @@ void setup()
   ModbusTCP::Init(gWallbox);
 
   // Set up MQTT
-  if (Constants::MQTT::Enabled)
+  if (Configuration::MQTT::Enabled)
   {
     MQTTManager::Init(gWallbox);
   }
@@ -72,7 +73,7 @@ void loop()
     gStatistics.UptimeS++;
   }
 
-  if (Constants::MQTT::Enabled && gMqttUpdater.IsElapsed())
+  if (Configuration::MQTT::Enabled && gMqttUpdater.IsElapsed())
   {
     gMqttUpdater.Restart();
     MQTTManager::Update();

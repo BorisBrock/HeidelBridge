@@ -10,8 +10,10 @@ extern "C"
 #include "../Statistics/Statistics.h"
 #include "../../Configuration/Version.h"
 #include "../../Configuration/Constants.h"
-#include "../../Configuration/Credentials.h"
+#include "../../Configuration/Configuration.h"
 #include "../Wallbox/IWallbox.h"
+#include "../../Utils/PrefixedString.h"
+#include "../../Utils/StringUtils.h"
 #include "MQTTManager.h"
 
 namespace MQTTManager
@@ -21,9 +23,9 @@ namespace MQTTManager
     TimerHandle_t gMqttPublishTimer;
     IWallbox *gWallbox = nullptr;
     uint8_t gCurValueIndex = 0;
-
-    // Topics
-    String ChargingCurrentControl = "heidelbridge/control/charging_current_limit";
+    char TopicBuffer[128];
+    char PayloadBuffer[512];
+    PrefixedString gMqttTopic(Configuration::General::DeviceName, 128);
 
     constexpr uint16_t NumMqttPublishedValues = 10;
     enum MqttPublishedValues
@@ -50,17 +52,46 @@ namespace MQTTManager
         }
     }
 
+    // Publishes a single MQTT discovery message for Home Assistant integration
+    void PublishHomeAssistantDiscoveryTopic(const char *topic, const char *payload)
+    {
+        StringUtils::InsertString(topic, TopicBuffer, sizeof(TopicBuffer), '%', Configuration::General::DeviceName);
+        StringUtils::InsertString(payload, PayloadBuffer, sizeof(PayloadBuffer), '%', Configuration::General::DeviceName);
+
+        gMqttClient.publish(TopicBuffer, 1, false, PayloadBuffer);
+    }
+
     // Publishes MQTT discovery messages for Home Assistant integration
     void PublishHomeAssistantDiscovery()
     {
         // Publish Home Assistant MQTT discovery messages
-        gMqttClient.publish("homeassistant/binary_sensor/HeidelBridge/is_vehicle_connected/config", 1, false, R"({"name":"Vehicle connected","device_class":"plug","state_topic":"heidelbridge/is_vehicle_connected","payload_on":"1","payload_off":"0","unique_id":"is_vehicle_connected","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
-        gMqttClient.publish("homeassistant/binary_sensor/HeidelBridge/is_vehicle_charging/config", 1, false, R"({"name":"Vehicle charging","device_class":"battery_charging","state_topic":"heidelbridge/is_vehicle_charging","payload_on":"1","payload_off":"0","unique_id":"is_vehicle_charging","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
-        gMqttClient.publish("homeassistant/sensor/HeidelBridge/charging_power/config", 1, false, R"({"name":"Charging power","device_class":"power","state_topic":"heidelbridge/charging_power","unique_id":"charging_power","unit_of_measurement":"W","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
-        gMqttClient.publish("homeassistant/sensor/HeidelBridge/charging_current/config", 1, false, R"({"name":"Charging current","device_class":"current","state_topic":"heidelbridge/charging_current/phase1","unique_id":"charging_current","unit_of_measurement":"A","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
-        gMqttClient.publish("homeassistant/sensor/HeidelBridge/charging_current_limit/config", 1, false, R"({"name":"Charging current limit","device_class":"current","state_topic":"heidelbridge/charging_current_limit","unique_id":"charging_current_limit","unit_of_measurement":"A","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
-        gMqttClient.publish("homeassistant/sensor/HeidelBridge/energy_meter/config", 1, false, R"({"name":"Energy meter","device_class":"energy","state_topic":"heidelbridge/energy_meter","state_class":"total_increasing","unique_id":"energy_meter","unit_of_measurement":"kWh","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
-        gMqttClient.publish("homeassistant/sensor/HeidelBridge/temperature/config", 1, false, R"({"name":"Temperature","device_class":"temperature","state_topic":"heidelbridge/temperature","unique_id":"temperature","unit_of_measurement":"°C","device":{"identifiers":["BB42"],"name":"HeidelBridge"}})");
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/binary_sensor/%/is_vehicle_connected/config",
+            R"({"name":"Vehicle connected","device_class":"plug","state_topic":"%/is_vehicle_connected","payload_on":"1","payload_off":"0","unique_id":"%_is_vehicle_connected","device":{"identifiers":["%"],"name":"%"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/binary_sensor/%/is_vehicle_charging/config",
+            R"({"name":"Vehicle charging","device_class":"battery_charging","state_topic":"%/is_vehicle_charging","payload_on":"1","payload_off":"0","unique_id":"%_is_vehicle_charging","device":{"identifiers":["%"],"name":"%"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/charging_power/config",
+            R"({"name":"Charging power","device_class":"power","state_topic":"%/charging_power","unique_id":"%_charging_power","unit_of_measurement":"W","device":{"identifiers":["%"],"name":"%"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/charging_current/config",
+            R"({"name":"Charging current","device_class":"current","state_topic":"%/charging_current/phase1","unique_id":"%_charging_current","unit_of_measurement":"A","device":{"identifiers":["%"],"name":"%"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/charging_current_limit/config",
+            R"({"name":"Charging current limit","device_class":"current","state_topic":"%/charging_current_limit","unique_id":"%_charging_current_limit","unit_of_measurement":"A","device":{"identifiers":["%"],"name":"%"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/energy_meter/config",
+            R"({"name":"Energy meter","device_class":"energy","state_topic":"%/energy_meter","state_class":"total_increasing","unique_id":"%_energy_meter","unit_of_measurement":"kWh","device":{"identifiers":["%"],"name":"%"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/temperature/config",
+            R"({"name":"Temperature","device_class":"temperature","state_topic":"%/temperature","unique_id":"%_temperature","unit_of_measurement":"°C","device":{"identifiers":["%"],"name":"%"}})");
     }
 
     // Publishes various MQTT status messages based on the current value index.
@@ -77,61 +108,61 @@ namespace MQTTManager
                 switch (gWallbox->GetState())
                 {
                 case (VehicleState::Disconnected):
-                    gMqttClient.publish("heidelbridge/is_vehicle_connected", 0, false, "0");
-                    gMqttClient.publish("heidelbridge/is_vehicle_charging", 0, false, "0");
-                    gMqttClient.publish("heidelbridge/vehicle_state", 0, false, "disconnected");
+                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_connected"), 0, false, "0");
+                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_charging"), 0, false, "0");
+                    gMqttClient.publish(gMqttTopic.SetString("/vehicle_state"), 0, false, "disconnected");
                     break;
                 case (VehicleState::Connected):
-                    gMqttClient.publish("heidelbridge/is_vehicle_connected", 0, false, "1");
-                    gMqttClient.publish("heidelbridge/is_vehicle_charging", 0, false, "0");
-                    gMqttClient.publish("heidelbridge/vehicle_state", 0, false, "connected");
+                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_connected"), 0, false, "1");
+                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_charging"), 0, false, "0");
+                    gMqttClient.publish(gMqttTopic.SetString("/vehicle_state"), 0, false, "connected");
                     break;
                 case (VehicleState::Charging):
-                    gMqttClient.publish("heidelbridge/is_vehicle_connected", 0, false, "1");
-                    gMqttClient.publish("heidelbridge/is_vehicle_charging", 0, false, "1");
-                    gMqttClient.publish("heidelbridge/vehicle_state", 0, false, "charging");
+                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_connected"), 0, false, "1");
+                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_charging"), 0, false, "1");
+                    gMqttClient.publish(gMqttTopic.SetString("/vehicle_state"), 0, false, "charging");
                     break;
                 }
                 break;
             case (MqttPublishedValues::ChargingCurrentLimit):
-                gMqttClient.publish("heidelbridge/charging_current_limit", 0, false, String(gWallbox->GetChargingCurrentLimit()).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/charging_current_limit"), 0, false, String(gWallbox->GetChargingCurrentLimit()).c_str());
                 break;
             case (MqttPublishedValues::ChargingPower):
-                gMqttClient.publish("heidelbridge/charging_power", 0, false, String(gWallbox->GetChargingPower()).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/charging_power"), 0, false, String(gWallbox->GetChargingPower()).c_str());
                 break;
             case (MqttPublishedValues::FailsafeCurrent):
-                gMqttClient.publish("heidelbridge/failsafe_current", 0, false, String(gWallbox->GetFailsafeCurrent()).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/failsafe_current"), 0, false, String(gWallbox->GetFailsafeCurrent()).c_str());
                 break;
             case (MqttPublishedValues::EnergyMeter):
-                gMqttClient.publish("heidelbridge/energy_meter", 0, false, String(gWallbox->GetEnergyMeterValue() * Constants::General::FactorWhToKWh).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/energy_meter"), 0, false, String(gWallbox->GetEnergyMeterValue() * Constants::General::FactorWhToKWh).c_str());
                 break;
             case (MqttPublishedValues::ChargingCurrent):
                 float c1, c2, c3;
                 if (gWallbox->GetChargingCurrents(c1, c2, c3))
                 {
-                    gMqttClient.publish("heidelbridge/charging_current/phase1", 0, false, String(c1).c_str());
-                    gMqttClient.publish("heidelbridge/charging_current/phase2", 0, false, String(c2).c_str());
-                    gMqttClient.publish("heidelbridge/charging_current/phase3", 0, false, String(c3).c_str());
+                    gMqttClient.publish(gMqttTopic.SetString("/charging_current/phase1"), 0, false, String(c1).c_str());
+                    gMqttClient.publish(gMqttTopic.SetString("/charging_current/phase2"), 0, false, String(c2).c_str());
+                    gMqttClient.publish(gMqttTopic.SetString("/charging_current/phase3"), 0, false, String(c3).c_str());
                 }
                 break;
             case (MqttPublishedValues::ChargingVoltage):
                 float v1, v2, v3;
                 if (gWallbox->GetChargingVoltages(v1, v2, v3))
                 {
-                    gMqttClient.publish("heidelbridge/charging_voltage/phase1", 0, false, String(v1).c_str());
-                    gMqttClient.publish("heidelbridge/charging_voltage/phase2", 0, false, String(v2).c_str());
-                    gMqttClient.publish("heidelbridge/charging_voltage/phase3", 0, false, String(v3).c_str());
+                    gMqttClient.publish(gMqttTopic.SetString("/charging_voltage/phase1"), 0, false, String(v1).c_str());
+                    gMqttClient.publish(gMqttTopic.SetString("/charging_voltage/phase2"), 0, false, String(v2).c_str());
+                    gMqttClient.publish(gMqttTopic.SetString("/charging_voltage/phase3"), 0, false, String(v3).c_str());
                 }
                 break;
             case (MqttPublishedValues::Temperature):
-                gMqttClient.publish("heidelbridge/temperature", 0, false, String(gWallbox->GetTemperature()).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/temperature"), 0, false, String(gWallbox->GetTemperature()).c_str());
                 break;
 
             case (MqttPublishedValues::Internals):
-                gMqttClient.publish("heidelbridge/internal/wifi_disconnects", 0, false, String(gStatistics.NumWifiDisconnects).c_str());
-                gMqttClient.publish("heidelbridge/internal/mqtt_disconnects", 0, false, String(gStatistics.NumMqttDisconnects).c_str());
-                gMqttClient.publish("heidelbridge/internal/modbus_read_errors", 0, false, String(gStatistics.NumModbusReadErrors).c_str());
-                gMqttClient.publish("heidelbridge/internal/modbus_write_errors", 0, false, String(gStatistics.NumModbusWriteErrors).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/internal/wifi_disconnects"), 0, false, String(gStatistics.NumWifiDisconnects).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/internal/mqtt_disconnects"), 0, false, String(gStatistics.NumMqttDisconnects).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_read_errors"), 0, false, String(gStatistics.NumModbusReadErrors).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_write_errors"), 0, false, String(gStatistics.NumModbusWriteErrors).c_str());
                 break;
 
             case (MqttPublishedValues::Discovery):
@@ -143,7 +174,7 @@ namespace MQTTManager
             gCurValueIndex = (gCurValueIndex + 1) % NumMqttPublishedValues;
 
             // These values are published every cycle
-            gMqttClient.publish("heidelbridge/internal/uptime", 0, false, String(gStatistics.UptimeS).c_str());
+            gMqttClient.publish(gMqttTopic.SetString("/internal/uptime"), 0, false, String(gStatistics.UptimeS).c_str());
         }
     }
 
@@ -153,13 +184,13 @@ namespace MQTTManager
         Logger::Info("Connected to MQTT");
 
         // Subscribe to control topics
-        gMqttClient.subscribe(ChargingCurrentControl.c_str(), 2);
+        gMqttClient.subscribe(gMqttTopic.SetString("/control/charging_current_limit"), 2);
 
         // Publish version information
         String versionString = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
-        gMqttClient.publish("heidelbridge/version", 0, true, versionString.c_str());
-        gMqttClient.publish("heidelbridge/build_date", 0, true, __DATE__);
-        gMqttClient.publish("heidelbridge/ip_address", 0, true, WiFi.localIP().toString().c_str());
+        gMqttClient.publish(gMqttTopic.SetString("/version"), 0, true, versionString.c_str());
+        gMqttClient.publish(gMqttTopic.SetString("/build_date"), 0, true, __DATE__);
+        gMqttClient.publish(gMqttTopic.SetString("/ip_address"), 0, true, WiFi.localIP().toString().c_str());
 
         // Publish discovery data
         PublishHomeAssistantDiscovery();
@@ -175,7 +206,7 @@ namespace MQTTManager
     // Callback for MQTT messages
     void OnMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
     {
-        if (ChargingCurrentControl == topic)
+        if (strcmp(gMqttTopic.SetString("/control/charging_current_limit"), topic) == 0)
         {
             float current = String(payload, len).toFloat();
             Logger::Trace("Received MQTT control command: charging current limit = %f\n", current);
@@ -203,11 +234,11 @@ namespace MQTTManager
         gMqttClient.onPublish(OnMqttPublish);
 
         // Configure the server
-        gMqttClient.setServer(Credentials::MQTT::Server, Constants::MQTT::Port);
+        gMqttClient.setServer(Configuration::MQTT::Server, Constants::MQTT::Port);
 
         // Set credentials
-        if (strlen(Credentials::MQTT::UserName) > 0)
-            gMqttClient.setCredentials(Credentials::MQTT::UserName, Credentials::MQTT::Password);
+        if (strlen(Configuration::MQTT::UserName) > 0)
+            gMqttClient.setCredentials(Configuration::MQTT::UserName, Configuration::MQTT::Password);
     }
 
     // Updates the MQTT connection and publishes messages

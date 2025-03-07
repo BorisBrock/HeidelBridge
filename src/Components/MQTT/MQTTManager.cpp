@@ -55,8 +55,8 @@ namespace MQTTManager
     // Publishes a single MQTT discovery message for Home Assistant integration
     void PublishHomeAssistantDiscoveryTopic(const char *topic, const char *payload)
     {
-        StringUtils::InsertString(topic, TopicBuffer, sizeof(TopicBuffer), '%', Configuration::General::DeviceName);
-        StringUtils::InsertString(payload, PayloadBuffer, sizeof(PayloadBuffer), '%', Configuration::General::DeviceName);
+        StringUtils::InsertString(topic, TopicBuffer, sizeof(TopicBuffer), '%', Settings::Instance()->DeviceName.c_str());
+        StringUtils::InsertString(payload, PayloadBuffer, sizeof(PayloadBuffer), '%', Settings::Instance()->DeviceName.c_str());
 
         gMqttClient.publish(TopicBuffer, 1, false, PayloadBuffer);
     }

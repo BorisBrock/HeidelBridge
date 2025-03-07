@@ -16,6 +16,7 @@ public:
     void ReadFromPersistentMemory();
 
 public:
+    String DeviceName{};
     String WifiSsid{};
     String WifiPassword{};
     bool IsMqttEnabled{false};

@@ -41,7 +41,7 @@ namespace WifiConnection
         // Set host name
         WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
         WiFi.mode(WIFI_MODE_NULL);
-        WiFi.setHostname(Configuration::General::DeviceName);
+        WiFi.setHostname(Settings::Instance()->DeviceName.c_str());
 
         // Register WiFi events
         WiFi.onEvent(WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);

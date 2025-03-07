@@ -23,9 +23,10 @@ void Settings::ReadFromPersistentMemory()
 {
     Logger::Trace("Reading settings from persistent memory");
 
+    DeviceName = gPreferences.getString("device_name", "HeidelBridge");
     WifiSsid = gPreferences.getString("wifi_ssid");
     WifiPassword = gPreferences.getString("wifi_password");
-    IsMqttEnabled = gPreferences.getBool("mqtt_port");
+    IsMqttEnabled = gPreferences.getBool("mqtt_enabled");
     MqttPort = gPreferences.getUShort("mqtt_port", 1833);
     MqttServer = gPreferences.getString("mqtt_server");
     MqttUser = gPreferences.getString("mqtt_user");

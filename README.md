@@ -19,7 +19,7 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 # Roadmap
 
-For the upcoming version **2.0** some nice enhancements are planned:
+For the upcoming version **3.0** some nice enhancements are planned:
 - :star: Pre-built binaries: no need to clone and compile the repositoiry yourself
 - :star: OTA updates: simply update your HeidelBridge via WiFi
 - :star: Wifi provisioning: easily integrate HeidelBridge into your home network
@@ -52,10 +52,11 @@ To compile this project you will need to install VS Code and the PlatformIO exte
 ## Programming your ESP32
 
 - Start by cloning or downloading this repository.
-- Change `board = ...` in platformio.ini to match the ESP32 board you are actually using.
-- Copy the file `Credentials.cpp.template` to `Credentials.cpp`.
-- Change the SSID and password in `Credentials.cpp` to match your home network settings.
-- If you want to use MQTT, also insert your MQTT server's address and your user name / password (can be left empty if not required).
+- Optional: change `board = ...` in platformio.ini to match the ESP32 board you are actually using.
+- Modify `Configuration/Configuration.cpp`:
+  - Change the WiFi SSID and password to match your home network settings.
+  - If you want to use MQTT, also insert your MQTT server's address and your user name / password (can be left empty if authorization is not required). Also set `Enabled` to `true`.
+  - If you want to use multiple HeidelBridges in the same network, change the `DeviceName` to make it unique for each node.
 - Compile the project.
 - Now connect your ESP32 via USB and upload the firmware.
 
@@ -137,34 +138,34 @@ The following topics are published by HeidelBridge:
 
 | Topic                                     | Unit | Data Type | Description                                                             |
 | ----------------------------------------- | ---- | --------- | ----------------------------------------------------------------------- |
-| heidelbridge/version                      | -    | String    | The version of the HeidelBridge firmware (e.g. 1.0.0).                  |
-| heidelbridge/build_date                   | -    | String    | Build date of the HeidelBridge firmware.                                |
-| heidelbridge/ip_address                   | -    | String    | Currently assigned IP address of the HeidelBridge.                      |
-| heidelbridge/is_vehicle_connected         | -    | Integer   | Boolean (0 or 1) indicating if a vehicle is connected.                  |
-| heidelbridge/is_vehicle_charging          | -    | Integer   | Boolean (0 or 1) indicating if a vehicle is charging.                   |
-| heidelbridge/vehicle_state                | -    | String    | 'disconnected', 'connected' or 'charging'.                              |
-| heidelbridge/charging_current_limit       | A    | Float     | Charging current limit in Ampere.                                       |
-| heidelbridge/charging_power               | W    | Float     | Momentary charging power in Watt.                                       |
-| heidelbridge/failsafe_current             | A    | Float     | Current the wallbox will fall back to in case of a communication error. |
-| heidelbridge/energy_meter                 | kWh  | Float     | Total charged energy so far.                                            |
-| heidelbridge/temperature                  | °C   | Float     | Current wallbox PCB temperature.                                        |
-| heidelbridge/charging_current/phase1      | A    | Float     | Momentary charging current on phase 1.                                  |
-| heidelbridge/charging_current/phase2      | A    | Float     | Momentary charging current on phase 2.                                  |
-| heidelbridge/charging_current/phase3      | A    | Float     | Momentary charging current on phase 3.                                  |
-| heidelbridge/charging_voltage/phase1      | V    | Float     | Momentary charging voltage on phase 1.                                  |
-| heidelbridge/charging_voltage/phase2      | V    | Float     | Momentary charging voltage on phase 2.                                  |
-| heidelbridge/charging_voltage/phase3      | V    | Float     | Momentary charging voltage on phase 3.                                  |
-| heidelbridge/internal/uptime              | s    | Integer   | Total time this HeidelBridge has been up and running.                   |
-| heidelbridge/internal/wifi_disconnects    | -    | Integer   | Total number of WiFi connection losses since start.                     |
-| heidelbridge/internal/mqtt_disconnects    | -    | Integer   | Total number of MQTT connection losses since start.                     |
-| heidelbridge/internal/modbus_read_errors  | -    | Integer   | Total number of Modbus RTU read errors since start.                     |
-| heidelbridge/internal/modbus_write_errors | -    | Integer   | Total number of Modbus RTU write errors since start.                    |
+| {DeviceName}/version                      | -    | String    | The version of the HeidelBridge firmware (e.g. 1.0.0).                  |
+| {DeviceName}/build_date                   | -    | String    | Build date of the HeidelBridge firmware.                                |
+| {DeviceName}/ip_address                   | -    | String    | Currently assigned IP address of the HeidelBridge.                      |
+| {DeviceName}/is_vehicle_connected         | -    | Integer   | Boolean (0 or 1) indicating if a vehicle is connected.                  |
+| {DeviceName}/is_vehicle_charging          | -    | Integer   | Boolean (0 or 1) indicating if a vehicle is charging.                   |
+| {DeviceName}/vehicle_state                | -    | String    | 'disconnected', 'connected' or 'charging'.                              |
+| {DeviceName}/charging_current_limit       | A    | Float     | Charging current limit in Ampere.                                       |
+| {DeviceName}/charging_power               | W    | Float     | Momentary charging power in Watt.                                       |
+| {DeviceName}/failsafe_current             | A    | Float     | Current the wallbox will fall back to in case of a communication error. |
+| {DeviceName}/energy_meter                 | kWh  | Float     | Total charged energy so far.                                            |
+| {DeviceName}/temperature                  | °C   | Float     | Current wallbox PCB temperature.                                        |
+| {DeviceName}/charging_current/phase1      | A    | Float     | Momentary charging current on phase 1.                                  |
+| {DeviceName}/charging_current/phase2      | A    | Float     | Momentary charging current on phase 2.                                  |
+| {DeviceName}/charging_current/phase3      | A    | Float     | Momentary charging current on phase 3.                                  |
+| {DeviceName}/charging_voltage/phase1      | V    | Float     | Momentary charging voltage on phase 1.                                  |
+| {DeviceName}/charging_voltage/phase2      | V    | Float     | Momentary charging voltage on phase 2.                                  |
+| {DeviceName}/charging_voltage/phase3      | V    | Float     | Momentary charging voltage on phase 3.                                  |
+| {DeviceName}/internal/uptime              | s    | Integer   | Total time this HeidelBridge has been up and running.                   |
+| {DeviceName}/internal/wifi_disconnects    | -    | Integer   | Total number of WiFi connection losses since start.                     |
+| {DeviceName}/internal/mqtt_disconnects    | -    | Integer   | Total number of MQTT connection losses since start.                     |
+| {DeviceName}/internal/modbus_read_errors  | -    | Integer   | Total number of Modbus RTU read errors since start.                     |
+| {DeviceName}/internal/modbus_write_errors | -    | Integer   | Total number of Modbus RTU write errors since start.                    |
 
 The following topics are subscribed by HeidelBridge. Use these to control your wallbox:
 
 | Topic                                        | Unit | Data Type | Description                                                             |
 | -------------------------------------------- | ---- | --------- | ----------------------------------------------------------------------- |
-| heidelbridge/control/charging_current_limit  | A    | Float     | Charging current limit in Ampere.                                       |
+| {DeviceName}/control/charging_current_limit  | A    | Float     | Charging current limit in Ampere.                                       |
 
 ---
 

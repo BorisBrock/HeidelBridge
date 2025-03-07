@@ -4,4 +4,3 @@
 .vscode/launch.json
 .vscode/ipch
 /.vscode
-src/Configuration/Credentials.cpp

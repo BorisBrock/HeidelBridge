@@ -1,49 +1,44 @@
 .hb-block-button {
-    display: inline-flex;
-    flex-direction: column; /* Stack lines vertically */
-    align-items: center;    /* Center-align text */
-    width: 100%;
-    padding: 14px 28px;
-    text-align: center;
-    background-color: #3f398d;
-    border-color: #3f398d;
-    border-radius: 10px;
-  }
+  display: inline-flex;
+  flex-direction: column;
+  /* Stack lines vertically */
+  align-items: center;
+  /* Center-align text */
+  width: 100%;
+  padding: 14px 28px;
+  text-align: center;
+  background-color: #3f398d;
+  border-color: #3f398d;
+  border-radius: 10px;
+  margin-top: 32px;
+}
 
-  .hb-block-button:hover {
-    background-color: #646baf;
-    border-color: #646baf;
-  }
+.hb-block-button:hover {
+  background-color: #646baf;
+  border-color: #646baf;
+}
 
-  .hb-page-headline {
-    display: flex;
-    width: 100%;
-    font-size: 1.4em;
-    justify-content: center;
-    align-items: center;
-  }
+.hb-banner {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  margin-top: 8px;
+  margin-left: 8px;
+}
 
-  .hb-banner {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-    margin-top: 16px;
-    margin-left: 8px;
-  }
+.hb-banner-headline {
+  color: #646baf;
+  font-size: 2.4em;
+  font-weight: 400;
+  margin-left: 10px;
+  margin-top: 12px;
+  margin-right: 6px;
+}
 
-  .hb-banner-headline {
-    color: #646baf;
-    font-size: 2.4em;
-    font-weight: 400;
-    margin-left: 10px;
-    margin-top: 12px;
-    margin-right: 6px;
-  }
-
-  .hb-banner-image {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-  }
+.hb-banner-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}

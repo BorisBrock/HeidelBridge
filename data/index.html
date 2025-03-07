@@ -21,11 +21,35 @@
     </div>
 
     <main class="container">
-        <p><button class="hb-block-button" onclick="window.location.href='wifi.html';">WiFi Network</button></p>
-        <p><button class="hb-block-button" onclick="window.location.href='mqtt.html';">MQTT Connection</button></p>
-        <p><button class="hb-block-button" onclick="window.location.href='firmware.html';">Firmware Update</button></p>
+
+        <h3>Device Name</h3>
+
+        <input type="text" id="device-name" name="device-name" value="HeidelBridge" />
+
+
+        <h3>WiFi Connection</h3>
+
+        <input type="text" id="ssid" name="ssid" placeholder="Network name" />
+        <input type="text" id="wifi-password" name="wifi-password" placeholder="Password" />
+
+
+        <h3>MQTT</h3>
+
+        <label for="mqtt-enabled" style="margin-bottom: 12px;">
+            <input type="checkbox" id="mqtt-enabled" name="mqtt-enabled" />
+            Enabled
+        </label>
+
+        <input type="text" id="mqtt-server" name="mqtt-server" placeholder="Server:port" />
+        <input type="text" id="mqtt-user" name="mqtt-user" placeholder="User name (optional)" />
+        <input type="text" id="mqtt-password" name="mqtt-password" placeholder="Password (optional)" />
+
+
+        <button class="hb-block-button" onclick="applySettings();">Apply Settings</button>
+
     </main>
-    
+
+    <script src="index.js"></script>
 </body>
 
 </html>

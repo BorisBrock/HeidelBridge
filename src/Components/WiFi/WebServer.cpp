@@ -3,6 +3,7 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
+#include <Update.h>
 #include "SPIFFS.h"
 #include "../../Configuration/Constants.h"
 #include "../../Configuration/Settings.h"
@@ -76,6 +77,12 @@ void WebServer::Init()
                   { request->send(200, "application/json", HandleApiRequestSettingsWrite(request)); });
     gWebServer.on("/api/reboot", HTTP_POST, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestReboot()); });
+    gWebServer.on("/update", HTTP_POST, [this](AsyncWebServerRequest *request)
+                  {
+                        request->send(200, "text/plain", Update.hasError() ? "FAIL" : "OK");
+                        delay(500);
+                        ESP.restart(); }, [this](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+                  { HandleFirmwareUpload(request, filename, index, data, len, final); });
 
     // handle 404 errors
     gWebServer.onNotFound([&](AsyncWebServerRequest *request)
@@ -243,4 +250,36 @@ String WebServer::HandleApiRequestReboot()
     ESP.restart();
 
     return R"({"status": "ok"})";
+}
+
+// Handles firmware upload for OTA flashing
+void WebServer::HandleFirmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+{
+    if (index == 0)
+    {
+        // First packet
+        Logger::Info("Updating firmware: %s\n", filename.c_str());
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN))
+        {
+            Logger::Error("Starting firmware update failed: %s", Update.errorString());
+        }
+    }
+
+    if (Update.write(data, len) != len)
+    {
+        Logger::Error("Processing firmware update failed: %s", Update.errorString());
+    }
+
+    if (final)
+    {
+        // Last packet
+        if (Update.end(true))
+        {
+            Logger::Info("Firmware update complete");
+        }
+        else
+        {
+            Logger::Error("Finishing firmware update failed: %s", Update.errorString());
+        }
+    }
 }

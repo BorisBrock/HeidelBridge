@@ -24,9 +24,15 @@
 
         <h3 class="hb-page-headline">Firmware Update</h3>
 
-        <p id="label_version">Currently installed version: ...</p>
-        <input type="file" id="fileInput" accept=".bin" />
+        <p id="version">Currently installed version: ...</p>
+        <input type="file" id="file-input" accept=".bin" />
         <p><button class="hb-block-button" onclick="updateFirmware();">Install Firmware</button></p>
+
+
+        <form method="POST" action="/update" enctype="multipart/form-data">
+            <input type="file" name="firmware">
+            <input type="submit" value="Upload">
+        </form>
 
     </main>
 

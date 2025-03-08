@@ -64,11 +64,11 @@ void WebServer::Init()
     // Handle API requests
     gWebServer.on("/api/version", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestGetVersion()); });
-    gWebServer.on("/api/wifi_scan_start", HTTP_GET, [this](AsyncWebServerRequest *request)
+    gWebServer.on("/api/wifi_scan_start", HTTP_POST, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestStartWifiScan()); });
     gWebServer.on("/api/wifi_scan_status", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestGetWifiScanStatus()); });
-    gWebServer.on("/api/wifi_connect", HTTP_GET, [this](AsyncWebServerRequest *request)
+    gWebServer.on("/api/wifi_connect", HTTP_POST, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestConnectWifi(request)); });
     gWebServer.on("/api/settings_read", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestSettingsRead(request)); });

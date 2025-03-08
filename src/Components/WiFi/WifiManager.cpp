@@ -25,7 +25,7 @@ void WifiManager::Start()
         isConnectedToWifi = ConnectToWifiNetwork();
     }
 
-    // Fallback in case no WiFi connection could be established
+    // Fallback in case no WiFi connection could not be established
     if(!isConnectedToWifi)
     {
         // Start captive portal

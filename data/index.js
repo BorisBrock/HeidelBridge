@@ -13,10 +13,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         // Update the HTML
         document.getElementById("device-name").value = data["device-name"];
-        document.getElementById("wifi-ssid").value = data["device-name"];
-        document.getElementById("wifi-password").value = data["device-name"];
+        document.getElementById("wifi-ssid").value = data["wifi-ssid"];
+        document.getElementById("wifi-password").value = data["wifi-password"];
         document.getElementById("mqtt-enabled").checked = data["mqtt-enabled"];
-        document.getElementById("mqtt-server").value = data["mqtt-server"] + ":" + data["mqtt-port"];
+
+        if (data["mqtt-server"]) {
+            document.getElementById("mqtt-server").value = data["mqtt-server"] + ":" + data["mqtt-port"];
+        }    
+
         document.getElementById("mqtt-user").value = data["mqtt-user"];
         document.getElementById("mqtt-password").value = data["mqtt-password"];
     } catch (error) {
@@ -64,7 +68,7 @@ function writeSettings() {
 }
 
 function restartEsp() {
-    fetch("/api/restart", {
+    fetch("/api/reboot", {
         method: "POST"
     })
         .catch(error => {

@@ -75,7 +75,7 @@ void WebServer::Init()
                   { request->send(200, "application/json", HandleApiRequestSettingsWrite(request)); });
     gWebServer.on("/api/reboot", HTTP_POST, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestReboot()); });
-    gWebServer.on("/update", HTTP_POST, [this](AsyncWebServerRequest *request)
+    gWebServer.on("api/update", HTTP_POST, [this](AsyncWebServerRequest *request)
                   {
                         request->send(200, "text/plain", Update.hasError() ? "FAIL" : "OK");
                         delay(500);

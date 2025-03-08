@@ -63,6 +63,7 @@ void Settings::Print()
     Logger::Debug(" > Device name: %s", DeviceName.c_str());
     Logger::Debug(" > WiFi SSID: %s", WifiSsid.c_str());
     Logger::Debug(" > MQTT enabled: %s", IsMqttEnabled ? "yes" : "no");
-    Logger::Debug(" > MQTT server: %s:%d", MqttServer.c_str(), MqttPort);
+    Logger::Debug(" > MQTT server: %s", MqttServer.c_str());
+    Logger::Debug(" > MQTT port: %d", MqttPort);
     Logger::Debug(" > MQTT user: %s", MqttUser.c_str());
 }

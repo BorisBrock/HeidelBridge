@@ -41,6 +41,7 @@ void setup()
   // Read persistent settings
   Settings::Instance()->Init();
   Settings::Instance()->ReadFromPersistentMemory();
+  Settings::Instance()->Print();
 
   // Make sure WiFi connection is up and running
   WifiManager::Instance()->Start();

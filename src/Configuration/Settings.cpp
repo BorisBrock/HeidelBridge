@@ -32,3 +32,15 @@ void Settings::ReadFromPersistentMemory()
     MqttUser = gPreferences.getString("mqtt_user");
     MqttPassword = gPreferences.getString("mqtt_password");
 }
+
+// Prints all settings to the logger
+void Settings::Print()
+{
+    Logger::Debug("Using the following device settings:");
+
+    Logger::Debug(" > Device name: %s", DeviceName.c_str());
+    Logger::Debug(" > WiFi SSID: %s", WifiSsid.c_str());
+    Logger::Debug(" > MQTT enabled: %s", IsMqttEnabled ? "yes" : "no");
+    Logger::Debug(" > MQTT server: %s:%d", MqttServer.c_str(), MqttPort);
+    Logger::Debug(" > MQTT user: %s", MqttUser.c_str());
+}

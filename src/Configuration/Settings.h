@@ -15,6 +15,9 @@ public:
     // Read all settings from SPIFFS
     void ReadFromPersistentMemory();
 
+    // Prints all settings to the logger
+    void Print();
+
 public:
     String DeviceName{};
     String WifiSsid{};

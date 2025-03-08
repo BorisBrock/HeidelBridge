@@ -188,7 +188,7 @@ String WebServer::HandleApiRequestSettingsWrite(AsyncWebServerRequest *request)
     if (request->hasParam("plain", true))
     {
         String body = request->getParam("plain", true)->value();
-        DynamicJsonDocument doc(1024);
+        JsonDocument doc;
         DeserializationError error = deserializeJson(doc, body);
 
         if (error)
@@ -197,35 +197,35 @@ String WebServer::HandleApiRequestSettingsWrite(AsyncWebServerRequest *request)
             return R"({"status": "error", "message": "Failed to parse JSON"})";
         }
 
-        if (doc.containsKey("device-name"))
+        if (doc["device-name"].is<String>())
         {
             Settings::Instance()->DeviceName = doc["device-name"].as<String>();
         }
-        if (doc.containsKey("wifi-ssid"))
+        if (doc["wifi-ssid"].is<String>())
         {
             Settings::Instance()->WifiSsid = doc["wifi-ssid"].as<String>();
         }
-        if (doc.containsKey("wifi-password"))
+        if (doc["wifi-password"].is<String>())
         {
             Settings::Instance()->WifiPassword = doc["wifi-password"].as<String>();
         }
-        if (doc.containsKey("mqtt-enabled"))
+        if (doc["mqtt-enabled"].is<bool>())
         {
             Settings::Instance()->IsMqttEnabled = doc["mqtt-enabled"].as<bool>();
         }
-        if (doc.containsKey("mqtt-server"))
+        if (doc["mqtt-server"].is<String>())
         {
             Settings::Instance()->MqttServer = doc["mqtt-server"].as<String>();
         }
-        if (doc.containsKey("mqtt-port"))
+        if (doc["mqtt-port"].is<int>())
         {
             Settings::Instance()->MqttPort = doc["mqtt-port"].as<int>();
         }
-        if (doc.containsKey("mqtt-user"))
+        if (doc["mqtt-user"].is<String>())
         {
             Settings::Instance()->MqttUser = doc["mqtt-user"].as<String>();
         }
-        if (doc.containsKey("mqtt-password"))
+        if (doc["mqtt-password"].is<String>())
         {
             Settings::Instance()->MqttPassword = doc["mqtt-password"].as<String>();
         }

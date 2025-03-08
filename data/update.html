@@ -29,7 +29,7 @@
         <p><button class="hb-block-button" onclick="updateFirmware();">Install Firmware</button></p>
 
 
-        <form method="POST" action="/update" enctype="multipart/form-data">
+        <form method="POST" action="/api/update" enctype="multipart/form-data">
             <input type="file" name="firmware">
             <input type="submit" value="Upload">
         </form>

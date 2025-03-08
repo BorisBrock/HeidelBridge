@@ -17,15 +17,6 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 ---
 
-# Roadmap
-
-For the upcoming version **3.0** some nice enhancements are planned:
-- :star: Pre-built binaries: no need to clone and compile the repositoiry yourself
-- :star: OTA updates: simply update your HeidelBridge via WiFi
-- :star: Wifi provisioning: easily integrate HeidelBridge into your home network
-
-The new version is planned to be released in 2025. Stay tuned!
-
 # Required Hardware
 
 You only need two components for this project: an ESP32 microcontroller and a MAX485 module. Both are available in large quantities and at reasonable prices on the Internet. You will also need a breadboard and a few jumper wires. All in all, it shouldn't cost you more than 10$.
@@ -43,22 +34,42 @@ Of course a well designed PCB would be much nicer, but this is still work in pro
 
 ---
 
-# Setting Up The ESP32
+# Setting Up Your HeidelBridge
 
-## Development Environment
+## Initial Programming Of The ESP32
+
+Follow these steps to turn your ESP32 into a HeidelBridge:
+
+- Download the firmware binary from the [latest GitHub release](https://github.com/BorisBrock/HeidelBridge/releases)
+- Connect your ESP32 to the computer via USB.
+- Visit the [ESPWEBTOOL](https://esp.huhn.me/) in a Chromium based web browser (Chromium, Brave, Vivaldi etc.).
+- Load the firmware binary to your ESP32.
+
+## Configuring Your HeidelBridge
+
+TODO: Captive portal...
+
+## Updating Your HeidelBridge
+
+TODO: GitHub release binary download, OTA flash {ip}/update
+
+## Changing The HeidelBridge Configuration
+
+TODO: Web Interface...
+
+## Programming Your ESP32 Manually
 
 To compile this project you will need to install VS Code and the PlatformIO extension. Both are available for free for Linux, MacOS and Windows.
 
-## Programming your ESP32
+Now follow these steps:
 
 - Start by cloning or downloading this repository.
 - Optional: change `board = ...` in platformio.ini to match the ESP32 board you are actually using.
-- Modify `Configuration/Configuration.cpp`:
-  - Change the WiFi SSID and password to match your home network settings.
-  - If you want to use MQTT, also insert your MQTT server's address and your user name / password (can be left empty if authorization is not required). Also set `Enabled` to `true`.
-  - If you want to use multiple HeidelBridges in the same network, change the `DeviceName` to make it unique for each node.
 - Compile the project.
-- Now connect your ESP32 via USB and upload the firmware.
+- Build the file system image via the PlatformIO command palette.
+- Now connect your ESP32 via USB.
+- Upload the file system image.
+- Upload the firmware.
 
 ---
 

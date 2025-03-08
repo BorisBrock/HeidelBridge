@@ -58,6 +58,7 @@ bool WifiManager::ConnectToWifiNetwork()
         delay(100);
         if (millis() - startTimeMs > Constants::WiFi::ConnectionTimeoutMs)
         {
+            WifiConnection::Disconnect();
             Logger::Error(" -> Failed to connect to WiFi network");
             return false;
         }

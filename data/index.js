@@ -59,7 +59,7 @@ function writeSettings() {
             }
 
             // Show a success message popup
-            alert("Settings saved successfully. Device will reboot to apply changes.");
+            alert("Settings saved successfully.\nDevice will reboot to apply changes.");
             restartEsp();
         })
         .catch(error => {

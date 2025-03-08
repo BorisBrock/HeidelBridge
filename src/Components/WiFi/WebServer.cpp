@@ -71,8 +71,12 @@ void WebServer::Init()
                   { request->send(200, "application/json", HandleApiRequestGetWifiScanStatus()); });
     gWebServer.on("/api/settings_read", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestSettingsRead(request)); });
-    gWebServer.on("/api/settings_write", HTTP_POST, [this](AsyncWebServerRequest *request)
-                  { request->send(200, "application/json", HandleApiRequestSettingsWrite(request)); });
+    gWebServer.onRequestBody([this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
+                             {
+                    if (request->url() == "/api/settings_write") {
+                        request->send(200, "application/json", HandleApiRequestSettingsWrite(request, data));
+                    } });
+
     gWebServer.on("/api/reboot", HTTP_POST, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestReboot()); });
     gWebServer.on("api/update", HTTP_POST, [this](AsyncWebServerRequest *request)
@@ -154,65 +158,56 @@ String WebServer::HandleApiRequestSettingsRead(AsyncWebServerRequest *request)
 }
 
 // Handles the API request
-String WebServer::HandleApiRequestSettingsWrite(AsyncWebServerRequest *request)
+String WebServer::HandleApiRequestSettingsWrite(AsyncWebServerRequest *request, uint8_t *data)
 {
     Logger::Debug("Received REST API request: write settings");
 
-    // Store settings from JSON
-    if (request->hasParam("plain", true))
+    JsonDocument jsonBuffer;
+    DeserializationError error = deserializeJson(jsonBuffer, (const char *)data);
+    if (error)
     {
-        String body = request->getParam("plain", true)->value();
-        JsonDocument doc;
-        DeserializationError error = deserializeJson(doc, body);
-
-        if (error)
-        {
-            Logger::Error("Failed to parse JSON");
-            return R"({"status": "error", "message": "Failed to parse JSON"})";
-        }
-
-        if (doc["device-name"].is<String>())
-        {
-            Settings::Instance()->DeviceName = doc["device-name"].as<String>();
-        }
-        if (doc["wifi-ssid"].is<String>())
-        {
-            Settings::Instance()->WifiSsid = doc["wifi-ssid"].as<String>();
-        }
-        if (doc["wifi-password"].is<String>())
-        {
-            Settings::Instance()->WifiPassword = doc["wifi-password"].as<String>();
-        }
-        if (doc["mqtt-enabled"].is<bool>())
-        {
-            Settings::Instance()->IsMqttEnabled = doc["mqtt-enabled"].as<bool>();
-        }
-        if (doc["mqtt-server"].is<String>())
-        {
-            Settings::Instance()->MqttServer = doc["mqtt-server"].as<String>();
-        }
-        if (doc["mqtt-port"].is<int>())
-        {
-            Settings::Instance()->MqttPort = doc["mqtt-port"].as<int>();
-        }
-        if (doc["mqtt-user"].is<String>())
-        {
-            Settings::Instance()->MqttUser = doc["mqtt-user"].as<String>();
-        }
-        if (doc["mqtt-password"].is<String>())
-        {
-            Settings::Instance()->MqttPassword = doc["mqtt-password"].as<String>();
-        }
-
-        Settings::Instance()->WriteToPersistentMemory();
-
-        return R"({"status": "ok"})";
+        Logger::Error("Failed to parse JSON");
+        return R"({"status": "error", "message": "Failed to parse JSON"})";
     }
-    else
+    JsonObject doc = jsonBuffer.as<JsonObject>();
+
+    if (doc["device-name"].is<String>())
     {
-        Logger::Error("No JSON body found");
-        return R"({"status": "error", "message": "No JSON body found"})";
+        Settings::Instance()->DeviceName = doc["device-name"].as<String>();
     }
+    if (doc["wifi-ssid"].is<String>())
+    {
+        Settings::Instance()->WifiSsid = doc["wifi-ssid"].as<String>();
+    }
+    if (doc["wifi-password"].is<String>())
+    {
+        Settings::Instance()->WifiPassword = doc["wifi-password"].as<String>();
+    }
+    if (doc["mqtt-enabled"].is<bool>())
+    {
+        Settings::Instance()->IsMqttEnabled = doc["mqtt-enabled"].as<bool>();
+    }
+    if (doc["mqtt-server"].is<String>())
+    {
+        Settings::Instance()->MqttServer = doc["mqtt-server"].as<String>();
+    }
+    if (doc["mqtt-port"].is<int>())
+    {
+        Settings::Instance()->MqttPort = doc["mqtt-port"].as<int>();
+    }
+    if (doc["mqtt-user"].is<String>())
+    {
+        Settings::Instance()->MqttUser = doc["mqtt-user"].as<String>();
+    }
+    if (doc["mqtt-password"].is<String>())
+    {
+        Settings::Instance()->MqttPassword = doc["mqtt-password"].as<String>();
+    }
+
+    Settings::Instance()->WriteToPersistentMemory();
+    Settings::Instance()->Print();
+
+    return R"({"status": "ok"})";
 }
 
 // Handles the API request

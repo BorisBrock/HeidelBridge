@@ -25,7 +25,7 @@ private:
     String HandleApiRequestSettingsRead(AsyncWebServerRequest *request);
 
     // Handles the API request
-    String HandleApiRequestSettingsWrite(AsyncWebServerRequest *request);
+    String HandleApiRequestSettingsWrite(AsyncWebServerRequest *request, uint8_t* data);
 
     // Handles the API request
     String HandleApiRequestReboot();

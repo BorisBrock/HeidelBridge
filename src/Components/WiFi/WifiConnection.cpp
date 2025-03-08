@@ -8,6 +8,8 @@
 
 namespace WifiConnection
 {
+    bool gReconnect = true;
+
     void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
     {
         Logger::Info("Connected to AP successfully!");
@@ -27,7 +29,10 @@ namespace WifiConnection
 
         gStatistics.NumWifiDisconnects++;
 
-        WiFi.begin(Settings::Instance()->WifiSsid, Settings::Instance()->WifiPassword);
+        if (gReconnect)
+        {
+            WiFi.begin(Settings::Instance()->WifiSsid, Settings::Instance()->WifiPassword);
+        }
     }
 
     // Connects to the given SSID with the given password
@@ -50,6 +55,7 @@ namespace WifiConnection
 
         // Start Wifi connection
         Logger::Info("Connecting to WiFi SSID '%s'", ssid);
+        gReconnect = true;
         WiFi.begin(ssid, password);
         gStatistics.NumWifiDisconnects = 0;
     }
@@ -58,5 +64,12 @@ namespace WifiConnection
     bool IsConnected()
     {
         return WiFi.status() == WL_CONNECTED;
+    }
+
+    // Disconnect and stop all reconnect attempts
+    void Disconnect()
+    {
+        gReconnect = false;
+        WiFi.disconnect(true);
     }
 };

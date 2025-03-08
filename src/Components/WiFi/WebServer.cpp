@@ -69,8 +69,6 @@ void WebServer::Init()
                   { request->send(200, "application/json", HandleApiRequestStartWifiScan()); });
     gWebServer.on("/api/wifi_scan_status", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestGetWifiScanStatus()); });
-    gWebServer.on("/api/wifi_connect", HTTP_POST, [this](AsyncWebServerRequest *request)
-                  { request->send(200, "application/json", HandleApiRequestConnectWifi(request)); });
     gWebServer.on("/api/settings_read", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestSettingsRead(request)); });
     gWebServer.on("/api/settings_write", HTTP_POST, [this](AsyncWebServerRequest *request)
@@ -131,30 +129,6 @@ String WebServer::HandleApiRequestGetWifiScanStatus()
     String jsonResponse;
     serializeJson(doc, jsonResponse);
     return jsonResponse;
-}
-
-// Handles the API request
-String WebServer::HandleApiRequestConnectWifi(AsyncWebServerRequest *request)
-{
-    Logger::Debug("Received REST API request: connect to WiFi");
-
-    if (!request->hasParam("ssid"))
-    {
-        Logger::Error("Parameter 'ssid' is missing");
-        return R"({"status": "error"})";
-    }
-
-    if (!request->hasParam("password"))
-    {
-        Logger::Error("Parameter 'password' is missing");
-        return R"({"status": "error"})";
-    }
-
-    Logger::Info("Connecting to WiFi '%s'", request->getParam("ssid")->value());
-
-    // Todo
-
-    return R"({"status": "ok"})";
 }
 
 // Handles the API request

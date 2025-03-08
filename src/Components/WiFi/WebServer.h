@@ -22,9 +22,6 @@ private:
     String HandleApiRequestStartWifiScan();
 
     // Handles the API request
-    String HandleApiRequestConnectWifi(AsyncWebServerRequest *request);
-
-    // Handles the API request
     String HandleApiRequestSettingsRead(AsyncWebServerRequest *request);
 
     // Handles the API request

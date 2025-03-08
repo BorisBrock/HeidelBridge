@@ -53,8 +53,6 @@ void Settings::WriteToPersistentMemory()
     gPreferences.putString("mqtt_server", MqttServer);
     gPreferences.putString("mqtt_user", MqttUser);
     gPreferences.putString("mqtt_password", MqttPassword);
-
-    gPreferences.
 }
 
 // Prints all settings to the logger

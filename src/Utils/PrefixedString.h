@@ -4,7 +4,7 @@ class PrefixedString
 {
 public:
     // Constructor;
-    PrefixedString(const char *prefix, uint16_t capacity);
+    PrefixedString(uint16_t capacity);
 
     // Destructor
     ~PrefixedString();

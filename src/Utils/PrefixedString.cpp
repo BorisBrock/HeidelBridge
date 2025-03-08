@@ -1,12 +1,11 @@
 #include <Arduino.h>
 #include "PrefixedString.h"
 
-PrefixedString::PrefixedString(const char *prefix, uint16_t capacity)
+PrefixedString::PrefixedString(uint16_t capacity)
     : mCapacity(capacity)
 {
     mBuffer = new char[mCapacity];
     memset(mBuffer, 0, mCapacity);
-    SetPrefix(prefix);
 }
 
 // Destructor

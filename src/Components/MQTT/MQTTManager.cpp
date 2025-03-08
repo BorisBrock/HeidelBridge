@@ -25,7 +25,7 @@ namespace MQTTManager
     uint8_t gCurValueIndex = 0;
     char TopicBuffer[128];
     char PayloadBuffer[512];
-    PrefixedString gMqttTopic(Configuration::General::DeviceName, 128);
+    PrefixedString gMqttTopic(128);
 
     constexpr uint16_t NumMqttPublishedValues = 10;
     enum MqttPublishedValues
@@ -224,6 +224,8 @@ namespace MQTTManager
     void Init(IWallbox *wallbox)
     {
         Logger::Info("Initializing MQTT");
+
+        gMqttTopic.SetPrefix(Settings::Instance()->DeviceName.c_str());
 
         gWallbox = wallbox;
 

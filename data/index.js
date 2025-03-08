@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById("wifi-ssid").value = data["device-name"];
         document.getElementById("wifi-password").value = data["device-name"];
         document.getElementById("mqtt-enabled").checked = data["mqtt-enabled"];
-        document.getElementById("mqtt-server").value = data["mqtt-server"];
+        document.getElementById("mqtt-server").value = data["mqtt-server"] + ":" + data["mqtt-port"];
         document.getElementById("mqtt-user").value = data["mqtt-user"];
         document.getElementById("mqtt-password").value = data["mqtt-password"];
     } catch (error) {
@@ -25,13 +25,20 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 function writeSettings() {
+    // Split MQTT server and port
+    const mqttServer = document.getElementById("mqtt-server").value;
+    const mqttServerParts = mqttServer.split(":");
+    const mqttServerValue = mqttServerParts[0];
+    const mqttPortValue = mqttServerParts[1];
+
     // Write the settings from the UI to the device
     const data = {
         "device-name": document.getElementById("device-name").value,
         "wifi-ssid": document.getElementById("wifi-ssid").value,
         "wifi-password": document.getElementById("wifi-password").value,
         "mqtt-enabled": document.getElementById("mqtt-enabled").checked,
-        "mqtt-server": document.getElementById("mqtt-server").value,
+        "mqtt-server": mqttServerValue,
+        "mqtt-port": mqttPortValue,
         "mqtt-user": document.getElementById("mqtt-user").value,
         "mqtt-password": document.getElementById("mqtt-password").value
     };

@@ -23,4 +23,13 @@ private:
 
     // Handles the API request
     String HandleApiRequestConnectWifi(AsyncWebServerRequest *request);
+
+    // Handles the API request
+    String HandleApiRequestSettingsRead(AsyncWebServerRequest *request);
+
+    // Handles the API request
+    String HandleApiRequestSettingsWrite(AsyncWebServerRequest *request);
+
+    // Handles the API request
+    String HandleApiRequestReboot();
 };

@@ -18,6 +18,13 @@ void Settings::Init()
     gPreferences.begin("heidelbridge", false);
 }
 
+// Deinitializes the settings
+void Settings::DeInit()
+{
+    Logger::Debug("Deinitializing persistent settings");
+    gPreferences.end();
+}
+
 // Read all settings from SPIFFS
 void Settings::ReadFromPersistentMemory()
 {
@@ -31,6 +38,23 @@ void Settings::ReadFromPersistentMemory()
     MqttServer = gPreferences.getString("mqtt_server");
     MqttUser = gPreferences.getString("mqtt_user");
     MqttPassword = gPreferences.getString("mqtt_password");
+}
+
+// Write all settings to SPIFFS
+void Settings::WriteToPersistentMemory()
+{
+    Logger::Trace("Writing settings to persistent memory");
+
+    gPreferences.putString("device_name", DeviceName);
+    gPreferences.putString("wifi_ssid", WifiSsid);
+    gPreferences.putString("wifi_password", WifiPassword);
+    gPreferences.putBool("mqtt_enabled", IsMqttEnabled);
+    gPreferences.putUShort("mqtt_port", MqttPort);
+    gPreferences.putString("mqtt_server", MqttServer);
+    gPreferences.putString("mqtt_user", MqttUser);
+    gPreferences.putString("mqtt_password", MqttPassword);
+
+    gPreferences.
 }
 
 // Prints all settings to the logger

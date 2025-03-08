@@ -70,6 +70,12 @@ void WebServer::Init()
                   { request->send(200, "application/json", HandleApiRequestGetWifiScanStatus()); });
     gWebServer.on("/api/wifi_connect", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestConnectWifi(request)); });
+    gWebServer.on("/api/settings_read", HTTP_GET, [this](AsyncWebServerRequest *request)
+                  { request->send(200, "application/json", HandleApiRequestSettingsRead(request)); });
+    gWebServer.on("/api/settings_write", HTTP_POST, [this](AsyncWebServerRequest *request)
+                  { request->send(200, "application/json", HandleApiRequestSettingsWrite(request)); });
+    gWebServer.on("/api/reboot", HTTP_POST, [this](AsyncWebServerRequest *request)
+                  { request->send(200, "application/json", HandleApiRequestReboot()); });
 
     // handle 404 errors
     gWebServer.onNotFound([&](AsyncWebServerRequest *request)
@@ -125,21 +131,116 @@ String WebServer::HandleApiRequestConnectWifi(AsyncWebServerRequest *request)
 {
     Logger::Debug("Received REST API request: connect to WiFi");
 
-    if(!request->hasParam("ssid"))
+    if (!request->hasParam("ssid"))
     {
         Logger::Error("Parameter 'ssid' is missing");
         return R"({"status": "error"})";
     }
 
-    if(!request->hasParam("password"))
+    if (!request->hasParam("password"))
     {
         Logger::Error("Parameter 'password' is missing");
         return R"({"status": "error"})";
     }
 
     Logger::Info("Connecting to WiFi '%s'", request->getParam("ssid")->value());
-    
+
     // Todo
+
+    return R"({"status": "ok"})";
+}
+
+// Handles the API request
+String WebServer::HandleApiRequestSettingsRead(AsyncWebServerRequest *request)
+{
+    Logger::Debug("Received REST API request: read settings");
+
+    // Return settings as JSON
+    JsonDocument doc;
+
+    doc["device-name"] = Settings::Instance()->DeviceName;
+    doc["wifi-ssid"] = Settings::Instance()->WifiSsid;
+    doc["wifi-password"] = Settings::Instance()->WifiPassword;
+    doc["mqtt-enabled"] = Settings::Instance()->IsMqttEnabled;
+    doc["mqtt-server"] = Settings::Instance()->MqttServer;
+    doc["mqtt-port"] = Settings::Instance()->MqttPort;
+    doc["mqtt-user"] = Settings::Instance()->MqttUser;
+    doc["mqtt-password"] = Settings::Instance()->MqttPassword;
+
+    String jsonResponse;
+    serializeJson(doc, jsonResponse);
+    return jsonResponse;
+}
+
+// Handles the API request
+String WebServer::HandleApiRequestSettingsWrite(AsyncWebServerRequest *request)
+{
+    Logger::Debug("Received REST API request: write settings");
+
+    // Store settings from JSON
+    if (request->hasParam("plain", true))
+    {
+        String body = request->getParam("plain", true)->value();
+        DynamicJsonDocument doc(1024);
+        DeserializationError error = deserializeJson(doc, body);
+
+        if (error)
+        {
+            Logger::Error("Failed to parse JSON");
+            return R"({"status": "error", "message": "Failed to parse JSON"})";
+        }
+
+        if (doc.containsKey("device-name"))
+        {
+            Settings::Instance()->DeviceName = doc["device-name"].as<String>();
+        }
+        if (doc.containsKey("wifi-ssid"))
+        {
+            Settings::Instance()->WifiSsid = doc["wifi-ssid"].as<String>();
+        }
+        if (doc.containsKey("wifi-password"))
+        {
+            Settings::Instance()->WifiPassword = doc["wifi-password"].as<String>();
+        }
+        if (doc.containsKey("mqtt-enabled"))
+        {
+            Settings::Instance()->IsMqttEnabled = doc["mqtt-enabled"].as<bool>();
+        }
+        if (doc.containsKey("mqtt-server"))
+        {
+            Settings::Instance()->MqttServer = doc["mqtt-server"].as<String>();
+        }
+        if (doc.containsKey("mqtt-port"))
+        {
+            Settings::Instance()->MqttPort = doc["mqtt-port"].as<int>();
+        }
+        if (doc.containsKey("mqtt-user"))
+        {
+            Settings::Instance()->MqttUser = doc["mqtt-user"].as<String>();
+        }
+        if (doc.containsKey("mqtt-password"))
+        {
+            Settings::Instance()->MqttPassword = doc["mqtt-password"].as<String>();
+        }
+
+        Settings::Instance()->WriteToPersistentMemory();
+
+        return R"({"status": "ok"})";
+    }
+    else
+    {
+        Logger::Error("No JSON body found");
+        return R"({"status": "error", "message": "No JSON body found"})";
+    }
+}
+
+// Handles the API request
+String WebServer::HandleApiRequestReboot()
+{
+    Logger::Info("Received REST API request: restarting ESP32");
+
+    Settings::Instance()->DeInit();
+    ESP.restart();
 
     return R"({"status": "ok"})";
 }

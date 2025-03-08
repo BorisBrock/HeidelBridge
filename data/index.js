@@ -49,15 +49,25 @@ function writeSettings() {
         },
         body: JSON.stringify(data)
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
 
-        // Show a success message popup
-        alert("Settings saved successfully. Device will reboot to apply changes.");
+            // Show a success message popup
+            alert("Settings saved successfully. Device will reboot to apply changes.");
+            restartEsp();
+        })
+        .catch(error => {
+            console.error(`Error: ${error.message}`);
+        });
+}
+
+function restartEsp() {
+    fetch("/api/restart", {
+        method: "POST"
     })
-    .catch(error => {
-        console.error(`Error: ${error.message}`);
-    });
+        .catch(error => {
+            console.error(`Error: ${error.message}`);
+        });
 }

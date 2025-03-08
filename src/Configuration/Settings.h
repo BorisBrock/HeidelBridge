@@ -12,8 +12,14 @@ public:
     // Initializes the settings
     void Init();
 
+    // Deinitializes the settings
+    void DeInit();
+
     // Read all settings from SPIFFS
     void ReadFromPersistentMemory();
+
+    // Write all settings to SPIFFS
+    void WriteToPersistentMemory();
 
     // Prints all settings to the logger
     void Print();

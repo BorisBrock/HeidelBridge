@@ -33,7 +33,7 @@ function writeSettings() {
     const mqttServer = document.getElementById("mqtt-server").value;
     const mqttServerParts = mqttServer.split(":");
     const mqttServerValue = mqttServerParts[0];
-    const mqttPortValue = mqttServerParts[1];
+    const mqttPortValue = Number(mqttServerParts[1]);
 
     // Write the settings from the UI to the device
     const data = {

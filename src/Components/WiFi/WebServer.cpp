@@ -193,9 +193,9 @@ String WebServer::HandleApiRequestSettingsWrite(AsyncWebServerRequest *request, 
     {
         Settings::Instance()->MqttServer = doc["mqtt-server"].as<String>();
     }
-    if (doc["mqtt-port"].is<int>())
+    if (doc["mqtt-port"].is<uint16_t>())
     {
-        Settings::Instance()->MqttPort = doc["mqtt-port"].as<int>();
+        Settings::Instance()->MqttPort = doc["mqtt-port"].as<uint16_t>();
     }
     if (doc["mqtt-user"].is<String>())
     {

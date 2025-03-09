@@ -199,7 +199,7 @@ namespace MQTTManager
     // Callback for MQTT disconnection
     void OnMqttDisconnect(AsyncMqttClientDisconnectReason reason)
     {
-        Logger::Warning("Disconnected from MQTT");
+        Logger::Warning("Disconnected from MQTT. Reason: %d", reason);
         gStatistics.NumMqttDisconnects++;
     }
 
@@ -236,11 +236,15 @@ namespace MQTTManager
         gMqttClient.onPublish(OnMqttPublish);
 
         // Configure the server
+        Logger::Trace("Using MQTT server %s:%d", Settings::Instance()->MqttServer.c_str(), Settings::Instance()->MqttPort);
         gMqttClient.setServer(Settings::Instance()->MqttServer.c_str(), Settings::Instance()->MqttPort);
 
         // Set credentials
         if (Settings::Instance()->MqttUser.length() > 0)
+        {
+            Logger::Trace("Using MQTT credentials");
             gMqttClient.setCredentials(Settings::Instance()->MqttUser.c_str(), Settings::Instance()->MqttPassword.c_str());
+        }
     }
 
     // Updates the MQTT connection and publishes messages

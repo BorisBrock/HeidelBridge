@@ -17,9 +17,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById("wifi-password").value = data["wifi-password"];
         document.getElementById("mqtt-enabled").checked = data["mqtt-enabled"];
 
-        if (data["mqtt-server"]) {
+        if (data["mqtt-server"] && data["mqtt-port"]) {
             document.getElementById("mqtt-server").value = data["mqtt-server"] + ":" + data["mqtt-port"];
-        }    
+        }
 
         document.getElementById("mqtt-user").value = data["mqtt-user"];
         document.getElementById("mqtt-password").value = data["mqtt-password"];
@@ -28,9 +28,32 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
+function isValidIPorHostnameWithPort(input) {
+    const regex = /^(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[[a-fA-F0-9:]+\]|[a-zA-Z0-9.-]+):([0-9]{1,5})$/;
+
+    const match = input.match(regex);
+    if (!match) return false;
+
+    const port = parseInt(match[1], 10);
+    return port >= 0 && port <= 65535;
+}
+
+function messageBox(title, text) {
+    document.getElementById("message-box-title").textContent = title;
+    document.getElementById("message-box-text").textContent = text;
+    toggleModal("message-box");
+}
+
 function writeSettings() {
+    // Validate the MQTT server
+    const mqttServerInput = document.getElementById("mqtt-server").value;
+    if (!isValidIPorHostnameWithPort(mqttServerInput)) {
+        messageBox("Invalid MQTT Server", "Please enter a valid MQTT server address (either {ip}:{port} or {hostname}:{port}).");
+        return;
+    }
+
     // Split MQTT server and port
-    const mqttServer = document.getElementById("mqtt-server").value;
+    const mqttServer = mqttServerInput;
     const mqttServerParts = mqttServer.split(":");
     const mqttServerValue = mqttServerParts[0];
     const mqttPortValue = Number(mqttServerParts[1]);
@@ -59,7 +82,7 @@ function writeSettings() {
             }
 
             // Show a success message popup
-            alert("Settings saved successfully.\nDevice will reboot to apply changes.");
+            messageBox("Success", "The device will now reboot to apply your changes.");
             restartEsp();
         })
         .catch(error => {

@@ -44,11 +44,25 @@
         <input type="text" id="mqtt-user" name="mqtt-user" placeholder="User name (optional)" />
         <input type="password" id="mqtt-password" name="mqtt-password" placeholder="Password (optional)" />
 
-
         <button class="hb-block-button" onclick="writeSettings();">Apply and restart</button>
 
     </main>
 
+    <!-- Error dialog -->
+    <dialog id="message-box">
+        <article>
+            <header>
+                <h3 id="message-box-title">Title</h3>
+            </header>
+            <p id="message-box-text">Text</p>
+            <footer>
+                <button autofocus data-target="message-box" onclick="toggleModal(event)">OK</button>
+            </footer>
+        </article>
+    </dialog>
+    <!-- ./ Error dialog -->
+
+    <script src="modal.js"></script>
     <script src="index.js"></script>
 </body>
 

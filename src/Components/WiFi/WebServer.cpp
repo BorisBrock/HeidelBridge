@@ -81,16 +81,22 @@ void WebServer::Init()
 
     gWebServer.on("/api/reboot", HTTP_POST, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestReboot()); });
-    gWebServer.on("api/update", HTTP_POST, [this](AsyncWebServerRequest *request)
-                  {
-                        request->send(200, "text/plain", Update.hasError() ? "FAIL" : "OK");
-                        delay(500);
-                        ESP.restart(); }, [this](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+    gWebServer.on("/api/update", HTTP_POST, [this](AsyncWebServerRequest *request)
+                  { request->send(200, "text/plain", Update.hasError() ? R"({"status": "error"})" : R"({"status": "ok"})");
+                    delay(500);
+                    ESP.restart(); }, [this](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
                   { HandleFirmwareUpload(request, filename, index, data, len, final); });
 
     // handle 404 errors
     gWebServer.onNotFound([&](AsyncWebServerRequest *request)
-                          { request->send(404, "text/plain", "This resource does not exist"); });
+                          { 
+                            // Print all important request information
+                            Logger::Debug("404: %s", request->url().c_str());
+                            Logger::Debug(" > Method: %s", request->methodToString());
+                            Logger::Debug(" > Content type: %s", request->contentType().c_str());
+                            Logger::Debug(" > Content length: %d", request->contentLength());
+                            Logger::Debug(" > Query string: %s", request->url().c_str());
+                            request->send(404, "text/plain", "This resource does not exist"); });
 
     gWebServer.begin();
 }
@@ -229,7 +235,7 @@ void WebServer::HandleFirmwareUpload(AsyncWebServerRequest *request, String file
     if (index == 0)
     {
         // First packet
-        Logger::Info("Updating firmware: %s\n", filename.c_str());
+        Logger::Info("Updating firmware: %s", filename.c_str());
         if (!Update.begin(UPDATE_SIZE_UNKNOWN))
         {
             Logger::Error("Starting firmware update failed: %s", Update.errorString());

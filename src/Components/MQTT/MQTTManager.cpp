@@ -67,31 +67,31 @@ namespace MQTTManager
         // Publish Home Assistant MQTT discovery messages
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/binary_sensor/%/is_vehicle_connected/config",
-            R"({"name":"Vehicle connected","device_class":"plug","state_topic":"%/is_vehicle_connected","payload_on":"1","payload_off":"0","unique_id":"%_is_vehicle_connected","device":{"identifiers":["%"],"name":"%"}})");
+            R"({"name":"Vehicle connected","device_class":"plug","state_topic":"%/is_vehicle_connected","payload_on":"1","payload_off":"0","unique_id":"%_is_vehicle_connected","object_id":"is_vehicle_connected","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/binary_sensor/%/is_vehicle_charging/config",
-            R"({"name":"Vehicle charging","device_class":"battery_charging","state_topic":"%/is_vehicle_charging","payload_on":"1","payload_off":"0","unique_id":"%_is_vehicle_charging","device":{"identifiers":["%"],"name":"%"}})");
+            R"({"name":"Vehicle charging","device_class":"battery_charging","state_topic":"%/is_vehicle_charging","payload_on":"1","payload_off":"0","unique_id":"%_is_vehicle_charging","object_id":"is_vehicle_charging","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/sensor/%/charging_power/config",
-            R"({"name":"Charging power","device_class":"power","state_topic":"%/charging_power","unique_id":"%_charging_power","unit_of_measurement":"W","device":{"identifiers":["%"],"name":"%"}})");
+            R"({"name":"Charging power","device_class":"power","state_topic":"%/charging_power","unique_id":"%_charging_power","object_id":"charging_power","unit_of_measurement":"W","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/sensor/%/charging_current/config",
-            R"({"name":"Charging current","device_class":"current","state_topic":"%/charging_current/phase1","unique_id":"%_charging_current","unit_of_measurement":"A","device":{"identifiers":["%"],"name":"%"}})");
+            R"({"name":"Charging current","device_class":"current","state_topic":"%/charging_current/phase1","unique_id":"%_charging_current","object_id":"charging_current","unit_of_measurement":"A","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/sensor/%/charging_current_limit/config",
-            R"({"name":"Charging current limit","device_class":"current","state_topic":"%/charging_current_limit","unique_id":"%_charging_current_limit","unit_of_measurement":"A","device":{"identifiers":["%"],"name":"%"}})");
+            R"({"name":"Charging current limit","device_class":"current","state_topic":"%/charging_current_limit","unique_id":"%_charging_current_limit","object_id":"charging_current_limit","unit_of_measurement":"A","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/sensor/%/energy_meter/config",
-            R"({"name":"Energy meter","device_class":"energy","state_topic":"%/energy_meter","state_class":"total_increasing","unique_id":"%_energy_meter","unit_of_measurement":"kWh","device":{"identifiers":["%"],"name":"%"}})");
+            R"({"name":"Energy meter","device_class":"energy","state_topic":"%/energy_meter","state_class":"total_increasing","unique_id":"%_energy_meter","object_id":"energy_meter","unit_of_measurement":"kWh","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/sensor/%/temperature/config",
-            R"({"name":"Temperature","device_class":"temperature","state_topic":"%/temperature","unique_id":"%_temperature","unit_of_measurement":"°C","device":{"identifiers":["%"],"name":"%"}})");
+            R"({"name":"Temperature","device_class":"temperature","state_topic":"%/temperature","unique_id":"%_temperature","object_id":"temperature","unit_of_measurement":"°C","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
     }
 
     // Publishes various MQTT status messages based on the current value index.

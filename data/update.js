@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const data = await response.json();
 
         // Update the HTML
-        document.getElementById("version").textContent = "Currently installed version:" + data["version"];
+        document.getElementById("version").textContent = "Currently installed version: " + data["version"];
     } catch (error) {
         console.error(`Error: ${error.message}`);
     }

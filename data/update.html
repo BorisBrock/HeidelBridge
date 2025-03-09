@@ -26,17 +26,17 @@
 
         <p id="version">Currently installed version: ...</p>
         <input type="file" id="file-input" accept=".bin" />
-        <p><button class="hb-block-button" onclick="updateFirmware();">Install Firmware</button></p>
+        <p><button class="hb-block-button" onclick="updateFirmware();">Install firmware</button></p>
 
 
         <form method="POST" action="/api/update" enctype="multipart/form-data">
             <input type="file" name="firmware">
-            <input type="submit" value="Upload">
+            <input type="submit" value="Install firmware">
         </form>
 
     </main>
 
-    <script src="firmware.js"></script>
+    <script src="update.js"></script>
 </body>
 
 </html>

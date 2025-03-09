@@ -61,6 +61,8 @@ void WebServer::Init()
 
     // Serve static files from SPIFFS
     gWebServer.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+    gWebServer.on("/update", HTTP_GET, [](AsyncWebServerRequest *request)
+                  { request->redirect("/update.html"); });
 
     // Handle API requests
     gWebServer.on("/api/version", HTTP_GET, [this](AsyncWebServerRequest *request)

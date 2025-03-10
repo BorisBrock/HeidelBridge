@@ -16,27 +16,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById("wifi-ssid").value = data["wifi-ssid"];
         document.getElementById("wifi-password").value = data["wifi-password"];
         document.getElementById("mqtt-enabled").checked = data["mqtt-enabled"];
-
-        if (data["mqtt-server"] && data["mqtt-port"]) {
-            document.getElementById("mqtt-server").value = data["mqtt-server"] + ":" + data["mqtt-port"];
-        }
-
+        document.getElementById("mqtt-server").value = data["mqtt-server"];
+        document.getElementById("mqtt-port").value = data["mqtt-port"];
         document.getElementById("mqtt-user").value = data["mqtt-user"];
         document.getElementById("mqtt-password").value = data["mqtt-password"];
     } catch (error) {
         console.error(`Error: ${error.message}`);
     }
 });
-
-function isValidIPorHostnameWithPort(input) {
-    const regex = /^(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[[a-fA-F0-9:]+\]|[a-zA-Z0-9.-]+):([0-9]{1,5})$/;
-
-    const match = input.match(regex);
-    if (!match) return false;
-
-    const port = parseInt(match[1], 10);
-    return port >= 0 && port <= 65535;
-}
 
 function messageBox(title, text) {
     document.getElementById("message-box-title").textContent = title;
@@ -45,30 +32,14 @@ function messageBox(title, text) {
 }
 
 function writeSettings() {
-    // Validate the MQTT server
-    let mqttServerValue = "";
-    let mqttPortValue = 1833;
-    const mqttServerInput = document.getElementById("mqtt-server").value;
-    if (mqttServerInput) {
-        if (!isValidIPorHostnameWithPort(mqttServerInput)) {
-            messageBox("Invalid MQTT Server", "Please enter a valid MQTT server address (either {ip}:{port} or {hostname}:{port}).");
-            return;
-        }
-
-        // Split MQTT server and port
-        const mqttServerParts = mqttServer.split(":");
-        mqttServerValue = mqttServerParts[0];
-        mqttPortValue = Number(mqttServerParts[1]);
-    }
-
     // Write the settings from the UI to the device
     const data = {
         "device-name": document.getElementById("device-name").value,
         "wifi-ssid": document.getElementById("wifi-ssid").value,
         "wifi-password": document.getElementById("wifi-password").value,
         "mqtt-enabled": document.getElementById("mqtt-enabled").checked,
-        "mqtt-server": mqttServerValue,
-        "mqtt-port": mqttPortValue,
+        "mqtt-server": document.getElementById("mqtt-server").value,
+        "mqtt-port": document.getElementById("mqtt-port").value,
         "mqtt-user": document.getElementById("mqtt-user").value,
         "mqtt-password": document.getElementById("mqtt-password").value
     };

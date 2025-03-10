@@ -29,7 +29,7 @@
 
         <h3>WiFi Connection</h3>
 
-        <input type="text" id="wifi-ssid" name="wifi-ssid" placeholder="Network name  (SSID)" />
+        <input type="text" id="wifi-ssid" name="wifi-ssid" placeholder="Network name (SSID)" />
         <input type="password" id="wifi-password" name="wifi-password" placeholder="Password" />
 
 
@@ -40,7 +40,12 @@
             Enabled
         </label>
 
-        <input type="text" id="mqtt-server" name="mqtt-server" placeholder="Server:port" />
+
+        <div class="grid">
+        <input type="text" id="mqtt-server" name="mqtt-server" placeholder="Server" />
+        <input type="number" id="mqtt-port" name="mqtt-port" placeholder="Port" />
+        </div>
+
         <input type="text" id="mqtt-user" name="mqtt-user" placeholder="User name (optional)" />
         <input type="password" id="mqtt-password" name="mqtt-password" placeholder="Password (optional)" />
 

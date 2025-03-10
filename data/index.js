@@ -46,17 +46,20 @@ function messageBox(title, text) {
 
 function writeSettings() {
     // Validate the MQTT server
+    let mqttServerValue = "";
+    let mqttPortValue = 1833;
     const mqttServerInput = document.getElementById("mqtt-server").value;
-    if (!isValidIPorHostnameWithPort(mqttServerInput)) {
-        messageBox("Invalid MQTT Server", "Please enter a valid MQTT server address (either {ip}:{port} or {hostname}:{port}).");
-        return;
-    }
+    if (mqttServerInput) {
+        if (!isValidIPorHostnameWithPort(mqttServerInput)) {
+            messageBox("Invalid MQTT Server", "Please enter a valid MQTT server address (either {ip}:{port} or {hostname}:{port}).");
+            return;
+        }
 
-    // Split MQTT server and port
-    const mqttServer = mqttServerInput;
-    const mqttServerParts = mqttServer.split(":");
-    const mqttServerValue = mqttServerParts[0];
-    const mqttPortValue = Number(mqttServerParts[1]);
+        // Split MQTT server and port
+        const mqttServerParts = mqttServer.split(":");
+        mqttServerValue = mqttServerParts[0];
+        mqttPortValue = Number(mqttServerParts[1]);
+    }
 
     // Write the settings from the UI to the device
     const data = {

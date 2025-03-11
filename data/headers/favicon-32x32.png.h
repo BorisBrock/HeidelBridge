@@ -1,5 +1,4 @@
-#ifndef FAVICON_32X32_PNG_H
-#define FAVICON_32X32_PNG_H
+#pragma once
 
 const unsigned char favicon_32x32_png[] PROGMEM = {
   0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
@@ -144,5 +143,3 @@ const unsigned char favicon_32x32_png[] PROGMEM = {
 };
 
 const unsigned int favicon_32x32_png_len = sizeof(favicon_32x32_png);
-
-#endif // FAVICON_32X32_PNG_H

@@ -1,5 +1,4 @@
-#ifndef BLUEBERRY_SVG_H
-#define BLUEBERRY_SVG_H
+#pragma once
 
 const unsigned char blueberry_svg[] PROGMEM = {
   0x3c, 0x3f, 0x78, 0x6d, 0x6c, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f,
@@ -336,5 +335,3 @@ const unsigned char blueberry_svg[] PROGMEM = {
 };
 
 const unsigned int blueberry_svg_len = sizeof(blueberry_svg);
-
-#endif // BLUEBERRY_SVG_H

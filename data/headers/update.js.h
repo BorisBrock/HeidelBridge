@@ -1,5 +1,4 @@
-#ifndef UPDATE_JS_H
-#define UPDATE_JS_H
+#pragma once
 
 const unsigned char update_js[] PROGMEM = {
   0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x61, 0x64, 0x64,
@@ -59,5 +58,3 @@ const unsigned char update_js[] PROGMEM = {
 };
 
 const unsigned int update_js_len = sizeof(update_js);
-
-#endif // UPDATE_JS_H

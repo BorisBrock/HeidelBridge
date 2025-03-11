@@ -21,16 +21,13 @@ find "$INPUT_DIR" -type f ! -name "*.h" | while read -r file; do
 
     echo "Converting $file -> $headerfile"
     
-    echo "#ifndef ${varname^^}_H" > "$headerfile"
-    echo "#define ${varname^^}_H" >> "$headerfile"
+    echo "#pragma once" > "$headerfile"
     echo "" >> "$headerfile"
     echo "const unsigned char ${varname}[] PROGMEM = {" >> "$headerfile"
-    xxd -i "$file" | sed "s/unsigned char/${varname}/g" >> "$headerfile"
-    echo "};" >> "$headerfile"
+    # Generate only the hex values without variable declaration
+    xxd -i "$file" | sed -E '/unsigned char|unsigned int/d' >> "$headerfile"
     echo "" >> "$headerfile"
     echo "const unsigned int ${varname}_len = sizeof(${varname});" >> "$headerfile"
-    echo "" >> "$headerfile"
-    echo "#endif // ${varname^^}_H" >> "$headerfile"
 done
 
 echo "Conversion complete. Header files saved in '$OUTPUT_DIR'."

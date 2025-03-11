@@ -1,5 +1,4 @@
-#ifndef PICO_VIOLET_MIN_CSS_H
-#define PICO_VIOLET_MIN_CSS_H
+#pragma once
 
 const unsigned char pico_violet_min_css[] PROGMEM = {
   0x40, 0x63, 0x68, 0x61, 0x72, 0x73, 0x65, 0x74, 0x20, 0x22, 0x55, 0x54,
@@ -6856,5 +6855,3 @@ const unsigned char pico_violet_min_css[] PROGMEM = {
 };
 
 const unsigned int pico_violet_min_css_len = sizeof(pico_violet_min_css);
-
-#endif // PICO_VIOLET_MIN_CSS_H

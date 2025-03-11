@@ -1,5 +1,4 @@
-#ifndef HEIDELBRIDGE_CSS_H
-#define HEIDELBRIDGE_CSS_H
+#pragma once
 
 const unsigned char heidelbridge_css[] PROGMEM = {
   0x2e, 0x68, 0x62, 0x2d, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x2d, 0x62, 0x75,
@@ -69,5 +68,3 @@ const unsigned char heidelbridge_css[] PROGMEM = {
 };
 
 const unsigned int heidelbridge_css_len = sizeof(heidelbridge_css);
-
-#endif // HEIDELBRIDGE_CSS_H

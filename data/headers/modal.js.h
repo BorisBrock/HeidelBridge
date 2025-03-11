@@ -1,5 +1,4 @@
-#ifndef MODAL_JS_H
-#define MODAL_JS_H
+#pragma once
 
 const unsigned char modal_js[] PROGMEM = {
   0x2f, 0x2a, 0x0a, 0x20, 0x2a, 0x20, 0x4d, 0x6f, 0x64, 0x61, 0x6c, 0x0a,
@@ -197,5 +196,3 @@ const unsigned char modal_js[] PROGMEM = {
 };
 
 const unsigned int modal_js_len = sizeof(modal_js);
-
-#endif // MODAL_JS_H

@@ -25,7 +25,7 @@ void Settings::DeInit()
     gPreferences.end();
 }
 
-// Read all settings from SPIFFS
+// Read all settings from SPIFstorageFS
 void Settings::ReadFromPersistentMemory()
 {
     Logger::Trace("Reading settings from persistent memory");
@@ -40,7 +40,7 @@ void Settings::ReadFromPersistentMemory()
     MqttPassword = gPreferences.getString("mqtt_password");
 }
 
-// Write all settings to SPIFFS
+// Write all settings to storage
 void Settings::WriteToPersistentMemory()
 {
     Logger::Trace("Writing settings to persistent memory");

@@ -4,13 +4,38 @@
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
 #include <Update.h>
-#include "SPIFFS.h"
 #include "../../Configuration/Constants.h"
 #include "../../Configuration/Settings.h"
 #include "../../Configuration/Version.h"
 #include "NetworkScanner.h"
+#include "../../Utils/StaticFile.h"
 #include "../Logger/Logger.h"
 #include "WebServer.h"
+
+// Static files
+#include "../../../data/headers/blueberry.svg.h"
+#include "../../../data/headers/favicon-16x16.png.h"
+#include "../../../data/headers/favicon-32x32.png.h"
+#include "../../../data/headers/heidelbridge.css.h"
+#include "../../../data/headers/index.html.h"
+#include "../../../data/headers/index.js.h"
+#include "../../../data/headers/modal.js.h"
+#include "../../../data/headers/pico.violet.min.css.h"
+#include "../../../data/headers/update.html.h"
+#include "../../../data/headers/update.js.h"
+
+StaticFile staticFiles[] = {
+    {"/", "text/html", index_html, index_html_len},
+    {"/index.js", "application/javascript", index_js, index_js_len},
+    {"/update", "text/html", update_html, update_html_len},
+    {"/update.js", "application/javascript", update_js, update_js_len},
+    {"/modal.js", "application/javascript", modal_js, modal_js_len},
+    {"/heidelbridge.css", "text/css", heidelbridge_css, heidelbridge_css_len},
+    {"/pico.violet.min.css", "text/css", pico_violet_min_css, pico_violet_min_css_len},
+    {"/blueberry.svg", "image/svg+xml", blueberry_svg, blueberry_svg_len},
+    {"/favicon-16x16.png", "image/png", favicon_16x16_png, favicon_16x16_png_len},
+    {"/favicon-32x32.png", "image/png", favicon_32x32_png, favicon_32x32_png_len},
+};
 
 AsyncWebServer gWebServer(Constants::WebServer::Port);
 
@@ -26,13 +51,6 @@ void WebServer::Init()
     if (!Constants::WebServer::Enabled)
     {
         Logger::Info("Web server is disabled");
-        return;
-    }
-
-    Logger::Info("Initializing SPIFFS");
-    if (!SPIFFS.begin(true))
-    {
-        Logger::Error("Failed to initialize SPIFFS");
         return;
     }
 
@@ -58,11 +76,6 @@ void WebServer::Init()
                   { request->send(200); }); // firefox captive portal call home
     gWebServer.on("/ncsi.txt", [](AsyncWebServerRequest *request)
                   { request->redirect(Constants::WebServer::LocalIpUrl); }); // windows call home
-
-    // Serve static files from SPIFFS
-    gWebServer.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
-    gWebServer.on("/update", HTTP_GET, [](AsyncWebServerRequest *request)
-                  { request->redirect("/update.html"); });
 
     // Handle API requests
     gWebServer.on("/api/version", HTTP_GET, [this](AsyncWebServerRequest *request)
@@ -97,6 +110,13 @@ void WebServer::Init()
                             Logger::Debug(" > Content length: %d", request->contentLength());
                             Logger::Debug(" > Query string: %s", request->url().c_str());
                             request->send(404, "text/plain", "This resource does not exist"); });
+
+    // Serve static files
+    for (StaticFile file : staticFiles)
+    {
+        gWebServer.on(file.path, HTTP_GET, [file](AsyncWebServerRequest *request)
+                  { request->send_P(200, file.contentType, file.data, file.size); });
+    }
 
     gWebServer.begin();
 }

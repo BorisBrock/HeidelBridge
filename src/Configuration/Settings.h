@@ -15,10 +15,10 @@ public:
     // Deinitializes the settings
     void DeInit();
 
-    // Read all settings from SPIFFS
+    // Read all settings from storage
     void ReadFromPersistentMemory();
 
-    // Write all settings to SPIFFS
+    // Write all settings to storage
     void WriteToPersistentMemory();
 
     // Prints all settings to the logger

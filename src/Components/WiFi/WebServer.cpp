@@ -131,8 +131,9 @@ void WebServer::Init()
     // Serve static files
     for (StaticFile file : staticFiles)
     {
-        gWebServer.on(file.path, HTTP_GET, [file](AsyncWebServerRequest *request)
-                      { request->send_P(200, file.contentType, file.data, file.size); });
+        gWebServer.on(file.path, HTTP_GET, [this, file](AsyncWebServerRequest *request)
+                      { mHadActivity = true;
+                        request->send_P(200, file.contentType, file.data, file.size); });
     }
 
     gWebServer.begin();
@@ -301,4 +302,10 @@ bool WebServer::HandleFirmwareUpload(AsyncWebServerRequest *request, String file
     }
 
     return true;
+}
+
+// Checks if any REST API calls have been made
+bool WebServer::HadActivity()
+{
+    return mHadActivity;
 }

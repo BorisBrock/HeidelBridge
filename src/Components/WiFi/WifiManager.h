@@ -9,6 +9,9 @@ public:
     // Connects to a WiFi network or starts the captive portal
     void Start();
 
+    // Cyclic processing
+    void Update();
+
 private:
     // Constructor
     WifiManager() {};

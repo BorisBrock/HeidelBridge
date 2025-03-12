@@ -8,6 +8,7 @@
 
 namespace CaptivePortal
 {
+    uint32_t gStartTimeMs = 0;
     bool gIsCaptivePortalActive = false;
     DNSServer gDnsServer;
 
@@ -30,6 +31,7 @@ namespace CaptivePortal
         gDnsServer.start(53, "*", localIp);
 
         gIsCaptivePortalActive = true;
+        gStartTimeMs = millis();
     }
 
     // Cyclic processing
@@ -39,5 +41,11 @@ namespace CaptivePortal
         {
             gDnsServer.processNextRequest();
         }
+    }
+
+    // Gets the uptime in milliseconds
+    uint32_t GetUptime()
+    {
+        return millis() - gStartTimeMs;
     }
 };

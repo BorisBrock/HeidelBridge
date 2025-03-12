@@ -67,3 +67,19 @@ bool WifiManager::ConnectToWifiNetwork()
     Logger::Trace(" -> WiFi connection established");
     return true;
 }
+
+// Cyclic processing
+void WifiManager::Update()
+{
+    CaptivePortal::Update();
+
+    // If the captive portal has been running for a while without any activity, restart the ESP32
+    if (CaptivePortal::GetUptime() > Constants::WiFi::CaptivePortalTimeoutS * 1000)
+    {
+        if(!WebServer::Instance()->HadActivity())
+        {
+            Logger::Error("Captive portal timeout reached, restarting ESP32");
+            ESP.restart();
+        } 
+    }
+}

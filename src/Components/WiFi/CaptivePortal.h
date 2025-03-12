@@ -7,4 +7,7 @@ namespace CaptivePortal
 
     // Cyclic processing
     void Update();
+
+    // Gets the uptime in milliseconds
+    uint32_t GetUptime();
 };

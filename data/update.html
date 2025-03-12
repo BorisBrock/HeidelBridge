@@ -25,13 +25,40 @@
 
         <p id="version">Currently installed: ...</p>
 
-        <form method="POST" action="/api/update" enctype="multipart/form-data">
-            <input type="file" name="firmware" accept=".bin">
-            <input type="submit" class="hb-block-button" value="Install firmware">
+        <form id="otaForm">
+            <input type="file" id="firmwareFile" name="firmware" accept=".bin" required>
+            <button class="hb-block-button" type="submit">Install firmware</button>
         </form>
 
     </main>
 
+    <!-- Busy Box -->
+    <dialog id="busy-box">
+        <article>
+            <header>
+                <h3>Updating</h3>
+            </header>
+            <progress></progress>
+            <p>Firmware update in progress...</p>
+        </article>
+    </dialog>
+    <!-- ./ Busy Box -->
+
+    <!-- Message Box -->
+    <dialog id="message-box">
+        <article>
+            <header>
+                <h3 id="message-box-title">Title</h3>
+            </header>
+            <p id="message-box-text">Text</p>
+            <footer>
+                <button autofocus data-target="message-box" onclick="toggleModal(event)">OK</button>
+            </footer>
+        </article>
+    </dialog>
+    <!-- ./ Message Box -->
+
+    <script src="modal.js"></script>
     <script src="update.js"></script>
 </body>
 

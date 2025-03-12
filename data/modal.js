@@ -22,32 +22,51 @@ const toggleModal = (eventOrId) => {
         eventOrId.preventDefault();
         modalId = eventOrId.currentTarget.dataset.target;
     }
-    
+
     const modal = document.getElementById(modalId);
     if (!modal) return;
     modal.open ? closeModal(modal) : openModal(modal);
 };
 
-// Open modal
+// Open modal with either an element or an ID string
 const openModal = (modal) => {
+    if (typeof modal === "string") {
+        modal = document.getElementById(modal);
+        if (!modal) {
+            console.error(`Modal with ID '${modal}' not found.`);
+            return;
+        }
+    }
+
     const { documentElement: html } = document;
     const scrollbarWidth = getScrollbarWidth();
     if (scrollbarWidth) {
         html.style.setProperty(scrollbarWidthCssVar, `${scrollbarWidth}px`);
     }
     html.classList.add(isOpenClass, openingClass);
+
     setTimeout(() => {
         visibleModal = modal;
         html.classList.remove(openingClass);
     }, animationDuration);
+
     modal.showModal();
 };
 
-// Close modal
+// Close modal with either an element or an ID string
 const closeModal = (modal) => {
+    if (typeof modal === "string") {
+        modal = document.getElementById(modal);
+        if (!modal) {
+            console.error(`Modal with ID '${modal}' not found.`);
+            return;
+        }
+    }
+
     visibleModal = null;
     const { documentElement: html } = document;
     html.classList.add(closingClass);
+
     setTimeout(() => {
         html.classList.remove(closingClass, isOpenClass);
         html.style.removeProperty(scrollbarWidthCssVar);
@@ -55,8 +74,9 @@ const closeModal = (modal) => {
     }, animationDuration);
 };
 
+
 // Close with a click outside
-document.addEventListener("click", (event) => {
+/*document.addEventListener("click", (event) => {
     if (visibleModal === null) return;
     const modalContent = visibleModal.querySelector("article");
     const isClickInside = modalContent.contains(event.target);
@@ -68,7 +88,7 @@ document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && visibleModal) {
         closeModal(visibleModal);
     }
-});
+});*/
 
 // Get scrollbar width
 const getScrollbarWidth = () => {

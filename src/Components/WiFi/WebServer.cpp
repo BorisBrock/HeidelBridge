@@ -94,11 +94,28 @@ void WebServer::Init()
 
     gWebServer.on("/api/reboot", HTTP_POST, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestReboot()); });
-    gWebServer.on("/api/update", HTTP_POST, [this](AsyncWebServerRequest *request)
-                  { request->send(200, "text/plain", Update.hasError() ? R"({"status": "error"})" : R"({"status": "ok"})");
-                    delay(500);
-                    ESP.restart(); }, [this](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
-                  { HandleFirmwareUpload(request, filename, index, data, len, final); });
+    gWebServer.on(
+        "/api/update", HTTP_POST,
+        [this](AsyncWebServerRequest *request)
+        {
+            if (Update.hasError())
+            {
+                request->send(400, "application/json", R"({"status": "error", "message": "Firmware update failed"})");
+            }
+            else
+            {
+                request->send(200, "application/json", R"({"status": "ok", "message": "Firmware updated successfully. Restarting..."})");
+                delay(500); // Give the client time to receive the response
+                ESP.restart();
+            }
+        },
+        [this](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+        {
+            if (!HandleFirmwareUpload(request, filename, index, data, len, final))
+            {
+                request->send(500, "application/json", R"({"status": "error", "message": "Upload handler failed"})");
+            }
+        });
 
     // handle 404 errors
     gWebServer.onNotFound([&](AsyncWebServerRequest *request)
@@ -115,7 +132,7 @@ void WebServer::Init()
     for (StaticFile file : staticFiles)
     {
         gWebServer.on(file.path, HTTP_GET, [file](AsyncWebServerRequest *request)
-                  { request->send_P(200, file.contentType, file.data, file.size); });
+                      { request->send_P(200, file.contentType, file.data, file.size); });
     }
 
     gWebServer.begin();
@@ -250,7 +267,7 @@ String WebServer::HandleApiRequestReboot()
 }
 
 // Handles firmware upload for OTA flashing
-void WebServer::HandleFirmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+bool WebServer::HandleFirmwareUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
     if (index == 0)
     {
@@ -259,12 +276,14 @@ void WebServer::HandleFirmwareUpload(AsyncWebServerRequest *request, String file
         if (!Update.begin(UPDATE_SIZE_UNKNOWN))
         {
             Logger::Error("Starting firmware update failed: %s", Update.errorString());
+            return false;
         }
     }
 
     if (Update.write(data, len) != len)
     {
         Logger::Error("Processing firmware update failed: %s", Update.errorString());
+        return false;
     }
 
     if (final)
@@ -277,6 +296,9 @@ void WebServer::HandleFirmwareUpload(AsyncWebServerRequest *request, String file
         else
         {
             Logger::Error("Finishing firmware update failed: %s", Update.errorString());
+            return false;
         }
     }
+
+    return true;
 }

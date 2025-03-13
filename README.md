@@ -13,7 +13,7 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 ---
 
-![graph](/doc/img/graph.svg)
+![graph](/docs/img/graph.svg)
 
 ---
 
@@ -35,27 +35,27 @@ Of course a well designed PCB would be much nicer, but this is still work in pro
 # Getting Started
 
 To get your very own HeidelBridge up and running follow these guides:
-- Step 1: [Programming the ESP32](/doc/SoftwareSetup.md)
-- Step 2: [Hardware Setup](/doc/HardwareSetup.md)
+- Step 1: [Programming the ESP32](/docs/SoftwareSetup.md)
+- Step 2: [Hardware Setup](/docs/HardwareSetup.md)
 
 # Using HeidelBridge With evcc
 
 Adding your HeidelBridge to evcc is very straight forward.
-See [these instructions](/doc/evcc.md) for details.
+See [these instructions](/docs/evcc.md) for details.
 
 # Using HeidelBridge With Home Assistant
 
-HeidelBridge can easily be integrated into Home Assistant. Check out [this guide](/doc/HomeAssistant.md) to get started.
+HeidelBridge can easily be integrated into Home Assistant. Check out [this guide](/docs/HomeAssistant.md) to get started.
 
 GUI Example:
 
-![graph](/doc/img/home_assistant.png)
+![graph](/docs/img/home_assistant.png)
 
 ---
 
 # Available APIs
 
-The HeidelBridge offers a MQTT API and a REST API. You can find more details about both APIs in the [HeidelBridge API Reference](/doc/APIReference.md).
+The HeidelBridge offers a MQTT API and a REST API. You can find more details about both APIs in the [HeidelBridge API Reference](/docs/APIReference.md).
 
 
 # Contribution

@@ -1,7 +1,7 @@
 {
-  "name": "ESP32 Sample Firmware",
-  "version": "1.0.0",
-  "build": "20250313",
+  "name": "ESP32 HeidelBridge Firmware",
+  "version": "3.0.0",
+  "build": "0",
   "chipFamily": "ESP32",
   "parts": [
     {
@@ -9,7 +9,7 @@
       "offset": "0x1000"
     },
     {
-      "path": "partition-table.bin",
+      "path": "partitions.bin",
       "offset": "0x8000"
     },
     {

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Web Flasher</title>
+    <script type="module" src="https://unpkg.com/esp-web-tools@9.1.1/dist/web/install-button.js"></script>
+</head>
+<body>
+    <h1>ESP32 Firmware Flasher</h1>
+    <p>Click the button below to flash your ESP32 with new firmware.</p>
+    
+    <esp-web-install-button
+        manifest="firmware.json">
+    </esp-web-install-button>
+    
+    <p>Make sure you are using a Chromium-based browser (Chrome, Edge) and connect your ESP32 via USB.</p>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "ESP32 Sample Firmware",
+  "version": "1.0.0",
+  "build": "20250313",
+  "chipFamily": "ESP32",
+  "parts": [
+    {
+      "path": "bootloader.bin",
+      "offset": "0x1000"
+    },
+    {
+      "path": "partition-table.bin",
+      "offset": "0x8000"
+    },
+    {
+      "path": "firmware.bin",
+      "offset": "0x10000"
+    }
+  ]
+}

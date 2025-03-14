@@ -1,19 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP32 Web Flasher</title>
+    <meta name="color-scheme" content="light dark" />
+    <link rel="stylesheet" href="pico.violet.min.css" />
+    <title>HeidelBridge Web Flasher</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <script type="module" src="https://unpkg.com/esp-web-tools@10.1.0/dist/install-button.js"></script>
 </head>
+
 <body>
-    <h1>HeidelBridge Firmware Flasher</h1>
-    <p>Click the button below to flash your ESP32 with the HeidelBridge firmware.</p>
-    
-    <esp-web-install-button
-        manifest="firmware.json">
-    </esp-web-install-button>
-    
-    <p>Make sure you are using a Chromium-based browser (Chromium, Brave, Vivaldi etc.) and connect your ESP32 via USB.</p>
+    <div class="hb-banner">
+        <img class="hb-banner-image" src="blueberry.svg" />
+        <h1 class="hb-banner-headline">HeidelBridge Web Flasher</h1>
+    </div>
+
+    <main class="container">
+
+        <p>Click the button below to flash your ESP32 with the HeidelBridge firmware.</p>
+
+        <esp-web-install-button manifest="firmware.json">
+        </esp-web-install-button>
+
+        <p>Make sure you are using a Chromium-based browser (Chromium, Brave, Vivaldi etc.) and connect your ESP32 via
+            USB.</p>
+
+    </main>
 </body>
+
 </html>

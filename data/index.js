@@ -39,7 +39,7 @@ function writeSettings() {
         "wifi-password": document.getElementById("wifi-password").value,
         "mqtt-enabled": document.getElementById("mqtt-enabled").checked,
         "mqtt-server": document.getElementById("mqtt-server").value,
-        "mqtt-port": document.getElementById("mqtt-port").value,
+        "mqtt-port": parseInt(document.getElementById("mqtt-port").value),
         "mqtt-user": document.getElementById("mqtt-user").value,
         "mqtt-password": document.getElementById("mqtt-password").value
     };

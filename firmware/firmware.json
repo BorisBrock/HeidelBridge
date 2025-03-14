@@ -1,0 +1,20 @@
+{
+  "name": "HeidelBridge Firmware",
+  "version": "3.0.0",
+  "build": "0",
+  "chipFamily": "ESP32",
+  "parts": [
+    {
+      "path": "https://borisbrock.github.io/HeidelBridge/firmware/bootloader.bin",
+      "offset": "0x1000"
+    },
+    {
+      "path": "https://borisbrock.github.io/HeidelBridge/firmware/partitions.bin",
+      "offset": "0x8000"
+    },
+    {
+      "path": "https://borisbrock.github.io/HeidelBridge/firmware/firmware.bin",
+      "offset": "0x10000"
+    }
+  ]
+}

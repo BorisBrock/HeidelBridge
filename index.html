@@ -11,21 +11,16 @@
 </head>
 
 <body>
-    <div class="hb-banner">
-        <h1 class="hb-banner-headline">HeidelBridge Web Flasher</h1>
-    </div>
-
     <main class="container">
 
-        <p>Make sure you are using a Chromium-based browser (Chromium, Brave, Vivaldi etc.) and connect your ESP32 via
-            USB.</p>
+        <div class="hb-banner">
+            <h1 class="hb-banner-headline">HeidelBridge Web Flasher</h1>
+        </div>
+
+        <p>Make sure you are using a Chromium-based browser (Chromium, Brave, Vivaldi etc.) and connect your ESP32 via USB.</p>
         <p>Click the button below to flash your ESP32 with the HeidelBridge firmware.</p>
 
-        <esp-web-install-button manifest="firmware.json">
-        </esp-web-install-button>
-
-
-
+        <esp-web-install-button manifest="https://borisbrock.github.io/HeidelBridge/firmware/firmware.json"></esp-web-install-button>
     </main>
 </body>
 

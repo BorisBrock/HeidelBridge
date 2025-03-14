@@ -46,6 +46,6 @@ namespace CaptivePortal
     // Gets the uptime in milliseconds
     uint32_t GetUptime()
     {
-        return millis() - gStartTimeMs;
+        return gIsCaptivePortalActive ? (millis() - gStartTimeMs) : 0;
     }
 };

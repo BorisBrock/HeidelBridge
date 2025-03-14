@@ -1,19 +1,19 @@
 {
-  "name": "ESP32 Sample Firmware",
-  "version": "1.0.0",
-  "build": "20250313",
+  "name": "HeidelBridge Firmware",
+  "version": "3.0.0",
+  "build": "0",
   "chipFamily": "ESP32",
   "parts": [
     {
-      "path": "bootloader.bin",
+      "path": "https://github.com/BorisBrock/HeidelBridge/releases/download/3.0.0-alpha1/bootloader_3.0.0_alpha1.bin",
       "offset": "0x1000"
     },
     {
-      "path": "partition-table.bin",
+      "path": "https://github.com/BorisBrock/HeidelBridge/releases/download/3.0.0-alpha1/partitions_3.0.0_alpha1.bin",
       "offset": "0x8000"
     },
     {
-      "path": "firmware.bin",
+      "path": "https://github.com/BorisBrock/HeidelBridge/releases/download/3.0.0-alpha1/firmware_3.0.0_alpha1.bin",
       "offset": "0x10000"
     }
   ]

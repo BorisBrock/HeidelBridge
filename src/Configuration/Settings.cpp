@@ -34,7 +34,7 @@ void Settings::ReadFromPersistentMemory()
     WifiSsid = gPreferences.getString("wifi_ssid");
     WifiPassword = gPreferences.getString("wifi_password");
     IsMqttEnabled = gPreferences.getBool("mqtt_enabled");
-    MqttPort = gPreferences.getUShort("mqtt_port", 1833);
+    MqttPort = gPreferences.getUShort("mqtt_port", 1883);
     MqttServer = gPreferences.getString("mqtt_server");
     MqttUser = gPreferences.getString("mqtt_user");
     MqttPassword = gPreferences.getString("mqtt_password");

@@ -30,7 +30,7 @@ public:
     String WifiPassword{};
     bool IsMqttEnabled{false};
     String MqttServer{};
-    uint16_t MqttPort{1833};
+    uint16_t MqttPort{1883};
     String MqttUser{};
     String MqttPassword{};
 };

@@ -19,7 +19,7 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 # Required Hardware
 
-You only need two components for this project: an ESP32 microcontroller and a MAX485 module. Both are available in large quantities and at reasonable prices on the Internet. You will also need a breadboard and a few jumper wires. All in all, it shouldn't cost you more than 10$.
+You only need two components for this project: an ESP32 microcontroller and a MAX485 module. Both are available in large quantities and at reasonable prices on the Internet. You will also need a breadboard and a few jumper wires. All in all, it shouldn't cost you more than 10€.
 
 Parts list:
 - ESP32 microcontroller*
@@ -37,6 +37,10 @@ Of course a well designed PCB would be much nicer, but this is still work in pro
 To get your very own HeidelBridge up and running follow these guides:
 - Step 1: [Programming the ESP32](/docs/SoftwareSetup.md)
 - Step 2: [Hardware Setup](/docs/HardwareSetup.md)
+
+# Keeping Your HeidelBridge Up-To-Date
+
+Heidelbridge supports OTA (Over The Air) updates. That means that you can update the device firmware via WiFi without physical access to the device. This process is described here: [updating your HeidelBridge](/docs/SoftwareSetup.md#updating-your-heidelbridge).
 
 # Using HeidelBridge With evcc
 
@@ -57,6 +61,14 @@ GUI Example:
 
 The HeidelBridge offers a MQTT API and a REST API. You can find more details about both APIs in the [HeidelBridge API Reference](/docs/APIReference.md).
 
+# Web Endpoints
+
+The following web endpoints are currently served by HeidelBridge:
+
+| URL         | Function                    |
+| ----------- | --------------------------- |
+| {ip}        | Configuration web interface |
+| {ip}/update | OTA update web interface    |
 
 # Contribution
 

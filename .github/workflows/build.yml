@@ -33,8 +33,5 @@ jobs:
       - name: Installing PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Clean PlatformIO Build
-        run: pio run --target clean
-
       - name: Build HeidelBridge
-        run: pio ci --project-conf platformio.ini -e heidelberg ./
+        run: pio run -e heidelberg

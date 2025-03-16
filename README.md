@@ -1,6 +1,6 @@
 <div align="center">
   <a href="#">
-    <img src="https://raw.githubusercontent.com/BorisBrock/Heidelbridge/main/img/blueberry.svg" height="100px" />
+    <img src="https://raw.githubusercontent.com/BorisBrock/Heidelbridge/main/docs/img/blueberry.svg" height="100px" />
  </a>
 </div>
 <h1 align="center">Heidel<span style="color:#646bafff">Bridge</span></h1>

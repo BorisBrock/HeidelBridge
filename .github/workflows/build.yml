@@ -36,8 +36,5 @@ jobs:
       - name: Clean PlatformIO Build
         run: pio run --target clean
 
-      - name: Copy partitions.csv to build directory
-        run: cp partitions.csv .pio/build/heidelberg/
-
       - name: Build HeidelBridge
         run: pio ci --project-conf platformio.ini -e heidelberg ./

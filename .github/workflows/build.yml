@@ -33,8 +33,11 @@ jobs:
       - name: Installing PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Verify partitions.csv presence
-        run: ls -l partitions.csv
+      - name: Clean PlatformIO Build
+        run: pio run --target clean
+
+      - name: Copy partitions.csv to build directory
+        run: cp partitions.csv .pio/build/heidelberg/
 
       - name: Build HeidelBridge
         run: pio ci --project-conf platformio.ini -e heidelberg ./

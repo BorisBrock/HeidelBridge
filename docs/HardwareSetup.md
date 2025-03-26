@@ -18,4 +18,4 @@ The hardware connections are very simple:
 - MAX485-board A terminal to Heidelberg wallbox A terminal
 - MAX485-board B terminal to Heidelberg wallbox B terminal
 
-![Hardware connections](/img/hardware_connections.png)
+![Hardware connections](/docs/img/hardware_connections.png)

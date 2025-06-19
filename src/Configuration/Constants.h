@@ -60,7 +60,7 @@ namespace Constants
         constexpr uint16_t ConnectionTimeoutTime = 89;
         constexpr uint16_t EnergyMeter = 28;
         constexpr uint16_t TotalChargingPower = 12;
-        constexpr uint16_t ChargeCurrents = 5;
+        constexpr uint16_t ChargeCurrents = 6;
         constexpr uint16_t ChargeVoltages = 108;
         constexpr uint16_t MaxChargingCurrentAfterConnectionLoss = 87;
         constexpr uint16_t RfidStationId = 38;

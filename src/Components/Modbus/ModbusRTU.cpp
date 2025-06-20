@@ -77,6 +77,8 @@ bool ModbusRTU::ReadRegisters(uint16_t startAddress, uint8_t numValues, uint8_t 
                 delay(Constants::ModbusRTU::RetryDelayMs);
             }
         }
+
+        numTries--;
     }
 
     // All read attempts failed

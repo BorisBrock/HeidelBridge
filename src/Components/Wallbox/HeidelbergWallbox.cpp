@@ -87,7 +87,7 @@ float HeidelbergWallbox::GetChargingCurrentLimit()
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::MaximalCurrent, 1, 0x3, registerValue))
     {
         mChargingCurrentLimitA = static_cast<float>(registerValue[0] * Constants::HeidelbergWallbox::CurrentFactor);
-        Logger::Debug("Heidelberg wallbox: Read max. charging current: %d", mChargingCurrentLimitA);
+        Logger::Debug("Heidelberg wallbox: Read max. charging current: %f", mChargingCurrentLimitA);
         return mChargingCurrentLimitA;
     }
     else

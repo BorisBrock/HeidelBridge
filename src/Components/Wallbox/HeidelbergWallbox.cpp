@@ -40,7 +40,7 @@ void HeidelbergWallbox::Init()
 
 VehicleState HeidelbergWallbox::GetState()
 {
-    uint16_t registerValue[0];
+    uint16_t registerValue[1];
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::ChargingState, 1, 0x4, registerValue))
     {
         Logger::Debug("Heidelberg wallbox: Read state: %d", registerValue[0]);
@@ -83,7 +83,7 @@ bool HeidelbergWallbox::SetChargingCurrentLimit(float currentLimitA)
 
 float HeidelbergWallbox::GetChargingCurrentLimit()
 {
-    uint16_t registerValue[0];
+    uint16_t registerValue[1];
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::MaximalCurrent, 1, 0x3, registerValue))
     {
         mChargingCurrentLimitA = static_cast<float>(registerValue[0] * Constants::HeidelbergWallbox::CurrentFactor);
@@ -203,7 +203,7 @@ bool HeidelbergWallbox::GetChargingVoltages(float &v1V, float &v2V, float &v3V)
 
 float HeidelbergWallbox::GetTemperature()
 {
-    uint16_t registerValue[0];
+    uint16_t registerValue[1];
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::PcbTemperature, 1, 0x4, registerValue))
     {
         return static_cast<float>(registerValue[0]) * Constants::HeidelbergWallbox::TemperatureFactor;

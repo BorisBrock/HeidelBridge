@@ -98,34 +98,38 @@ namespace ModbusTCP
         case (Constants::DaheimladenRegisters::ChargeCurrents):
         {
             Logger::Trace(" -> Responding with charging currents");
-            responseLengthBytes = 12;
+            responseLengthBytes = 10;
 
             float c1, c2, c3;
             gWallbox->GetChargingCurrents(c1, c2, c3);
-            uint32_t rawCurrent1 = static_cast<uint32_t>(c1 * Constants::DaheimladenWallbox::CurrentFactor);
-            uint32_t rawCurrent2 = static_cast<uint32_t>(c2 * Constants::DaheimladenWallbox::CurrentFactor);
-            uint32_t rawCurrent3 = static_cast<uint32_t>(c3 * Constants::DaheimladenWallbox::CurrentFactor);
+            uint16_t rawCurrent1 = static_cast<uint16_t>(c1 * Constants::DaheimladenWallbox::CurrentFactor);
+            uint16_t rawCurrent2 = static_cast<uint16_t>(c2 * Constants::DaheimladenWallbox::CurrentFactor);
+            uint16_t rawCurrent3 = static_cast<uint16_t>(c3 * Constants::DaheimladenWallbox::CurrentFactor);
 
             response.add(request.getServerID(), fc, responseLengthBytes);
             response.add(rawCurrent1);
+            response.add(uint16_t(0)); // filler
             response.add(rawCurrent2);
+            response.add(uint16_t(0)); // filler
             response.add(rawCurrent3);
             break;
         }
         case (Constants::DaheimladenRegisters::ChargeVoltages):
         {
             Logger::Trace(" -> Responding with charging voltages");
-            responseLengthBytes = 12;
+            responseLengthBytes = 10;
 
             float v1, v2, v3;
             gWallbox->GetChargingVoltages(v1, v2, v3);
-            uint32_t rawVoltage1 = static_cast<uint32_t>(v1 * Constants::DaheimladenWallbox::VoltageFactor);
-            uint32_t rawVoltage2 = static_cast<uint32_t>(v2 * Constants::DaheimladenWallbox::VoltageFactor);
-            uint32_t rawVoltage3 = static_cast<uint32_t>(v3 * Constants::DaheimladenWallbox::VoltageFactor);
+            uint16_t rawVoltage1 = static_cast<uint16_t>(v1 * Constants::DaheimladenWallbox::VoltageFactor);
+            uint16_t rawVoltage2 = static_cast<uint16_t>(v2 * Constants::DaheimladenWallbox::VoltageFactor);
+            uint16_t rawVoltage3 = static_cast<uint16_t>(v3 * Constants::DaheimladenWallbox::VoltageFactor);
 
             response.add(request.getServerID(), fc, responseLengthBytes);
             response.add(rawVoltage1);
+            response.add(uint16_t(0)); // filler
             response.add(rawVoltage2);
+            response.add(uint16_t(0)); // filler
             response.add(rawVoltage3);
             break;
         }

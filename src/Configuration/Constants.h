@@ -61,7 +61,7 @@ namespace Constants
         constexpr uint16_t EnergyMeter = 28;
         constexpr uint16_t TotalChargingPower = 12;
         constexpr uint16_t ChargeCurrents = 6;
-        constexpr uint16_t ChargeVoltages = 108;
+        constexpr uint16_t ChargeVoltages = 109;
         constexpr uint16_t MaxChargingCurrentAfterConnectionLoss = 87;
         constexpr uint16_t RfidStationId = 38;
         constexpr uint16_t RfidCardId = 54;

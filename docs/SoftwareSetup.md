@@ -12,6 +12,7 @@ Follow these steps to turn your ESP32 into a HeidelBridge. This has to be done o
 ### Fixing Connection Issues
 
 If you cannot connect to your ESP32 via WebSerial, these hints might help:
+- Use a USB data cable! Make sure you use a cable that transfers power and data and is not for charging only.
 - On Windows, make sure you have installed the serial port drivers for your ESP32. It should appear as a COM port in the Windows Device Manager.
 - On Linux, make sure you have added your user to the required user groups (e.g. `sudo usermod -aG dialout $USER` for Ubuntu, `sudo usermod -aG uucp,lock $USER` for Arch)
 - Sometimes you need to hold the boot-button and/or press the reset button for the flahing process to start.

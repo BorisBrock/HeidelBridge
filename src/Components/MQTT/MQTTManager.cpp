@@ -42,6 +42,8 @@ namespace MQTTManager
         Discovery
     };
 
+    float gPreviousCurrentLimit = 16.0f; // Default value, adjust if necessary
+
     // Connects to the MQTT broker if not already connected
     void ConnectToMqtt()
     {
@@ -92,7 +94,23 @@ namespace MQTTManager
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/sensor/%/temperature/config",
             R"({"name":"Temperature","device_class":"temperature","state_topic":"%/temperature","unique_id":"%_temperature","object_id":"temperature","unit_of_measurement":"°C","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
-    }
+    
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/switch/%/enable_charging/config",
+            R"({
+                "name": "Enable Charging",
+                "state_topic": "%/enable_charging",
+                "command_topic": "%/control/enable_charging",
+                "unique_id": "%_enable_charging_switch",
+                "object_id": "enable_charging",
+                "payload_on": "ON",
+                "payload_off": "OFF",
+                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+        
+        PublishHomeAssistantDiscoveryTopic( 
+            "homeassistant/number/%/charging_current_limit/config", 
+            R"({"name": "Charging Current Limit", "command_topic": "%/control/charging_current_limit", "state_topic": "%/status/charging_current_limit", "min": 6, "max": 16, "step": 1, "unit_of_measurement": "A", "uniq_id": "heidelbridge_charging_current_limit", "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+ }
 
     // Publishes various MQTT status messages based on the current value index.
     // This function cycles through different types of data (e.g., vehicle state, charging current, temperature)
@@ -175,6 +193,10 @@ namespace MQTTManager
 
             // These values are published every cycle
             gMqttClient.publish(gMqttTopic.SetString("/internal/uptime"), 0, false, String(gStatistics.UptimeS).c_str());
+
+
+            gMqttClient.publish(gMqttTopic.SetString("/enable_charging"), 0, true,
+                gWallbox->GetChargingCurrentLimit() > 0.1f ? "ON" : "OFF");
         }
     }
 
@@ -185,6 +207,8 @@ namespace MQTTManager
 
         // Subscribe to control topics
         gMqttClient.subscribe(gMqttTopic.SetString("/control/charging_current_limit"), 2);
+        gMqttClient.subscribe(gMqttTopic.SetString("/control/enable_charging"), 2);
+
 
         // Publish version information
         String versionString = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
@@ -202,7 +226,10 @@ namespace MQTTManager
         Logger::Warning("Disconnected from MQTT. Reason: %d", reason);
         gStatistics.NumMqttDisconnects++;
     }
-
+    // Add this helper function to check if charging is enabled
+    bool IsChargingEnabled() {
+        return gWallbox->GetChargingCurrentLimit() > 0.1f;
+    }
     // Callback for MQTT messages
     void OnMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
     {
@@ -210,7 +237,56 @@ namespace MQTTManager
         {
             float current = String(payload, len).toFloat();
             Logger::Trace("Received MQTT control command: charging current limit = %f\n", current);
-            gWallbox->SetChargingCurrentLimit(current);
+            // If current is between 0 and 6, set to 0
+            if (current > 0.0f && current < 6.0f) {
+                current = 0.0f;
+            }
+            // Only set the wallbox current if charging is enabled
+            if (IsChargingEnabled()) {
+                gWallbox->SetChargingCurrentLimit(current);
+            }
+            // Always update the previous value if not 0
+            if (current > 0.1f) {
+                gPreviousCurrentLimit = current;
+            }
+        }
+        else if (strcmp(gMqttTopic.SetString("/control/charging_enable"), topic) == 0)
+        {
+            String cmd(payload, len);
+            cmd.trim();
+            Logger::Trace("Received MQTT control command: charging_enable = %s\n", cmd.c_str());
+            if (cmd.equalsIgnoreCase("ON"))
+            {
+                // ON now means charging is enabled (restore previous value)
+                gWallbox->SetChargingCurrentLimit(gPreviousCurrentLimit);
+            }
+            else if (cmd.equalsIgnoreCase("OFF"))
+            {
+                // OFF now means charging is disabled (set current to 0)
+                if (gWallbox->GetChargingCurrentLimit() > 0.1f) {
+                    gPreviousCurrentLimit = gWallbox->GetChargingCurrentLimit();
+                }
+                gWallbox->SetChargingCurrentLimit(0);
+            }
+        }
+        else if (strcmp(gMqttTopic.SetString("/control/enable_charging"), topic) == 0)
+        {
+            String cmd(payload, len);
+            cmd.trim();
+            Logger::Trace("Received MQTT control command: enable_charging = %s\n", cmd.c_str());
+            if (cmd.equalsIgnoreCase("ON"))
+            {
+                // ON now means charging is enabled (restore previous value)
+                gWallbox->SetChargingCurrentLimit(gPreviousCurrentLimit);
+            }
+            else if (cmd.equalsIgnoreCase("OFF"))
+            {
+                // OFF now means charging is disabled (set current to 0)
+                if (gWallbox->GetChargingCurrentLimit() > 0.1f) {
+                    gPreviousCurrentLimit = gWallbox->GetChargingCurrentLimit();
+                }
+                gWallbox->SetChargingCurrentLimit(0);
+            }
         }
     }
 
@@ -264,4 +340,6 @@ namespace MQTTManager
     {
         return gMqttClient.connected();
     }
+
+
 }

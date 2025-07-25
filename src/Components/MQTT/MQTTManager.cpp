@@ -42,6 +42,8 @@ namespace MQTTManager
         Discovery
     };
 
+    float gPreviousCurrentLimit = 16.0f; // Default value, adjust if necessary
+
     // Connects to the MQTT broker if not already connected
     void ConnectToMqtt()
     {
@@ -92,7 +94,29 @@ namespace MQTTManager
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/sensor/%/temperature/config",
             R"({"name":"Temperature","device_class":"temperature","state_topic":"%/temperature","unique_id":"%_temperature","object_id":"temperature","unit_of_measurement":"°C","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
-    }
+    
+        PublishHomeAssistantDiscoveryTopic( 
+            "homeassistant/number/%/charging_current_limit/config", 
+            R"({"name": "Charging Current Limit", "command_topic": "%/control/charging_current_limit", "state_topic": "%/status/charging_current_limit", "min": 6, "max": 16, "step": 1, "unit_of_measurement": "A", "uniq_id": "heidelbridge_charging_current_limit", "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
+        // Lock Switch für Home Assistant Discovery
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/switch/%/lock/config",
+            R"({
+                "name": "Wallbox Lock",
+                "state_topic": "%/lock",
+                "command_topic": "%/control/lock",
+                "unique_id": "%_lock_switch",
+                "object_id": "lock",
+                "payload_on": "ON",
+                "payload_off": "OFF",
+                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
+
+
+
+
+        }
 
     // Publishes various MQTT status messages based on the current value index.
     // This function cycles through different types of data (e.g., vehicle state, charging current, temperature)
@@ -175,6 +199,11 @@ namespace MQTTManager
 
             // These values are published every cycle
             gMqttClient.publish(gMqttTopic.SetString("/internal/uptime"), 0, false, String(gStatistics.UptimeS).c_str());
+
+            // Publish lock status (retain=true so HA always sees the status)
+            gMqttClient.publish(gMqttTopic.SetString("/lock"), 0, true,
+                gWallbox->GetChargingCurrentLimit() <= 0.1f ? "ON" : "OFF");
+
         }
     }
 
@@ -185,6 +214,8 @@ namespace MQTTManager
 
         // Subscribe to control topics
         gMqttClient.subscribe(gMqttTopic.SetString("/control/charging_current_limit"), 2);
+        gMqttClient.subscribe(gMqttTopic.SetString("/control/lock"), 2);
+
 
         // Publish version information
         String versionString = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
@@ -210,8 +241,32 @@ namespace MQTTManager
         {
             float current = String(payload, len).toFloat();
             Logger::Trace("Received MQTT control command: charging current limit = %f\n", current);
+            // If current is between 0 and 6, set to 0
+            if (current > 0.0f && current < 6.0f) {
+                current = 0.0f;
+            }
             gWallbox->SetChargingCurrentLimit(current);
         }
+        else if (strcmp(gMqttTopic.SetString("/control/lock"), topic) == 0)
+        {
+            String cmd(payload, len);
+            cmd.trim();
+            Logger::Trace("Received MQTT control command: lock = %s\n", cmd.c_str());
+            if (cmd.equalsIgnoreCase("ON"))
+            {
+                /// Save previous value if not already locked
+                if (gWallbox->GetChargingCurrentLimit() > 0.1f) {
+                    gPreviousCurrentLimit = gWallbox->GetChargingCurrentLimit();
+                }
+                gWallbox->SetChargingCurrentLimit(0); // Lock: Strom auf 0
+            }
+            else if (cmd.equalsIgnoreCase("OFF"))
+            {
+                // Restore previous value
+                gWallbox->SetChargingCurrentLimit(gPreviousCurrentLimit);
+            }
+        }
+
     }
 
     // Callback for MQTT publish

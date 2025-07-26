@@ -222,12 +222,6 @@ namespace MQTTManager
         Logger::Warning("Disconnected from MQTT. Reason: %d", reason);
         gStatistics.NumMqttDisconnects++;
     }
-
-    // Add this helper function to check if charging is enabled
-    bool IsChargingEnabled()
-    {
-        return gWallbox->GetChargingCurrentLimit() > 0.1f;
-    }
     
     // Callback for MQTT messages
     void OnMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)

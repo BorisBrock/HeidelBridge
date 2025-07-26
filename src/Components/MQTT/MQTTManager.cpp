@@ -232,11 +232,11 @@ namespace MQTTManager
             Logger::Trace("Received MQTT control command: charging current limit = %f\n", current);
             gWallbox->SetChargingCurrentLimit(current);
         }
-        else if (strcmp(gMqttTopic.SetString("/control/charging_enable"), topic) == 0)
+        else if (strcmp(gMqttTopic.SetString("/control/enable_charging"), topic) == 0)
         {
             String cmd(payload, len);
             cmd.trim();
-            Logger::Trace("Received MQTT control command: charging_enable = %s", cmd.c_str());
+            Logger::Trace("Received MQTT control command: enable_charging = %s", cmd.c_str());
             bool enableCharging = cmd.equalsIgnoreCase("ON");
             gWallbox->SetChargingEnabled(enableCharging);
         }

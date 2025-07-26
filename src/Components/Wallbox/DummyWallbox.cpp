@@ -35,6 +35,19 @@ bool DummyWallbox::SetChargingCurrentLimit(float currentLimitA)
     return true;
 }
 
+bool DummyWallbox::SetChargingEnabled(bool chargingEnabled)
+{
+    mChargingEnabled = chargingEnabled;
+    Logger::Debug("Dummy wallbox: setting charging enabled to %i", mChargingEnabled);
+    return true;
+}
+
+bool DummyWallbox::IsChargingEnabled()
+{
+    Logger::Debug("Dummy wallbox: reurning charging enabled %i", mChargingEnabled);
+    return mChargingEnabled;
+}
+
 float DummyWallbox::GetChargingCurrentLimit()
 {
     Logger::Debug("Dummy wallbox: returning charging current limit %f A", mChargingCurrentLimitA);

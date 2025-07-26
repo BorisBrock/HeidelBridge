@@ -236,7 +236,7 @@ namespace MQTTManager
         {
             String cmd(payload, len);
             cmd.trim();
-            Logger::Trace("Received MQTT control command: charging_enable = %s\n", cmd.c_str());
+            Logger::Trace("Received MQTT control command: charging_enable = %s", cmd.c_str());
             bool enableCharging = cmd.equalsIgnoreCase("ON");
             gWallbox->SetChargingEnabled(enableCharging);
         }

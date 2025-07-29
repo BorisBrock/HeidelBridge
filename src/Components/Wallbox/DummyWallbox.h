@@ -31,4 +31,5 @@ private:
     float mFailsafeCurrentA{Constants::DummyWallbox::FailSafeCurrentA};
     float mEnergyMeterWh{0.0f};
     bool mChargingEnabled{true};
+    float mPreviousChargingCurrentLimitA{Constants::HeidelbergWallbox::InitialChargingCurrentLimitA};
 };

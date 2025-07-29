@@ -30,21 +30,48 @@ VehicleState DummyWallbox::GetState()
 
 bool DummyWallbox::SetChargingCurrentLimit(float currentLimitA)
 {
-    mChargingCurrentLimitA = currentLimitA;
-    Logger::Debug("Dummy wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
+    if (mChargingEnabled)
+    {
+        mChargingCurrentLimitA = currentLimitA;
+        Logger::Debug("Dummy wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
+    }
+    else
+    {
+        mPreviousChargingCurrentLimitA = currentLimitA;
+        Logger::Info("Dummy wallbox: charging is disabled. current limit %f A is not applied", mChargingCurrentLimitA);
+    }
+
     return true;
 }
 
 bool DummyWallbox::SetChargingEnabled(bool chargingEnabled)
 {
-    mChargingEnabled = chargingEnabled;
-    Logger::Debug("Dummy wallbox: setting charging enabled to %i", mChargingEnabled);
-    return true;
+    bool ok = true;
+
+    if (!mChargingEnabled && chargingEnabled)
+    {
+        Logger::Info("Dummy wallbox: enabling charging");
+
+        // Enable charging
+        mChargingEnabled = true;
+        ok = SetChargingCurrentLimit(mPreviousChargingCurrentLimitA);
+    }
+    else if (mChargingEnabled && !chargingEnabled)
+    {
+        Logger::Info("Dummy wallbox: disabling charging");
+
+        // Disable charging
+        mPreviousChargingCurrentLimitA = mChargingCurrentLimitA;
+        ok = SetChargingCurrentLimit(0.0f);
+        mChargingEnabled = false;
+    }
+
+    return ok;
 }
 
 bool DummyWallbox::IsChargingEnabled()
 {
-    Logger::Debug("Dummy wallbox: reurning charging enabled %i", mChargingEnabled);
+    Logger::Debug("Dummy wallbox: returning charging enabled %i", mChargingEnabled);
     return mChargingEnabled;
 }
 

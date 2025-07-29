@@ -21,23 +21,13 @@ HeidelBridge is a firmware for ESP32 microcontrollers. It allows you to bring yo
 
 # Required Hardware
 
-You have two options for the hardware setup:
-
-## Option 1: ESP32 + External MAX485 Module
-You need two components: an ESP32 microcontroller and a MAX485 module. Both are available in large quantities and at reasonable prices on the Internet. You will also need a breadboard and a few jumper wires. All in all, it shouldn't cost you more than 10€.
+You only need two components for this project: an ESP32 microcontroller and a MAX485 module. Both are available in large quantities and at reasonable prices on the Internet. You will also need a breadboard and a few jumper wires. All in all, it shouldn't cost you more than 10€.
 
 Parts list:
 - ESP32 microcontroller*
 - MAX485 breakout board
 - 6 jumper wires
 - A breadboard
-
-## Option 2: LilyGo T-Can485 Board
-Alternatively, you can use a LilyGo T-Can485 board which has the RS485 transceiver already built-in, eliminating the need for an external MAX485 module.
-
-Parts list:
-- LilyGo T-Can485 board (includes ESP32 + built-in RS485 transceiver)
-- 3 jumper wires (for connecting to the wallbox)
 
 This should be enough for quickly putting together a fully functioning prototype.
 Of course a well designed PCB would be much nicer, but this is still work in progress. Once the design is ready, the schematics will be available *right here*.

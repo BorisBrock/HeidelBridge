@@ -25,20 +25,6 @@ void ModbusRTU::Init()
     gMutex = xSemaphoreCreateMutex();
 
     // Init serial conneted to the RTU Modbus
-
-#ifdef LILYGO_BOARD
-    //config for Lilygo ESP32 RS485 board
-    pinMode(RS485_EN_PIN, OUTPUT);
-    digitalWrite(RS485_EN_PIN, HIGH);
-
-    pinMode(RS485_SE_PIN, OUTPUT);
-    digitalWrite(RS485_SE_PIN, HIGH);
-
-    pinMode(PIN_5V_EN, OUTPUT);
-    digitalWrite(PIN_5V_EN, HIGH);
-    // end config for Lilygo ESP32 RS485 board
-#endif
-
     Logger::Info("Starting RS485 hardware serial");
     RTUutils::prepareHardwareSerial(gRs485Serial);
     gRs485Serial.begin(

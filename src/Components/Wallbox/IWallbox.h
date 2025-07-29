@@ -42,8 +42,14 @@ public:
     // Returns the current charging voltages in Volts
     virtual bool GetChargingVoltages(float &v1V, float &v2V, float &v3V) = 0;
 
+    // Returns if charging is currently enabled
+    virtual bool IsChargingEnabled() = 0;
+
     // Write functions
 
     // Sets the charging current limit in Amperes
     virtual bool SetChargingCurrentLimit(float currentLimitA) = 0;
+
+    // Enables/disables the charging
+    virtual bool SetChargingEnabled(bool chargingEnabled) = 0;
 };

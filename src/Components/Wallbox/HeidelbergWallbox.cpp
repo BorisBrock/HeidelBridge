@@ -68,17 +68,55 @@ VehicleState HeidelbergWallbox::GetState()
 
 bool HeidelbergWallbox::SetChargingCurrentLimit(float currentLimitA)
 {
-    mChargingCurrentLimitA = currentLimitA;
-    Logger::Info("Heidelberg wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
-
-    uint16_t rawCurrent = static_cast<uint16_t>(mChargingCurrentLimitA / Constants::HeidelbergWallbox::CurrentFactor);
-    if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::MaximalCurrent, rawCurrent))
+    if (mChargingEnabled)
     {
-        // Error writing modbus register
-        Logger::Error("Heidelberg wallbox: ERROR: Could not set maximum charging current");
+        mChargingCurrentLimitA = currentLimitA;
+        Logger::Info("Heidelberg wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
+
+        uint16_t rawCurrent = static_cast<uint16_t>(mChargingCurrentLimitA / Constants::HeidelbergWallbox::CurrentFactor);
+        if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::MaximalCurrent, rawCurrent))
+        {
+            // Error writing modbus register
+            Logger::Error("Heidelberg wallbox: ERROR: Could not set maximum charging current");
+        }
+    }
+    else
+    {
+        mPreviousChargingCurrentLimitA = currentLimitA;
+        Logger::Info("Heidelberg wallbox: charging is disabled. current limit %f A is not applied", mChargingCurrentLimitA);
     }
 
     return true;
+}
+
+bool HeidelbergWallbox::SetChargingEnabled(bool chargingEnabled)
+{
+    bool ok = true;
+
+    if (!mChargingEnabled && chargingEnabled)
+    {
+        Logger::Info("Heidelberg wallbox: enabling charging");
+
+        // Enable charging
+        mChargingEnabled = true;
+        ok = SetChargingCurrentLimit(mPreviousChargingCurrentLimitA);
+    }
+    else if (mChargingEnabled && !chargingEnabled)
+    {
+        Logger::Info("Heidelberg wallbox: disabling charging");
+
+        // Disable charging
+        mPreviousChargingCurrentLimitA = mChargingCurrentLimitA;
+        ok = SetChargingCurrentLimit(0.0f);
+        mChargingEnabled = false;
+    }
+
+    return ok;
+}
+
+bool HeidelbergWallbox::IsChargingEnabled()
+{
+    return mChargingEnabled;
 }
 
 float HeidelbergWallbox::GetChargingCurrentLimit()

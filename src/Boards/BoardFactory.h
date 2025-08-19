@@ -1,7 +1,7 @@
 #pragma once
 
 // Forward declarations
-class IBoard;
+class Board;
 
 class BoardFactory
 {
@@ -13,5 +13,5 @@ public:
   static BoardFactory *Instance();
 
   // Gets the currently used board
-  static IBoard *GetBoard();
+  static Board *GetBoard();
 };

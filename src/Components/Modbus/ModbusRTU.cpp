@@ -3,13 +3,14 @@
 #include "../Statistics/Statistics.h"
 #include "HardwareSerial.h"
 #include "ModbusClientRTU.h"
-#include "../../Configuration/Pins.h"
 #include "../../Configuration/Constants.h"
+#include "../../Boards/BoardFactory.h"
+#include "../../Boards/Board.h"
 #include "ModbusRTU.h"
 
-ModbusClientRTU gModbusRTU(Pins::PinRTS); // Create a ModbusRTU client instance
-HardwareSerial gRs485Serial(1);           // Define a Serial for UART1
-SemaphoreHandle_t gMutex = nullptr;       // A mutex object for buss access
+ModbusClientRTU gModbusRTU(BoardFactory::Instance()->GetBoard()->GetPinRts()); // Create a ModbusRTU client instance
+HardwareSerial gRs485Serial(1);                                                // Define a Serial for UART1
+SemaphoreHandle_t gMutex = nullptr;                                            // A mutex object for buss access
 
 // Returns the singleton instance of ModbusRTU
 ModbusRTU *ModbusRTU::Instance()
@@ -30,8 +31,8 @@ void ModbusRTU::Init()
     gRs485Serial.begin(
         Constants::HeidelbergWallbox::ModbusBaudrate,
         SERIAL_8E1,
-        Pins::PinRX,
-        Pins::PinTX);
+        BoardFactory::Instance()->GetBoard()->GetPinRx(),
+        BoardFactory::Instance()->GetBoard()->GetPinTx());
 
     // Start Modbus RTU
     Logger::Trace("Creating Modbus RTU instance");

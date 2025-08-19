@@ -14,7 +14,7 @@ BoardFactory *BoardFactory::Instance()
 }
 
 // Gets the currently used board
-static IBoard *BoardFactory::GetBoard()
+Board *BoardFactory::GetBoard()
 {
 #ifdef BOARD_ESP32
   static BoardESP32 boardInstance;

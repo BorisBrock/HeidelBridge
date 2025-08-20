@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "Components/Logger/Logger.h"
 #include "../Board.h"
 #include "BoardESP32.h"
 
@@ -14,4 +15,17 @@ constexpr uint8_t PinRTS = GPIO_NUM_21;
 BoardESP32::BoardESP32()
     : Board(PinRX, PinTX, PinRTS)
 {
+  // Nothing to do
+}
+
+// Initializes the board
+void BoardESP32::Init()
+{
+  // Nothing to do
+}
+
+// Logs board name/information
+void BoardESP32::Print()
+{
+  Logger::Print("ESP32");
 }

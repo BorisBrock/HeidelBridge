@@ -34,4 +34,4 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build HeidelBridge
-        run: pio run -e heidelberg
+        run: pio run -e esp32

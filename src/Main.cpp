@@ -11,6 +11,7 @@
 #include "Components/Modbus/ModbusTCP.h"
 #include "Components/Wallbox/DummyWallbox.h"
 #include "Components/Wallbox/HeidelbergWallbox.h"
+#include "Components/LockController/LockController.h"
 #include "Components/MQTT/MQTTManager.h"
 #include "Components/AsyncDelay/AsyncDelay.h"
 #include "Boards/Board.h"
@@ -63,6 +64,11 @@ void setup()
   gWallbox = DummyWallbox::Instance();
 #endif
   gWallbox->Init();
+
+#ifdef ENABLE_LOCK_RELAY
+  // Initialize lock controller
+  LockController::Instance()->Init();
+#endif
 
   // Start Modbus TCP server
   ModbusTCP::Init(gWallbox);

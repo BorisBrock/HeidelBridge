@@ -24,6 +24,7 @@ public:
     virtual bool GetChargingCurrents(float &c1A, float &c2A, float &c3A) override;
     virtual bool GetChargingVoltages(float &v1V, float &v2V, float &v3V) override;
     virtual bool IsChargingEnabled() override;
+    virtual bool IsRemoteUnlocked() override;
 #pragma endregion IWallbox
 
 private:

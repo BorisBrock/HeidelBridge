@@ -45,6 +45,9 @@ public:
     // Returns if charging is currently enabled
     virtual bool IsChargingEnabled() = 0;
 
+    // Returns the remote lock status (true = unlocked, false = locked)
+    virtual bool IsRemoteUnlocked() = 0;
+
     // Write functions
 
     // Sets the charging current limit in Amperes

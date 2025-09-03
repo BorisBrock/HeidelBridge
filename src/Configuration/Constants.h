@@ -34,6 +34,7 @@ namespace Constants
     {
         constexpr uint16_t WatchdogTimeout = 257;
         constexpr uint16_t DisableStandby = 258;
+        constexpr uint16_t RemoteLockStatus = 259;
         constexpr uint16_t ChargingState = 5;
         constexpr uint16_t MaximalCurrent = 261;
         constexpr uint16_t Power = 14;

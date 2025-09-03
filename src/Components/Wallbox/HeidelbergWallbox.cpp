@@ -253,3 +253,20 @@ float HeidelbergWallbox::GetTemperature()
         return 0.0f;
     }
 }
+
+bool HeidelbergWallbox::IsRemoteUnlocked()
+{
+    uint16_t registerValue[1];
+    if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::RemoteLockStatus, 1, 0x4, registerValue))
+    {
+        bool isUnlocked = (registerValue[0] == 1);
+        Logger::Debug("Heidelberg wallbox: Read remote lock status: %s", isUnlocked ? "unlocked" : "locked");
+        return isUnlocked;
+    }
+    else
+    {
+        // Error reading modbus register
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read remote lock status");
+        return true; // Default to unlocked as per spec
+    }
+}

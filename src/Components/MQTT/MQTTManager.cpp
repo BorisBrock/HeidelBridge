@@ -12,6 +12,7 @@ extern "C"
 #include "../../Configuration/Constants.h"
 #include "../../Configuration/Settings.h"
 #include "../Wallbox/IWallbox.h"
+#include "../LockController/LockController.h"
 #include "../../Utils/PrefixedString.h"
 #include "../../Utils/StringUtils.h"
 #include "MQTTManager.h"
@@ -27,7 +28,11 @@ namespace MQTTManager
     char PayloadBuffer[512];
     PrefixedString gMqttTopic(128);
 
-    constexpr uint16_t NumMqttPublishedValues = 10;
+#ifdef ENABLE_LOCK_RELAY
+    constexpr uint16_t NumMqttPublishedValues = 12;
+#else
+    constexpr uint16_t NumMqttPublishedValues = 11;
+#endif
     enum MqttPublishedValues
     {
         VehicleState,
@@ -38,6 +43,10 @@ namespace MQTTManager
         ChargingCurrent,
         ChargingVoltage,
         Temperature,
+        RemoteLockStatus,
+#ifdef ENABLE_LOCK_RELAY
+        LockControllerStatus,
+#endif
         Internals,
         Discovery
     };
@@ -92,6 +101,16 @@ namespace MQTTManager
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/sensor/%/temperature/config",
             R"({"name":"Temperature","device_class":"temperature","state_topic":"%/temperature","unique_id":"%_temperature","object_id":"temperature","unit_of_measurement":"°C","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/binary_sensor/%/remote_lock_status/config",
+            R"({"name":"Remote Lock Status","device_class":"lock","state_topic":"%/remote_lock_status","payload_on":"1","payload_off":"0","unique_id":"%_remote_lock_status","object_id":"remote_lock_status","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
+#ifdef ENABLE_LOCK_RELAY
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/lock/%/lock_control/config",
+            R"({"name":"Lock Control","state_topic":"%/lock_control/state","command_topic":"%/lock_control/command","payload_lock":"LOCK","payload_unlock":"UNLOCK","state_locked":"LOCKED","state_unlocked":"UNLOCKED","unique_id":"%_lock_control","object_id":"lock_control","device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+#endif
 
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/switch/%/enable_charging/config",
@@ -174,6 +193,16 @@ namespace MQTTManager
                 gMqttClient.publish(gMqttTopic.SetString("/temperature"), 0, false, String(gWallbox->GetTemperature()).c_str());
                 break;
 
+            case (MqttPublishedValues::RemoteLockStatus):
+                gMqttClient.publish(gMqttTopic.SetString("/remote_lock_status"), 0, false, gWallbox->IsRemoteUnlocked() ? "1" : "0");
+                break;
+
+#ifdef ENABLE_LOCK_RELAY
+            case (MqttPublishedValues::LockControllerStatus):
+                gMqttClient.publish(gMqttTopic.SetString("/lock_control/state"), 0, true, LockController::Instance()->GetLockState() ? "UNLOCKED" : "LOCKED");
+                break;
+#endif
+
             case (MqttPublishedValues::Internals):
                 gMqttClient.publish(gMqttTopic.SetString("/internal/wifi_disconnects"), 0, false, String(gStatistics.NumWifiDisconnects).c_str());
                 gMqttClient.publish(gMqttTopic.SetString("/internal/mqtt_disconnects"), 0, false, String(gStatistics.NumMqttDisconnects).c_str());
@@ -205,12 +234,22 @@ namespace MQTTManager
         // Subscribe to control topics
         gMqttClient.subscribe(gMqttTopic.SetString("/control/charging_current_limit"), 2);
         gMqttClient.subscribe(gMqttTopic.SetString("/control/enable_charging"), 2);
+#ifdef ENABLE_LOCK_RELAY
+        gMqttClient.subscribe(gMqttTopic.SetString("/lock_control/command"), 2);
+#endif
 
         // Publish version information
         String versionString = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
         gMqttClient.publish(gMqttTopic.SetString("/version"), 0, true, versionString.c_str());
         gMqttClient.publish(gMqttTopic.SetString("/build_date"), 0, true, __DATE__);
         gMqttClient.publish(gMqttTopic.SetString("/ip_address"), 0, true, WiFi.localIP().toString().c_str());
+
+#ifdef ENABLE_LOCK_RELAY
+        // Publish initial lock control state
+        const char* lockState = LockController::Instance()->GetLockState() ? "UNLOCKED" : "LOCKED";
+        gMqttClient.publish(gMqttTopic.SetString("/lock_control/state"), 0, true, lockState);
+        Logger::Info("Published initial lock state: %s", lockState);
+#endif
 
         // Publish discovery data
         PublishHomeAssistantDiscovery();
@@ -240,6 +279,21 @@ namespace MQTTManager
             bool enableCharging = cmd.equalsIgnoreCase("ON");
             gWallbox->SetChargingEnabled(enableCharging);
         }
+#ifdef ENABLE_LOCK_RELAY
+        else if (strcmp(gMqttTopic.SetString("/lock_control/command"), topic) == 0)
+        {
+            String cmd(payload, len);
+            cmd.trim();
+            Logger::Trace("Received MQTT lock control command: %s", cmd.c_str());
+            bool unlock = cmd.equalsIgnoreCase("UNLOCK");
+            LockController::Instance()->SetLockState(unlock);
+            
+            // Immediately publish the new state
+            const char* newState = LockController::Instance()->GetLockState() ? "UNLOCKED" : "LOCKED";
+            gMqttClient.publish(gMqttTopic.SetString("/lock_control/state"), 0, true, newState);
+            Logger::Info("Lock state updated and published: %s", newState);
+        }
+#endif
     }
 
     // Callback for MQTT publish

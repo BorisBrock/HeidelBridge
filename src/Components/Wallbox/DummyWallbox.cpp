@@ -127,3 +127,9 @@ float DummyWallbox::GetTemperature()
 {
     return Constants::DummyWallbox::TemperatureDegCel;
 }
+
+bool DummyWallbox::IsRemoteUnlocked()
+{
+    Logger::Debug("Dummy wallbox: returning remote lock status: unlocked");
+    return true; // Dummy wallbox is always unlocked
+}

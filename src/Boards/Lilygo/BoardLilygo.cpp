@@ -10,6 +10,9 @@
 constexpr uint8_t PinRX = GPIO_NUM_21;
 constexpr uint8_t PinTX = GPIO_NUM_22;
 constexpr uint8_t PinRTS = GPIO_NUM_21;
+#ifdef ENABLE_LOCK_RELAY
+constexpr uint8_t PinLockRelay = GPIO_NUM_18; // Available GPIO for lock relay control
+#endif
 
 // Additional pins
 constexpr uint8_t Pin_5V_EN = 16;
@@ -28,7 +31,11 @@ constexpr uint8_t Pin_WS2812 = 4;
 
 // Constructor
 BoardLilygo::BoardLilygo()
+#ifdef ENABLE_LOCK_RELAY
+    : Board(PinRX, PinTX, PinRTS, PinLockRelay)
+#else
     : Board(PinRX, PinTX, PinRTS)
+#endif
 {
   // Nothing to do
 }
@@ -44,6 +51,12 @@ void BoardLilygo::Init()
 
   pinMode(Pin_5V_EN, OUTPUT);
   digitalWrite(Pin_5V_EN, HIGH);
+
+#ifdef ENABLE_LOCK_RELAY
+  // Initialize lock relay pin (active HIGH to unlock)
+  pinMode(PinLockRelay, OUTPUT);
+  digitalWrite(PinLockRelay, LOW); // Default to locked
+#endif
 }
 
 // Logs board name/information

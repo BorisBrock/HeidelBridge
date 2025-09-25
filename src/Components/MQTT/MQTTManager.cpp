@@ -103,11 +103,20 @@ namespace MQTTManager
                 "object_id": "enable_charging",
                 "payload_on": "ON",
                 "payload_off": "OFF",
-                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+                "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/number/%/charging_current_limit/config",
-            R"({"name": "Charging Current Limit", "command_topic": "%/control/charging_current_limit", "state_topic": "%/status/charging_current_limit", "min": 6, "max": 16, "step": 1, "unit_of_measurement": "A", "uniq_id": "heidelbridge_charging_current_limit", "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+            R"({
+                "name": "Charging Current Limit",
+                "command_topic": "%/control/charging_current_limit",
+                "state_topic": "%/charging_current_limit",
+                "min": 6,
+                "max": 16,
+                "step": 1,
+                "unit_of_measurement": "A",
+                "uniq_id": "heidelbridge_charging_current_limit",
+                "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
     }
 
     // Publishes various MQTT status messages based on the current value index.

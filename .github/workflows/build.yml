@@ -33,5 +33,20 @@ jobs:
       - name: Installing PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build HeidelBridge
+      - name: Build HeidelBridge ESP32
         run: pio run -e esp32
+
+      - name: Build HeidelBridge Lilygo
+        run: pio run -e lilygo
+
+      - name: Upload ESP32 Firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-esp32
+          path: .pio/build/esp32/firmware.bin
+
+      - name: Upload Lilygo Firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-lilygo
+          path: .pio/build/lilygo/firmware.bin

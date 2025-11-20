@@ -10,6 +10,7 @@
 ## Connecting the Hardware Components
 
 The hardware connections are very simple:
+
 - ESP32's GND to MAX485-board GND
 - ESP32's 3.3 V to MAX485-board VCC
 - ESP32 pin 18 to MAX485-board RO pin

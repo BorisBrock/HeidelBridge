@@ -6,7 +6,7 @@
 Adding your HeidelBridge to evcc is very straight forward.
 Start by defining a new charger:
 
-```
+```yaml
 chargers:
   - name: heidelberg_ec
     type: template
@@ -17,7 +17,7 @@ chargers:
 
 Next, add a loadpoint:
 
-```
+```yaml
 loadpoints:
   - title: Heidelberg EC
     charger: heidelberg_ec

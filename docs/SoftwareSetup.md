@@ -12,6 +12,7 @@ Follow these steps to turn your ESP32 into a HeidelBridge. This has to be done o
 ### Fixing Connection Issues
 
 If you cannot connect to your ESP32 via WebSerial, these hints might help:
+
 - Use a USB data cable! Make sure you use a cable that transfers power and data and is not for charging only.
 - On Windows, make sure you have installed the serial port drivers for your ESP32. It should appear as a COM port in the Windows Device Manager.
 - On Linux, make sure you have added your user to the required user groups (e.g. `sudo usermod -aG dialout $USER` for Ubuntu, `sudo usermod -aG uucp,lock $USER` for Arch)
@@ -57,38 +58,44 @@ Then follow these steps:
 - Upload the file system image.
 - Upload the firmware.
 
-
 ## Build Environments
 
 HeidelBridge supports multiple build environments to accommodate different hardware configurations:
 
 ### Standard ESP32 + External RS485 Module (`esp32`)
+
 This is the default build environment for regular ESP32 development boards with an external RS485 module.
 
 **To compile:**
+
 ```bash
 pio run -e esp32
 ```
 
 **Pin configuration:**
+
 - GPIO18 → RS485 RO (Receiver Output)
 - GPIO19 → RS485 DI (Driver Input)  
 - GPIO21 → RS485 DE+RE
 
 ### LilyGo T-Can485 Board (`lilygo`)
+
 This build environment is specifically designed for the LilyGo T-Can485 board, which has built-in RS485 capabilities and **does not require an external MAX485 module**.
 
 **To compile:**
+
 ```bash
 pio run -e lilygo
 ```
 
 **Pin configuration:**
+
 - GPIO21 → RS485 RO (Receiver Output)
 - GPIO22 → RS485 DI (Driver Input)
 - GPIO21 → RS485 DE+RE
 
 **Additional features:**
+
 - Automatic initialization of onboard RS485 transceivers
 - 5V power supply control
 - CAN bus support (hardware available but not used in current firmware)
@@ -97,9 +104,11 @@ pio run -e lilygo
 For detailed wiring information and hardware setup for the LilyGo T-Can485 board, please refer to the [discussion thread](https://github.com/BorisBrock/HeidelBridge/discussions/4).
 
 ### Dummy Wallbox (`dummy`)
+
 This build environment creates a simulation mode for testing without actual wallbox hardware.
 
 **To compile:**
+
 ```bash
 pio run -e dummy
 ```

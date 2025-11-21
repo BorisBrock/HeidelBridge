@@ -74,7 +74,7 @@ namespace MQTTManager
                 "payload_on":"1",
                 "payload_off":"0",
                 "unique_id":"%_is_vehicle_connected",
-                "object_id":"%_is_vehicle_connected",
+                "default_entity_id":"%_is_vehicle_connected",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
@@ -86,7 +86,7 @@ namespace MQTTManager
                 "payload_on":"1",
                 "payload_off":"0",
                 "unique_id":"%_is_vehicle_charging",
-                "object_id":"%_is_vehicle_charging",
+                "default_entity_id":"%_is_vehicle_charging",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
@@ -96,7 +96,7 @@ namespace MQTTManager
                 "device_class":"power",
                 "state_topic":"%/charging_power",
                 "unique_id":"%_charging_power",
-                "object_id":"%_charging_power",
+                "default_entity_id":"%_charging_power",
                 "unit_of_measurement":"W",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
@@ -107,7 +107,7 @@ namespace MQTTManager
                 "device_class":"current",
                 "state_topic":"%/charging_current/phase1",
                 "unique_id":"%_charging_current",
-                "object_id":"%_charging_current",
+                "default_entity_id":"%_charging_current",
                 "unit_of_measurement":"A",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
@@ -118,7 +118,7 @@ namespace MQTTManager
                 "device_class":"current",
                 "state_topic":"%/charging_current_limit",
                 "unique_id":"%_charging_current_limit",
-                "object_id":"%_charging_current_limit",
+                "default_entity_id":"%_charging_current_limit",
                 "unit_of_measurement":"A",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
@@ -130,7 +130,7 @@ namespace MQTTManager
                 "state_topic":"%/energy_meter",
                 "state_class":"total_increasing",
                 "unique_id":"%_energy_meter",
-                "object_id":"%_energy_meter",
+                "default_entity_id":"%_energy_meter",
                 "unit_of_measurement":"kWh",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
@@ -141,7 +141,7 @@ namespace MQTTManager
                 "device_class":"temperature",
                 "state_topic":"%/temperature",
                 "unique_id":"%_temperature",
-                "object_id":"%_temperature",
+                "default_entity_id":"%_temperature",
                 "unit_of_measurement":"°C",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
@@ -152,7 +152,7 @@ namespace MQTTManager
                 "state_topic":"%/enable_charging",
                 "command_topic":"%/control/enable_charging",
                 "unique_id":"%control_enable_charging",
-                "object_id":"%control_enable_charging",
+                "default_entity_id":"%control_enable_charging",
                 "payload_on":"ON",
                 "payload_off":"OFF",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
@@ -168,7 +168,7 @@ namespace MQTTManager
                 "step":1,
                 "unit_of_measurement":"A",
                 "unique_id":"%_control_charging_current_limit",
-                "object_id":"%_control_charging_current_limit",
+                "default_entity_id":"%_control_charging_current_limit",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
     }
 

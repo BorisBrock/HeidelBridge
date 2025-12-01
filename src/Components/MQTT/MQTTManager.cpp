@@ -157,6 +157,19 @@ namespace MQTTManager
                 "payload_off":"OFF",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
+        // Standby Switch (neu)
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/switch/%/control_standby/config",
+            R"({
+                "name":"Standby Mode",
+                "state_topic":"%/standby_enabled",
+                "command_topic":"%/control/standby",
+                "unique_id":"%_control_standby",
+                "default_entity_id":"%_control_standby",
+                "payload_on":"ON",
+                "payload_off":"OFF",
+                "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/number/%/control_charging_current_limit/config",
             R"({
@@ -256,6 +269,9 @@ namespace MQTTManager
 
             gMqttClient.publish(gMqttTopic.SetString("/enable_charging"), 0, true,
                                 gWallbox->IsChargingEnabled() ? "ON" : "OFF");
+
+            gMqttClient.publish(gMqttTopic.SetString("/standby_enabled"), 0, true,
+                                gWallbox->IsStandbyEnabled() ? "ON" : "OFF");
         }
     }
 
@@ -267,6 +283,7 @@ namespace MQTTManager
         // Subscribe to control topics
         gMqttClient.subscribe(gMqttTopic.SetString("/control/charging_current_limit"), 2);
         gMqttClient.subscribe(gMqttTopic.SetString("/control/enable_charging"), 2);
+        gMqttClient.subscribe(gMqttTopic.SetString("/control/standby"), 2);
 
         // Publish version information
         String versionString = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
@@ -301,6 +318,14 @@ namespace MQTTManager
             Logger::Trace("Received MQTT control command: enable_charging = %s", cmd.c_str());
             bool enableCharging = cmd.equalsIgnoreCase("ON");
             gWallbox->SetChargingEnabled(enableCharging);
+        }
+        else if (strcmp(gMqttTopic.SetString("/control/standby"), topic) == 0)
+        {
+            String cmd(payload, len);
+            cmd.trim();
+            Logger::Trace("Received MQTT control command: standby = %s", cmd.c_str());
+            bool enableStandby = cmd.equalsIgnoreCase("ON");
+            gWallbox->SetStandbyEnabled(enableStandby);
         }
     }
 

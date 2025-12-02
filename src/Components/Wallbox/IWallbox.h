@@ -57,6 +57,6 @@ public:
     virtual bool SetStandbyEnabled(bool standbyEnabled) = 0;
     
     // Returns if Standby is currently enabled
-    virtual bool IsStandbyEnabled() = 0;
+    virtual bool GetStandbyEnabled() = 0;
 
 };

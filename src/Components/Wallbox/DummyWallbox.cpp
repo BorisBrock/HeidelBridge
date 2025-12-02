@@ -75,29 +75,25 @@ bool DummyWallbox::IsChargingEnabled()
     return mChargingEnabled;
 }
 
+//New Part to enable Standby
 bool DummyWallbox::SetStandbyEnabled(bool standbyEnabled)
 {
-    bool ok = true;
-
-    if (!mStandbyEnabled && standbyEnabled)
+    if (mStandbyEnabled != standbyEnabled)
     {
-        Logger::Info("Dummy wallbox: enabling standby");
-        mStandbyEnabled = true;
-    }
-    else if (mStandbyEnabled && !standbyEnabled)
-    {
-        Logger::Info("Dummy wallbox: disabling standby");
-        mStandbyEnabled = false;
+        Logger::Info("Dummy wallbox: %s standby",
+                     standbyEnabled ? "enabling" : "disabling");
     }
 
-    return ok;
+    mStandbyEnabled = standbyEnabled;
+    return true;
 }
 
-bool DummyWallbox::IsStandbyEnabled()
+bool DummyWallbox::GetStandbyEnabled()
 {
-    Logger::Debug("Dummy wallbox: returning standby enabled %i", mStandbyEnabled);
+    Logger::Debug("Dummy wallbox: returning standby enabled = %d", mStandbyEnabled);
     return mStandbyEnabled;
 }
+
 
 float DummyWallbox::GetChargingCurrentLimit()
 {

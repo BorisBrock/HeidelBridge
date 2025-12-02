@@ -28,8 +28,6 @@ void HeidelbergWallbox::Init()
         // Error writing modbus register
         Logger::Error("ERROR: Could not configure standby");
     }
-    // Hove correct status for standby
-    mStandbyEnabled = (standbyDisabled == 0);
     
     // Disable watchdog
     Logger::Debug("Heidelberg wallbox: Setting watch dog timeout to %d s", Constants::HeidelbergWallbox::WatchdogTimeoutS);
@@ -126,43 +124,45 @@ bool HeidelbergWallbox::SetStandbyEnabled(bool standbyEnabled)
 {
     bool ok = true;
 
-    // Zustand ändert sich von DISABLED -> ENABLED
-    if (!mStandbyEnabled && standbyEnabled)
+    // Write only if state changes
+    if (mStandbyEnabled != standbyEnabled)
     {
-        Logger::Info("Heidelberg wallbox: enabling standby");
+        uint16_t value = standbyEnabled ? 0 : 4;
 
-        uint16_t value = 0; // 0 = Standby erlaubt
+        Logger::Info("Heidelberg wallbox: %s standby",
+                     standbyEnabled ? "enabling" : "disabling");
+
         ok = ModbusRTU::Instance()->WriteHoldRegister16(
-            Constants::HeidelbergRegisters::DisableStandby,
-            value
-        );
+            Constants::HeidelbergRegisters::DisableStandby, value);
 
         if (ok)
-            mStandbyEnabled = true;
-    }
-    // Zustand ändert sich von ENABLED -> DISABLED
-    else if (mStandbyEnabled && !standbyEnabled)
-    {
-        Logger::Info("Heidelberg wallbox: disabling standby");
-
-        uint16_t value = 4; // 4 = Standby deaktiviert
-        ok = ModbusRTU::Instance()->WriteHoldRegister16(
-            Constants::HeidelbergRegisters::DisableStandby,
-            value
-        );
-
-        if (ok)
-            mStandbyEnabled = false;
+            mStandbyEnabled = standbyEnabled;
     }
 
     return ok;
 }
 
-bool HeidelbergWallbox::IsStandbyEnabled()
+bool HeidelbergWallbox::GetStandbyEnabled()
 {
-    return mStandbyEnabled;
-}
+    uint16_t reg[1];
 
+    if (!ModbusRTU::Instance()->ReadRegisters(
+            Constants::HeidelbergRegisters::DisableStandby,
+            1,
+            0x3,
+            reg))
+    {
+        Logger::Error("Heidelberg wallbox: Could not read standby state");
+        return mStandbyEnabled; // last known
+    }
+
+    bool enabled = (reg[0] == 0); // 0 = standby allowed
+    mStandbyEnabled = enabled;
+
+    Logger::Debug("Heidelberg wallbox: Read standby enabled = %d", enabled);
+
+    return enabled;
+}
 
 float HeidelbergWallbox::GetChargingCurrentLimit()
 {

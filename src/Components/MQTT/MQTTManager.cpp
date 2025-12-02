@@ -271,7 +271,7 @@ namespace MQTTManager
                                 gWallbox->IsChargingEnabled() ? "ON" : "OFF");
 
             gMqttClient.publish(gMqttTopic.SetString("/standby_enabled"), 0, true,
-                                gWallbox->IsStandbyEnabled() ? "ON" : "OFF");
+                                gWallbox->GetStandbyEnabled() ? "ON" : "OFF");
         }
     }
 

@@ -157,7 +157,6 @@ namespace MQTTManager
                 "payload_off":"OFF",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
-        // Standby Switch (neu)
         PublishHomeAssistantDiscoveryTopic(
             "homeassistant/switch/%/control_standby/config",
             R"({

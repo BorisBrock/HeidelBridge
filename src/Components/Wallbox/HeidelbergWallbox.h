@@ -6,7 +6,7 @@
 class HeidelbergWallbox : public IWallbox
 {
 private:
-    HeidelbergWallbox(){};
+    HeidelbergWallbox() {};
 
 public:
     static HeidelbergWallbox *Instance();
@@ -26,7 +26,7 @@ public:
     virtual bool GetChargingVoltages(float &v1V, float &v2V, float &v3V) override;
     virtual bool IsChargingEnabled() override;
     virtual bool GetStandbyEnabled() override;
-    
+
 #pragma endregion IWallbox
 
 private:

@@ -34,6 +34,6 @@ private:
     float mFailsafeCurrentA{Constants::DummyWallbox::FailSafeCurrentA};
     float mEnergyMeterWh{0.0f};
     bool mChargingEnabled{true};
-    bool mStandbyEnabled{true}; // default: standby enabled
+    bool mStandbyEnabled{false};
     float mPreviousChargingCurrentLimitA{Constants::HeidelbergWallbox::InitialChargingCurrentLimitA};
 };

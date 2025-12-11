@@ -75,7 +75,6 @@ bool DummyWallbox::IsChargingEnabled()
     return mChargingEnabled;
 }
 
-//New Part to enable Standby
 bool DummyWallbox::SetStandbyEnabled(bool standbyEnabled)
 {
     if (mStandbyEnabled != standbyEnabled)
@@ -93,7 +92,6 @@ bool DummyWallbox::GetStandbyEnabled()
     Logger::Debug("Dummy wallbox: returning standby enabled = %d", mStandbyEnabled);
     return mStandbyEnabled;
 }
-
 
 float DummyWallbox::GetChargingCurrentLimit()
 {

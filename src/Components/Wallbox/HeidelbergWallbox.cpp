@@ -145,19 +145,19 @@ bool HeidelbergWallbox::SetStandbyEnabled(bool standbyEnabled)
 
 bool HeidelbergWallbox::GetStandbyEnabled()
 {
-    uint16_t reg[1];
+    uint16_t registerValue[1];
 
     if (!ModbusRTU::Instance()->ReadRegisters(
             Constants::HeidelbergRegisters::DisableStandby,
             1,
             0x3,
-            reg))
+            registerValue))
     {
         Logger::Error("Heidelberg wallbox: Could not read standby state");
         return mStandbyEnabled; // last known
     }
 
-    bool enabled = (reg[0] == 0); // 0 = standby allowed
+    bool enabled = (registerValue[0] == 0); // 0 = standby allowed
     mStandbyEnabled = enabled;
 
     Logger::Debug("Heidelberg wallbox: Read standby enabled = %d", enabled);

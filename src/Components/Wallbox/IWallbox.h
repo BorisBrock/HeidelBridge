@@ -52,4 +52,11 @@ public:
 
     // Enables/disables the charging
     virtual bool SetChargingEnabled(bool chargingEnabled) = 0;
+
+    // Enables/disables standby
+    virtual bool SetStandbyEnabled(bool standbyEnabled) = 0;
+    
+    // Returns if Standby is currently enabled
+    virtual bool GetStandbyEnabled() = 0;
+
 };

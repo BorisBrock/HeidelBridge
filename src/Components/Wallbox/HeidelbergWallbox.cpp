@@ -119,6 +119,52 @@ bool HeidelbergWallbox::IsChargingEnabled()
     return mChargingEnabled;
 }
 
+bool HeidelbergWallbox::SetStandbyEnabled(bool standbyEnabled)
+{
+    bool ok = true;
+
+    // Write only if state changes
+    if (mStandbyEnabled != standbyEnabled)
+    {
+        uint16_t value = standbyEnabled ? 0 : 4;
+
+        Logger::Info("Heidelberg wallbox: %s standby",
+                     standbyEnabled ? "enabling" : "disabling");
+
+        ok = ModbusRTU::Instance()->WriteHoldRegister16(
+            Constants::HeidelbergRegisters::DisableStandby, value);
+
+        if (ok)
+        {
+            mStandbyEnabled = standbyEnabled;
+        }
+    }
+
+    return ok;
+}
+
+bool HeidelbergWallbox::GetStandbyEnabled()
+{
+    uint16_t registerValue[1];
+
+    if (!ModbusRTU::Instance()->ReadRegisters(
+            Constants::HeidelbergRegisters::DisableStandby,
+            1,
+            0x3,
+            registerValue))
+    {
+        Logger::Error("Heidelberg wallbox: Could not read standby state");
+        return mStandbyEnabled; // last known
+    }
+
+    bool enabled = (registerValue[0] == 0); // 0 = standby allowed
+    mStandbyEnabled = enabled;
+
+    Logger::Debug("Heidelberg wallbox: Read standby enabled = %d", enabled);
+
+    return enabled;
+}
+
 float HeidelbergWallbox::GetChargingCurrentLimit()
 {
     uint16_t registerValue[1];

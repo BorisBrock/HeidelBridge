@@ -6,7 +6,7 @@
 class HeidelbergWallbox : public IWallbox
 {
 private:
-    HeidelbergWallbox(){};
+    HeidelbergWallbox() {};
 
 public:
     static HeidelbergWallbox *Instance();
@@ -16,6 +16,7 @@ public:
     virtual VehicleState GetState() override;
     virtual bool SetChargingCurrentLimit(float currentLimitA) override;
     virtual bool SetChargingEnabled(bool chargingEnabled) override;
+    virtual bool SetStandbyEnabled(bool standbyEnabled) override;
     virtual float GetChargingCurrentLimit() override;
     virtual float GetEnergyMeterValue() override;
     virtual float GetFailsafeCurrent() override;
@@ -24,6 +25,8 @@ public:
     virtual bool GetChargingCurrents(float &c1A, float &c2A, float &c3A) override;
     virtual bool GetChargingVoltages(float &v1V, float &v2V, float &v3V) override;
     virtual bool IsChargingEnabled() override;
+    virtual bool GetStandbyEnabled() override;
+
 #pragma endregion IWallbox
 
 private:
@@ -33,5 +36,6 @@ private:
     float mLastPowerMeterValueW{0.0f};
     float mLastEnergyMeterValueWh{0.0f};
     bool mChargingEnabled{true};
+    bool mStandbyEnabled{true}; // default: standby enabled
     float mPreviousChargingCurrentLimitA{Constants::HeidelbergWallbox::InitialChargingCurrentLimitA};
 };

@@ -21,6 +21,10 @@ The hardware connections are very simple:
 
 ![Hardware connections](/docs/img/hardware_connections.png)
 
+## Powering the ESP32
+
+The ESP32 is **not** powered by the Modbus line. You need to power it externally, usually via an USB phone charger.
+
 ## Modbus Connection And Troubleshooting
 
 To establish a stable and reliable Modbus connection between the Heidelberg wallbox and the HeidelBridge, please consider the following recommendations:

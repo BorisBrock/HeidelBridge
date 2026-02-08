@@ -20,3 +20,14 @@ The hardware connections are very simple:
 - MAX485-board B terminal to Heidelberg wallbox B terminal
 
 ![Hardware connections](/docs/img/hardware_connections.png)
+
+## Modbus Connection And Troubleshooting
+
+To establish a stable and reliable Modbus connection between the Heidelberg wallbox and the HeidelBridge, please consider the following recommendations:
+
+- Use a high-quality cable, preferably Ethernet CAT5 or CAT6.
+- Use a twisted pair for the RS-485 A/B signal lines.
+- Connect the ground (GND) of the wallbox and the ESP32, ideally using a dedicated conductor.
+- Connect the cable shield on one side only (preferably at the wallbox) to protective earth (PE) or ground (GND).
+- Terminate the RS-485 bus with 120 Ω resistors at both ends of the bus (verification with a multimeter is recommended).
+- Avoid unnecessarily long cable runs and keep the cable away from sources of electromagnetic interference.

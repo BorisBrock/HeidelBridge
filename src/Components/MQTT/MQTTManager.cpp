@@ -215,8 +215,14 @@ namespace MQTTManager
                 }
                 break;
             case (MqttPublishedValues::ChargingCurrentLimit):
-                gMqttClient.publish(gMqttTopic.SetString("/charging_current_limit"), 0, false, String(gWallbox->GetChargingCurrentLimit()).c_str());
-                break;
+            {
+                float chargingCurrentLimit = gWallbox->GetChargingCurrentLimit();
+                if (chargingCurrentLimit >= 6.0f && chargingCurrentLimit <= 16.0f) // Only publish valid current limits
+                {
+                    gMqttClient.publish(gMqttTopic.SetString("/charging_current_limit"), 0, false, String(chargingCurrentLimit).c_str());
+                }
+            }
+            break;
             case (MqttPublishedValues::ChargingPower):
                 gMqttClient.publish(gMqttTopic.SetString("/charging_power"), 0, false, String(gWallbox->GetChargingPower()).c_str());
                 break;
@@ -300,7 +306,7 @@ namespace MQTTManager
         Logger::Warning("Disconnected from MQTT. Reason: %d", reason);
         gStatistics.NumMqttDisconnects++;
     }
-    
+
     // Callback for MQTT messages
     void OnMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
     {

@@ -33,11 +33,20 @@ jobs:
       - name: Installing PlatformIO Core
         run: pip install --upgrade platformio
 
+      - name: Build HeidelBridge Atom S3 Lite
+        run: pio run -e atoms3lite
+
       - name: Build HeidelBridge ESP32
         run: pio run -e esp32
 
       - name: Build HeidelBridge Lilygo
         run: pio run -e lilygo
+
+      - name: Upload Atom S3 Lite Firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-atoms3lite
+          path: .pio/build/atoms3lite/firmware.bin
 
       - name: Upload ESP32 Firmware
         uses: actions/upload-artifact@v4

@@ -76,6 +76,10 @@ The following web endpoints are currently served by HeidelBridge:
 | {ip}        | Configuration web interface |
 | {ip}/update | OTA update web interface    |
 
+# Troubleshooting
+
+Things aren't working as expected? [Maybe the troubleshooting section can help](docs/Troubleshooting.md).
+
 # Contribution
 
 :heart: Help is welcome! Do you own a Heidelberg Energy Control wallbox? Are you a Modbus expert? Do you have ideas for improvements? Did you find a bug? Feel free to review the code, create pull requests, open issues or contact me directly.

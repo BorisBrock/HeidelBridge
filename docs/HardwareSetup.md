@@ -25,7 +25,7 @@ The hardware connections are very simple:
 
 The ESP32 is **not** powered by the Modbus line. You need to power it externally, usually via an USB phone charger.
 
-## Modbus Connection And Troubleshooting
+## Modbus Connection
 
 To establish a stable and reliable Modbus connection between the Heidelberg wallbox and the HeidelBridge, please consider the following recommendations:
 
@@ -35,3 +35,5 @@ To establish a stable and reliable Modbus connection between the Heidelberg wall
 - Connect the cable shield on one side only (preferably at the wallbox) to protective earth (PE) or ground (GND).
 - Terminate the RS-485 bus with 120 Ω resistors at both ends of the bus (verification with a multimeter is recommended).
 - Avoid unnecessarily long cable runs and keep the cable away from sources of electromagnetic interference.
+
+If the communication is not working as expected check [the troubleshooting section](Troubleshooting.md).

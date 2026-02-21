@@ -32,7 +32,11 @@ Parts list:
 This should be enough for quickly putting together a fully functioning prototype.
 Of course a well designed PCB would be much nicer, but this is still work in progress. Once the design is ready, the schematics will be available *right here*.
 
-> *\* This project supports the classic ESP32. It has not been built/tested for newer models, like the S2 and C6. Additionally the LILYGO T-CAN485 board is supported, which already includes an on-board RS485 transceiver.*
+> *\* This project supports the classic ESP32. It has not been built/tested for newer models, like the S2 and C6.*
+
+Hardware options with with on-board RS485 transceiver:
+* LILYGO T-CAN485
+* [M5Stack Atom S3 Lite](https://shop.m5stack.com/products/atoms3-lite-esp32s3-dev-kit) with [ATOMIC RS485 Base](https://shop.m5stack.com/products/atomic-rs485-base)
 
 # Getting Started
 

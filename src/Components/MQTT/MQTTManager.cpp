@@ -94,6 +94,7 @@ namespace MQTTManager
             R"({
                 "name":"Charging power",
                 "device_class":"power",
+                "state_class":"measurement",
                 "state_topic":"%/charging_power",
                 "unique_id":"%_charging_power",
                 "default_entity_id":"%_charging_power",
@@ -101,13 +102,38 @@ namespace MQTTManager
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
-            "homeassistant/sensor/%/charging_current/config",
+            "homeassistant/sensor/%/charging_current_phase1/config",
             R"({
-                "name":"Charging current",
+                "name":"Charging current phase 1",
                 "device_class":"current",
+                "state_class":"measurement",
                 "state_topic":"%/charging_current/phase1",
-                "unique_id":"%_charging_current",
-                "default_entity_id":"%_charging_current",
+                "unique_id":"%_charging_current_phase1",
+                "default_entity_id":"%_charging_current_phase1",
+                "unit_of_measurement":"A",
+                "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/charging_current_phase2/config",
+            R"({
+                "name":"Charging current phase 2",
+                "device_class":"current",
+                "state_class":"measurement",
+                "state_topic":"%/charging_current/phase2",
+                "unique_id":"%_charging_current_phase2",
+                "default_entity_id":"%_charging_current_phase2",
+                "unit_of_measurement":"A",
+                "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/charging_current_phase3/config",
+            R"({
+                "name":"Charging current phase 3",
+                "device_class":"current",
+                "state_class":"measurement",
+                "state_topic":"%/charging_current/phase3",
+                "unique_id":"%_charging_current_phase3",
+                "default_entity_id":"%_charging_current_phase3",
                 "unit_of_measurement":"A",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
@@ -116,6 +142,7 @@ namespace MQTTManager
             R"({
                 "name":"Charging current limit",
                 "device_class":"current",
+                "state_class":"measurement",
                 "state_topic":"%/charging_current_limit",
                 "unique_id":"%_charging_current_limit",
                 "default_entity_id":"%_charging_current_limit",
@@ -139,10 +166,47 @@ namespace MQTTManager
             R"({
                 "name":"Temperature",
                 "device_class":"temperature",
+                "state_class":"measurement",
                 "state_topic":"%/temperature",
                 "unique_id":"%_temperature",
                 "default_entity_id":"%_temperature",
                 "unit_of_measurement":"°C",
+                "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/charging_voltage_phase1/config",
+            R"({
+                "name":"Charging voltage phase 1",
+                "device_class":"voltage",
+                "state_class":"measurement",
+                "state_topic":"%/charging_voltage/phase1",
+                "unique_id":"%_charging_voltage_phase1",
+                "default_entity_id":"%_charging_voltage_phase1",
+                "unit_of_measurement":"V",
+                "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/charging_voltage_phase2/config",
+            R"({
+                "name":"Charging voltage phase 2",
+                "device_class":"voltage",
+                "state_class":"measurement",
+                "state_topic":"%/charging_voltage/phase2",
+                "unique_id":"%_charging_voltage_phase2",
+                "default_entity_id":"%_charging_voltage_phase2",
+                "unit_of_measurement":"V",
+                "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
+
+        PublishHomeAssistantDiscoveryTopic(
+            "homeassistant/sensor/%/charging_voltage_phase3/config",
+            R"({
+                "name":"Charging voltage phase 3",
+                "device_class":"voltage",
+                "state_class":"measurement",
+                "state_topic":"%/charging_voltage/phase3",
+                "unique_id":"%_charging_voltage_phase3",
+                "default_entity_id":"%_charging_voltage_phase3",
+                "unit_of_measurement":"V",
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(

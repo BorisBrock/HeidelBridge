@@ -96,5 +96,7 @@ namespace Constants
     namespace MQTT
     {
         constexpr uint16_t PublishIntervalMs = 500;
+        constexpr uint32_t UptimePublishIntervalMs = 10000;  // Publish uptime only every 10 seconds
+        constexpr float FloatComparisonTolerance = 0.01f;   // Ignore sensor noise for floating point values
     };
 };

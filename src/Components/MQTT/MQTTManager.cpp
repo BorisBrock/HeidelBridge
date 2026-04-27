@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <cmath>
 extern "C"
 {
 #include "freertos/FreeRTOS.h"
@@ -26,6 +27,28 @@ namespace MQTTManager
     char TopicBuffer[128];
     char PayloadBuffer[1024];
     PrefixedString gMqttTopic(128);
+
+    // Cache variables for change detection
+    int gLastPublishedVehicleState = 1;  // Disconnected = 1
+    float gLastPublishedChargingCurrentLimit = -1.0f;
+    float gLastPublishedChargingPower = -1.0f;
+    float gLastPublishedFailsafeCurrent = -1.0f;
+    float gLastPublishedEnergyMeter = -1.0f;
+    float gLastPublishedChargingCurrent1 = -1.0f;
+    float gLastPublishedChargingCurrent2 = -1.0f;
+    float gLastPublishedChargingCurrent3 = -1.0f;
+    float gLastPublishedChargingVoltage1 = -1.0f;
+    float gLastPublishedChargingVoltage2 = -1.0f;
+    float gLastPublishedChargingVoltage3 = -1.0f;
+    float gLastPublishedTemperature = -1.0f;
+    bool gLastPublishedChargingEnabled = false;
+    bool gLastPublishedStandbyEnabled = false;
+    uint32_t gLastPublishedUptimeS = 0;
+    uint32_t gLastUptimePublishTimeMs = 0;
+    uint32_t gLastWifiDisconnects = 0;
+    uint32_t gLastMqttDisconnects = 0;
+    uint32_t gLastModbusReadErrors = 0;
+    uint32_t gLastModbusWriteErrors = 0;
 
     constexpr uint16_t NumMqttPublishedValues = 10;
     enum MqttPublishedValues
@@ -248,99 +271,197 @@ namespace MQTTManager
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
     }
 
+    // Helper function for safe float comparison with tolerance
+    bool FloatChanged(float newValue, float lastValue)
+    {
+        if (lastValue < 0) return true; // First time
+        return fabs(newValue - lastValue) > Constants::MQTT::FloatComparisonTolerance;
+    }
+
     // Publishes various MQTT status messages based on the current value index.
     // This function cycles through different types of data (e.g., vehicle state, charging current, temperature)
-    // and publishes the corresponding values to the MQTT broker. It ensures that all relevant data points
-    // are periodically updated and sent to the MQTT broker for monitoring and control purposes.
+    // and publishes the corresponding values to the MQTT broker.
+    // Change detection ensures that values are only published when they actually change,
+    // reducing unnecessary MQTT traffic. The uptime value is published less frequently (every 10 seconds).
     void PublishStatusMessages()
     {
         if (gMqttClient.connected())
         {
+            uint32_t currentTimeMs = millis();
+
             switch (gCurValueIndex)
             {
             case (MqttPublishedValues::VehicleState):
-                switch (gWallbox->GetState())
+            {
+                int currentState = (int)gWallbox->GetState();
+                if (currentState != gLastPublishedVehicleState)
                 {
-                case (VehicleState::Disconnected):
-                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_connected"), 0, false, "0");
-                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_charging"), 0, false, "0");
-                    gMqttClient.publish(gMqttTopic.SetString("/vehicle_state"), 0, false, "disconnected");
-                    break;
-                case (VehicleState::Connected):
-                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_connected"), 0, false, "1");
-                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_charging"), 0, false, "0");
-                    gMqttClient.publish(gMqttTopic.SetString("/vehicle_state"), 0, false, "connected");
-                    break;
-                case (VehicleState::Charging):
-                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_connected"), 0, false, "1");
-                    gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_charging"), 0, false, "1");
-                    gMqttClient.publish(gMqttTopic.SetString("/vehicle_state"), 0, false, "charging");
-                    break;
+                    gLastPublishedVehicleState = currentState;
+                    if (currentState == 1)  // Disconnected
+                    {
+                        gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_connected"), 0, false, "0");
+                        gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_charging"), 0, false, "0");
+                        gMqttClient.publish(gMqttTopic.SetString("/vehicle_state"), 0, false, "disconnected");
+                    }
+                    else if (currentState == 2)  // Connected
+                    {
+                        gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_connected"), 0, false, "1");
+                        gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_charging"), 0, false, "0");
+                        gMqttClient.publish(gMqttTopic.SetString("/vehicle_state"), 0, false, "connected");
+                    }
+                    else if (currentState == 4)  // Charging
+                    {
+                        gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_connected"), 0, false, "1");
+                        gMqttClient.publish(gMqttTopic.SetString("/is_vehicle_charging"), 0, false, "1");
+                        gMqttClient.publish(gMqttTopic.SetString("/vehicle_state"), 0, false, "charging");
+                    }
                 }
-                break;
+            }
+            break;
             case (MqttPublishedValues::ChargingCurrentLimit):
             {
                 float chargingCurrentLimit = gWallbox->GetChargingCurrentLimit();
-                if (chargingCurrentLimit >= 6.0f && chargingCurrentLimit <= 16.0f) // Only publish valid current limits
+                if (chargingCurrentLimit >= 6.0f && chargingCurrentLimit <= 16.0f &&
+                    FloatChanged(chargingCurrentLimit, gLastPublishedChargingCurrentLimit))
                 {
+                    gLastPublishedChargingCurrentLimit = chargingCurrentLimit;
                     gMqttClient.publish(gMqttTopic.SetString("/charging_current_limit"), 0, false, String(chargingCurrentLimit).c_str());
                 }
             }
             break;
             case (MqttPublishedValues::ChargingPower):
-                gMqttClient.publish(gMqttTopic.SetString("/charging_power"), 0, false, String(gWallbox->GetChargingPower()).c_str());
-                break;
+            {
+                float chargingPower = gWallbox->GetChargingPower();
+                if (FloatChanged(chargingPower, gLastPublishedChargingPower))
+                {
+                    gLastPublishedChargingPower = chargingPower;
+                    gMqttClient.publish(gMqttTopic.SetString("/charging_power"), 0, false, String(chargingPower).c_str());
+                }
+            }
+            break;
             case (MqttPublishedValues::FailsafeCurrent):
-                gMqttClient.publish(gMqttTopic.SetString("/failsafe_current"), 0, false, String(gWallbox->GetFailsafeCurrent()).c_str());
-                break;
+            {
+                float failsafeCurrent = gWallbox->GetFailsafeCurrent();
+                if (FloatChanged(failsafeCurrent, gLastPublishedFailsafeCurrent))
+                {
+                    gLastPublishedFailsafeCurrent = failsafeCurrent;
+                    gMqttClient.publish(gMqttTopic.SetString("/failsafe_current"), 0, false, String(failsafeCurrent).c_str());
+                }
+            }
+            break;
             case (MqttPublishedValues::EnergyMeter):
-                gMqttClient.publish(gMqttTopic.SetString("/energy_meter"), 0, false, String(gWallbox->GetEnergyMeterValue() * Constants::General::FactorWhToKWh).c_str());
-                break;
+            {
+                float energyMeter = gWallbox->GetEnergyMeterValue() * Constants::General::FactorWhToKWh;
+                if (FloatChanged(energyMeter, gLastPublishedEnergyMeter))
+                {
+                    gLastPublishedEnergyMeter = energyMeter;
+                    gMqttClient.publish(gMqttTopic.SetString("/energy_meter"), 0, false, String(energyMeter).c_str());
+                }
+            }
+            break;
             case (MqttPublishedValues::ChargingCurrent):
+            {
                 float c1, c2, c3;
                 if (gWallbox->GetChargingCurrents(c1, c2, c3))
                 {
-                    gMqttClient.publish(gMqttTopic.SetString("/charging_current/phase1"), 0, false, String(c1).c_str());
-                    gMqttClient.publish(gMqttTopic.SetString("/charging_current/phase2"), 0, false, String(c2).c_str());
-                    gMqttClient.publish(gMqttTopic.SetString("/charging_current/phase3"), 0, false, String(c3).c_str());
+                    bool changed = FloatChanged(c1, gLastPublishedChargingCurrent1) ||
+                                   FloatChanged(c2, gLastPublishedChargingCurrent2) ||
+                                   FloatChanged(c3, gLastPublishedChargingCurrent3);
+                    if (changed)
+                    {
+                        gLastPublishedChargingCurrent1 = c1;
+                        gLastPublishedChargingCurrent2 = c2;
+                        gLastPublishedChargingCurrent3 = c3;
+                        gMqttClient.publish(gMqttTopic.SetString("/charging_current/phase1"), 0, false, String(c1).c_str());
+                        gMqttClient.publish(gMqttTopic.SetString("/charging_current/phase2"), 0, false, String(c2).c_str());
+                        gMqttClient.publish(gMqttTopic.SetString("/charging_current/phase3"), 0, false, String(c3).c_str());
+                    }
                 }
-                break;
+            }
+            break;
             case (MqttPublishedValues::ChargingVoltage):
+            {
                 float v1, v2, v3;
                 if (gWallbox->GetChargingVoltages(v1, v2, v3))
                 {
-                    gMqttClient.publish(gMqttTopic.SetString("/charging_voltage/phase1"), 0, false, String(v1).c_str());
-                    gMqttClient.publish(gMqttTopic.SetString("/charging_voltage/phase2"), 0, false, String(v2).c_str());
-                    gMqttClient.publish(gMqttTopic.SetString("/charging_voltage/phase3"), 0, false, String(v3).c_str());
+                    bool changed = FloatChanged(v1, gLastPublishedChargingVoltage1) ||
+                                   FloatChanged(v2, gLastPublishedChargingVoltage2) ||
+                                   FloatChanged(v3, gLastPublishedChargingVoltage3);
+                    if (changed)
+                    {
+                        gLastPublishedChargingVoltage1 = v1;
+                        gLastPublishedChargingVoltage2 = v2;
+                        gLastPublishedChargingVoltage3 = v3;
+                        gMqttClient.publish(gMqttTopic.SetString("/charging_voltage/phase1"), 0, false, String(v1).c_str());
+                        gMqttClient.publish(gMqttTopic.SetString("/charging_voltage/phase2"), 0, false, String(v2).c_str());
+                        gMqttClient.publish(gMqttTopic.SetString("/charging_voltage/phase3"), 0, false, String(v3).c_str());
+                    }
                 }
-                break;
+            }
+            break;
             case (MqttPublishedValues::Temperature):
-                gMqttClient.publish(gMqttTopic.SetString("/temperature"), 0, false, String(gWallbox->GetTemperature()).c_str());
-                break;
+            {
+                float temperature = gWallbox->GetTemperature();
+                if (FloatChanged(temperature, gLastPublishedTemperature))
+                {
+                    gLastPublishedTemperature = temperature;
+                    gMqttClient.publish(gMqttTopic.SetString("/temperature"), 0, false, String(temperature).c_str());
+                }
+            }
+            break;
 
             case (MqttPublishedValues::Internals):
-                gMqttClient.publish(gMqttTopic.SetString("/internal/wifi_disconnects"), 0, false, String(gStatistics.NumWifiDisconnects).c_str());
-                gMqttClient.publish(gMqttTopic.SetString("/internal/mqtt_disconnects"), 0, false, String(gStatistics.NumMqttDisconnects).c_str());
-                gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_read_errors"), 0, false, String(gStatistics.NumModbusReadErrors).c_str());
-                gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_write_errors"), 0, false, String(gStatistics.NumModbusWriteErrors).c_str());
-                break;
+            {
+                // Only publish if values have changed
+                bool statsChanged = (gStatistics.NumWifiDisconnects != gLastWifiDisconnects) ||
+                                    (gStatistics.NumMqttDisconnects != gLastMqttDisconnects) ||
+                                    (gStatistics.NumModbusReadErrors != gLastModbusReadErrors) ||
+                                    (gStatistics.NumModbusWriteErrors != gLastModbusWriteErrors);
+                if (statsChanged)
+                {
+                    gLastWifiDisconnects = gStatistics.NumWifiDisconnects;
+                    gLastMqttDisconnects = gStatistics.NumMqttDisconnects;
+                    gLastModbusReadErrors = gStatistics.NumModbusReadErrors;
+                    gLastModbusWriteErrors = gStatistics.NumModbusWriteErrors;
+                    gMqttClient.publish(gMqttTopic.SetString("/internal/wifi_disconnects"), 0, false, String(gStatistics.NumWifiDisconnects).c_str());
+                    gMqttClient.publish(gMqttTopic.SetString("/internal/mqtt_disconnects"), 0, false, String(gStatistics.NumMqttDisconnects).c_str());
+                    gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_read_errors"), 0, false, String(gStatistics.NumModbusReadErrors).c_str());
+                    gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_write_errors"), 0, false, String(gStatistics.NumModbusWriteErrors).c_str());
+                }
+            }
+            break;
 
             case (MqttPublishedValues::Discovery):
                 PublishHomeAssistantDiscovery();
                 break;
             }
 
-            // Increment the current value index and wrap around if it exceeds the number of published values
+            // Increment the current value index and wrap around
             gCurValueIndex = (gCurValueIndex + 1) % NumMqttPublishedValues;
 
-            // These values are published every cycle
-            gMqttClient.publish(gMqttTopic.SetString("/internal/uptime"), 0, false, String(gStatistics.UptimeS).c_str());
+            // Publish uptime only every 10 seconds (not at every update)
+            if ((currentTimeMs - gLastUptimePublishTimeMs) >= Constants::MQTT::UptimePublishIntervalMs)
+            {
+                gLastUptimePublishTimeMs = currentTimeMs;
+                gMqttClient.publish(gMqttTopic.SetString("/internal/uptime"), 0, false, String(gStatistics.UptimeS).c_str());
+            }
 
-            gMqttClient.publish(gMqttTopic.SetString("/enable_charging"), 0, true,
-                                gWallbox->IsChargingEnabled() ? "ON" : "OFF");
+            // Publish enable_charging and standby_enabled only when they change
+            bool chargingEnabled = gWallbox->IsChargingEnabled();
+            if (chargingEnabled != gLastPublishedChargingEnabled)
+            {
+                gLastPublishedChargingEnabled = chargingEnabled;
+                gMqttClient.publish(gMqttTopic.SetString("/enable_charging"), 0, true,
+                                   chargingEnabled ? "ON" : "OFF");
+            }
 
-            gMqttClient.publish(gMqttTopic.SetString("/standby_enabled"), 0, true,
-                                gWallbox->GetStandbyEnabled() ? "ON" : "OFF");
+            bool standbyEnabled = gWallbox->GetStandbyEnabled();
+            if (standbyEnabled != gLastPublishedStandbyEnabled)
+            {
+                gLastPublishedStandbyEnabled = standbyEnabled;
+                gMqttClient.publish(gMqttTopic.SetString("/standby_enabled"), 0, true,
+                                   standbyEnabled ? "ON" : "OFF");
+            }
         }
     }
 

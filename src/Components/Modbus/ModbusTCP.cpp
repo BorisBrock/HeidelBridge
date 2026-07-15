@@ -4,6 +4,7 @@
 #include "ModbusServerWiFi.h"
 #include "../../Configuration/Constants.h"
 #include "../Wallbox/IWallbox.h"
+#include "../../Utils/DeviceInfo.h"
 #include "ModbusTCP.h"
 
 namespace ModbusTCP
@@ -134,13 +135,29 @@ namespace ModbusTCP
             break;
         }
         case (Constants::DaheimladenRegisters::RfidStationId):
+        {
+            Logger::Trace(" -> Responding with station serial number");
+            responseLengthBytes = 32;
+            const String serial = DeviceInfo::GetDeviceSerialNumber();
+            response.add(request.getServerID(), fc, responseLengthBytes);
+            for (uint i = 0; i < 16; ++i)
+            {
+                const size_t charIndex = i * 2;
+                const uint8_t highByte = charIndex < serial.length() ? static_cast<uint8_t>(serial[charIndex]) : 0;
+                const uint8_t lowByte = (charIndex + 1) < serial.length() ? static_cast<uint8_t>(serial[charIndex + 1]) : 0;
+                const uint16_t reg = (static_cast<uint16_t>(highByte) << 8) | lowByte;
+                response.add(reg);
+            }
+            break;
+        }
         case (Constants::DaheimladenRegisters::RfidCardId):
         {
-            Logger::Trace(" -> Responding with ID");
+            // Not supported: this would represent the currently scanned RFID card, not a fixed device property
+            Logger::Trace(" -> Responding with RFID card ID (not supported, returning empty)");
             responseLengthBytes = 32;
-            const uint32_t dummyValue = 0;
+            const uint16_t dummyValue = 0;
             response.add(request.getServerID(), fc, responseLengthBytes);
-            for (uint i = 0; i < 8; ++i)
+            for (uint i = 0; i < 16; ++i)
                 response.add(dummyValue);
             break;
         }

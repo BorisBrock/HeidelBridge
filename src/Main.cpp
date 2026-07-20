@@ -39,16 +39,16 @@ void setup()
 #endif
   Logger::Print("");
 
+  // Read persistent settings
+  Settings::Instance()->Init();
+  Settings::Instance()->ReadFromPersistentMemory();
+  Settings::Instance()->Print();
+
   // Prepare the board
   auto* board = BoardFactory::Instance()->GetBoard();
   Logger::Print("Used hardware board:");
   board->Print();
   board->Init();
-  
-  // Read persistent settings
-  Settings::Instance()->Init();
-  Settings::Instance()->ReadFromPersistentMemory();
-  Settings::Instance()->Print();
 
   // Make sure WiFi connection is up and running
   WifiManager::Instance()->Start();

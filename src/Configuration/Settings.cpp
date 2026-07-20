@@ -38,6 +38,7 @@ void Settings::ReadFromPersistentMemory()
     MqttServer = gPreferences.getString("mqtt_server");
     MqttUser = gPreferences.getString("mqtt_user");
     MqttPassword = gPreferences.getString("mqtt_password");
+    BoardType = gPreferences.getString("board_type", "generic");
 }
 
 // Write all settings to storage
@@ -53,6 +54,7 @@ void Settings::WriteToPersistentMemory()
     gPreferences.putString("mqtt_server", MqttServer);
     gPreferences.putString("mqtt_user", MqttUser);
     gPreferences.putString("mqtt_password", MqttPassword);
+    gPreferences.putString("board_type", BoardType);
 }
 
 // Prints all settings to the logger

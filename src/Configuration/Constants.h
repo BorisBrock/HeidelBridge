@@ -10,6 +10,7 @@ namespace Constants
 
     namespace ModbusRTU
     {
+        constexpr uint8_t PinRTS = GPIO_NUM_21;
         constexpr uint8_t RegisterSize = 2;
         constexpr uint16_t NumReadRetries = 3;
         constexpr uint16_t NumWriteRetries = 5;

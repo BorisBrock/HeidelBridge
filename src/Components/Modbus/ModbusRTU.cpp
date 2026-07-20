@@ -8,9 +8,9 @@
 #include "../../Boards/Board.h"
 #include "ModbusRTU.h"
 
-ModbusClientRTU gModbusRTU(BoardFactory::Instance()->GetBoard()->GetPinRts()); // Create a ModbusRTU client instance
-HardwareSerial gRs485Serial(1);                                                // Define a Serial for UART1
-SemaphoreHandle_t gMutex = nullptr;                                            // A mutex object for buss access
+ModbusClientRTU gModbusRTU(Constants::ModbusRTU::PinRTS); // Create a ModbusRTU client instance
+HardwareSerial gRs485Serial(1);                           // Define a Serial for UART1
+SemaphoreHandle_t gMutex = nullptr;                       // A mutex object for buss access
 
 // Returns the singleton instance of ModbusRTU
 ModbusRTU *ModbusRTU::Instance()

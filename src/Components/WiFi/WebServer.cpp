@@ -197,6 +197,7 @@ String WebServer::HandleApiRequestSettingsRead(AsyncWebServerRequest *request)
     doc["mqtt-port"] = Settings::Instance()->MqttPort;
     doc["mqtt-user"] = Settings::Instance()->MqttUser;
     doc["mqtt-password"] = Settings::Instance()->MqttPassword;
+    doc["board-type"] = Settings::Instance()->BoardType;
 
     String jsonResponse;
     serializeJson(doc, jsonResponse);
@@ -248,6 +249,10 @@ String WebServer::HandleApiRequestSettingsWrite(AsyncWebServerRequest *request, 
     if (doc["mqtt-password"].is<String>())
     {
         Settings::Instance()->MqttPassword = doc["mqtt-password"].as<String>();
+    }
+    if (doc["board-type"].is<String>())
+    {
+        Settings::Instance()->BoardType = doc["board-type"].as<String>();
     }
 
     Settings::Instance()->WriteToPersistentMemory();

@@ -33,4 +33,5 @@ public:
     uint16_t MqttPort{1883};
     String MqttUser{};
     String MqttPassword{};
+    String BoardType{"generic"};
 };

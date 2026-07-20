@@ -2,15 +2,13 @@
 #include "../Logger/Logger.h"
 #include "../Statistics/Statistics.h"
 #include "HardwareSerial.h"
-#include "ModbusClientRTU.h"
 #include "../../Configuration/Constants.h"
 #include "../../Boards/BoardFactory.h"
 #include "../../Boards/Board.h"
 #include "ModbusRTU.h"
 
-ModbusClientRTU gModbusRTU(BoardFactory::Instance()->GetBoard()->GetPinRts()); // Create a ModbusRTU client instance
-HardwareSerial gRs485Serial(1);                                                // Define a Serial for UART1
-SemaphoreHandle_t gMutex = nullptr;                                            // A mutex object for buss access
+HardwareSerial gRs485Serial(1);                           // Define a Serial for UART1
+SemaphoreHandle_t gMutex = nullptr;                       // A mutex object for buss access
 
 // Returns the singleton instance of ModbusRTU
 ModbusRTU *ModbusRTU::Instance()
@@ -36,8 +34,9 @@ void ModbusRTU::Init()
 
     // Start Modbus RTU
     Logger::Trace("Creating Modbus RTU instance");
-    gModbusRTU.setTimeout(Constants::HeidelbergWallbox::ModbusTimeoutMs);
-    gModbusRTU.begin(gRs485Serial); // Start ModbusRTU background task
+    modbusClient = new ModbusClientRTU(BoardFactory::Instance()->GetBoard()->GetPinRts());
+    modbusClient->setTimeout(Constants::HeidelbergWallbox::ModbusTimeoutMs);
+    modbusClient->begin(gRs485Serial); // Start ModbusRTU background task
 }
 
 // Reads multiple registers starting from the specified address
@@ -51,7 +50,7 @@ bool ModbusRTU::ReadRegisters(uint16_t startAddress, uint8_t numValues, uint8_t 
         // Try to get the mutex
         if (xSemaphoreTake(gMutex, portMAX_DELAY))
         {
-            ModbusMessage response = gModbusRTU.syncRequest(
+            ModbusMessage response = modbusClient->syncRequest(
                 0,
                 Constants::HeidelbergWallbox::ModbusServerId,
                 (FunctionCode)fc,
@@ -103,7 +102,7 @@ bool ModbusRTU::WriteHoldRegister16(uint16_t address, uint16_t value)
         // Try to get the mutex
         if (xSemaphoreTake(gMutex, portMAX_DELAY))
         {
-            ModbusMessage response = gModbusRTU.syncRequest(
+            ModbusMessage response = modbusClient->syncRequest(
                 0,
                 Constants::HeidelbergWallbox::ModbusServerId,
                 WRITE_HOLD_REGISTER,

@@ -32,7 +32,7 @@ Parts list:
 This should be enough for quickly putting together a fully functioning prototype.
 Of course a well designed PCB would be much nicer, but this is still work in progress. Once the design is ready, the schematics will be available *right here*.
 
-> *\* This project supports the classic ESP32. It has not been built/tested for newer models, like the S2 and C6. Additionally the LILYGO T-CAN485 board is supported, which already includes an on-board RS485 transceiver.*
+> *\* This project supports the classic ESP32 and the LILYGO T-CAN485 board (with on-board RS485 transceiver). The hardware type is selected in the web interface during initial setup. It has not been built/tested for newer ESP32 models like the S2 and C6.*
 
 # Getting Started
 

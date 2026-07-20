@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById("mqtt-port").value = data["mqtt-port"];
         document.getElementById("mqtt-user").value = data["mqtt-user"];
         document.getElementById("mqtt-password").value = data["mqtt-password"];
+        document.getElementById("board-type").value = data["board-type"] || "generic";
     } catch (error) {
         console.error(`Error: ${error.message}`);
     }
@@ -41,7 +42,8 @@ function writeSettings() {
         "mqtt-server": document.getElementById("mqtt-server").value,
         "mqtt-port": parseInt(document.getElementById("mqtt-port").value),
         "mqtt-user": document.getElementById("mqtt-user").value,
-        "mqtt-password": document.getElementById("mqtt-password").value
+        "mqtt-password": document.getElementById("mqtt-password").value,
+        "board-type": document.getElementById("board-type").value
     };
     fetch("/api/settings_write", {
         method: "POST",

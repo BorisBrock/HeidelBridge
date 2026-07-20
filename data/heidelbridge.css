@@ -10,7 +10,7 @@
   background-color: #3f398d;
   border-color: #3f398d;
   border-radius: 10px;
-  margin-top: 32px;
+  margin-top: 8px;
 }
 
 .hb-block-button:hover {
@@ -42,3 +42,11 @@
   height: 40px;
   object-fit: cover;
 }
+
+h3{
+  margin-top: 16px;
+}
+
+.spacer {
+     margin-bottom: 16px;
+  }

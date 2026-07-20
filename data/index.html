@@ -26,6 +26,14 @@
         <input type="text" id="device-name" name="device-name" value="HeidelBridge" />
 
 
+        <h3>Hardware</h3>
+
+        <select id="board-type" name="board-type">
+            <option value="generic">Generic ESP32 + MAX485</option>
+            <option value="lilygo">LilyGo T-CAN485</option>
+        </select>
+        
+
         <h3>WiFi Connection</h3>
 
         <input type="text" id="wifi-ssid" name="wifi-ssid" placeholder="Network name (SSID)" />
@@ -47,7 +55,11 @@
         <input type="text" id="mqtt-user" name="mqtt-user" placeholder="User name (optional)" />
         <input type="password" id="mqtt-password" name="mqtt-password" placeholder="Password (optional)" />
 
+
+        <p class="spacer"></p>
+
         <button class="hb-block-button" onclick="writeSettings();">Apply and restart</button>
+        <a href="/update"><button class="hb-block-button">Update firmware...</button></a>
 
     </main>
 

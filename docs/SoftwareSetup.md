@@ -60,48 +60,21 @@ Then follow these steps:
 
 ## Build Environments
 
-HeidelBridge supports multiple build environments to accommodate different hardware configurations:
+HeidelBridge supports two build environments:
 
-### Standard ESP32 + External RS485 Module (`esp32`)
+### Standard Build (`esp32`)
 
-This is the default build environment for regular ESP32 development boards with an external RS485 module.
-
-**To compile:**
-
-```bash
-pio run -e esp32
-```
-
-**Pin configuration:**
-
-- GPIO18 → RS485 RO (Receiver Output)
-- GPIO19 → RS485 DI (Driver Input)  
-- GPIO21 → RS485 DE+RE
-
-### LilyGo T-Can485 Board (`lilygo`)
-
-This build environment is specifically designed for the LilyGo T-Can485 board, which has built-in RS485 capabilities and **does not require an external MAX485 module**.
+This is the default build for production use with either a Generic ESP32 + MAX485 module or a LilyGo T-CAN485 board.
 
 **To compile:**
 
 ```bash
-pio run -e lilygo
+pio run
 ```
 
-**Pin configuration:**
+**Hardware selection:**
 
-- GPIO21 → RS485 RO (Receiver Output)
-- GPIO22 → RS485 DI (Driver Input)
-- GPIO21 → RS485 DE+RE
-
-**Additional features:**
-
-- Automatic initialization of onboard RS485 transceivers
-- 5V power supply control
-- CAN bus support (hardware available but not used in current firmware)
-- **No external MAX485 module needed** - RS485 transceiver is built into the board
-
-For detailed wiring information and hardware setup for the LilyGo T-Can485 board, please refer to the [discussion thread](https://github.com/BorisBrock/HeidelBridge/discussions/4).
+The hardware type is selected in the web interface during initial setup. After flashing, connect to the captive portal (`HeidelBridge Setup`) and choose either "Generic ESP32 + MAX485" or "LilyGo T-CAN485" under the Hardware section.
 
 ### Dummy Wallbox (`dummy`)
 

@@ -1,10 +1,14 @@
 #pragma once
 
+#include "ModbusClientRTU.h"
+
 class ModbusRTU
 {
 private:
     // Private constructor to prevent instantiation
     ModbusRTU() {};
+
+    ModbusClientRTU* modbusClient = nullptr;
 
 public:
     // Returns the singleton instance of ModbusRTU

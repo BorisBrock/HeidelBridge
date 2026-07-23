@@ -3,10 +3,11 @@
 
 namespace DeviceInfo
 {
-    // Returns a stable, unique-per-device serial number string derived from the ESP32's factory eFuse MAC address
+    // Returns the device serial number
     String GetDeviceSerialNumber()
     {
-        static String serial;
+        // Returns a stable, unique-per-device serial number string derived from the ESP32's factory eFuse MAC address
+        /*static String serial;
         if (serial.isEmpty())
         {
             const uint64_t efuseMac = ESP.getEfuseMac();
@@ -14,6 +15,9 @@ namespace DeviceInfo
             snprintf(buffer, sizeof(buffer), "%012llX", efuseMac);
             serial = String(buffer);
         }
-        return serial;
+        return serial;*/
+
+        // Returns the fixed string "heidelbridge"
+        return "heidelbridge";
     }
 }

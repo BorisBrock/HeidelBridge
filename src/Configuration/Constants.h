@@ -23,6 +23,9 @@ namespace Constants
         constexpr float VoltageFactor = 1.0f;
         constexpr float TemperatureFactor = 0.1f;
         constexpr float InitialChargingCurrentLimitA = 16.0f;
+        // The wallbox accepts 0 A (charging blocked) or 6-16 A. Nothing in between.
+        constexpr float MinChargingCurrentA = 6.0f;
+        constexpr float MaxChargingCurrentA = 16.0f;
         constexpr uint8_t ModbusServerId = 1;
         constexpr uint32_t ModbusBaudrate = 19200;
         constexpr uint16_t ModbusTimeoutMs = 2000;

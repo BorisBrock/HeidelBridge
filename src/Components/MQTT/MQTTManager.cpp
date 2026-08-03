@@ -58,7 +58,11 @@ namespace MQTTManager
         StringUtils::InsertString(topic, TopicBuffer, sizeof(TopicBuffer), '%', Settings::Instance()->DeviceName.c_str());
         StringUtils::InsertString(payload, PayloadBuffer, sizeof(PayloadBuffer), '%', Settings::Instance()->DeviceName.c_str());
 
-        gMqttClient.publish(TopicBuffer, 1, false, PayloadBuffer);
+        // Discovery messages must be retained: they are only published when this
+        // device connects to the broker, so without the retain flag a Home
+        // Assistant instance that restarts later finds nothing under
+        // homeassistant/+/+/config and cannot rebuild the entities.
+        gMqttClient.publish(TopicBuffer, 1, true, PayloadBuffer);
     }
 
     // Publishes MQTT discovery messages for Home Assistant integration

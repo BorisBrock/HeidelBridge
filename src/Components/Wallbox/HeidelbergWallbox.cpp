@@ -10,35 +10,32 @@ HeidelbergWallbox *HeidelbergWallbox::Instance()
     return &instance;
 }
 
-namespace
+// The wallbox accepts 0 A or 6-16 A. Below the minimum means blocked, which is
+// also what a client writing 0 to stop charging expects.
+float HeidelbergWallbox::ClampToWallboxRange(float currentLimitA)
 {
-    // The wallbox accepts 0 A or 6-16 A. Below the minimum means blocked, which is
-    // also what a client writing 0 to stop charging expects.
-    float ClampToWallboxRange(float currentLimitA)
+    if (currentLimitA < Constants::HeidelbergWallbox::MinChargingCurrentA)
     {
-        if (currentLimitA < Constants::HeidelbergWallbox::MinChargingCurrentA)
-        {
-            return 0.0f;
-        }
-        if (currentLimitA > Constants::HeidelbergWallbox::MaxChargingCurrentA)
-        {
-            return Constants::HeidelbergWallbox::MaxChargingCurrentA;
-        }
-        return currentLimitA;
+        return 0.0f;
     }
+    if (currentLimitA > Constants::HeidelbergWallbox::MaxChargingCurrentA)
+    {
+        return Constants::HeidelbergWallbox::MaxChargingCurrentA;
+    }
+    return currentLimitA;
+}
 
-    // 0 A blocks charging, 6-16 A permits it
-    bool WriteCurrentLimitRegister(float currentLimitA)
+// 0 A blocks charging, 6-16 A permits it
+bool HeidelbergWallbox::WriteCurrentLimitRegister(float currentLimitA)
+{
+    const uint16_t rawCurrent = static_cast<uint16_t>(currentLimitA / Constants::HeidelbergWallbox::CurrentFactor);
+    if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::MaximalCurrent, rawCurrent))
     {
-        const uint16_t rawCurrent = static_cast<uint16_t>(currentLimitA / Constants::HeidelbergWallbox::CurrentFactor);
-        if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::MaximalCurrent, rawCurrent))
-        {
-            // Error writing modbus register
-            Logger::Error("Heidelberg wallbox: ERROR: Could not set maximum charging current");
-            return false;
-        }
-        return true;
+        // Error writing modbus register
+        Logger::Error("Heidelberg wallbox: ERROR: Could not set maximum charging current");
+        return false;
     }
+    return true;
 }
 
 void HeidelbergWallbox::Init()

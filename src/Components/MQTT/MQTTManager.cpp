@@ -25,6 +25,7 @@ namespace MQTTManager
     uint8_t gCurValueIndex = 0;
     char TopicBuffer[128];
     char PayloadBuffer[1024];
+    char AvailabilityTopic[128];
     PrefixedString gMqttTopic(128);
 
     constexpr uint16_t NumMqttPublishedValues = 10;
@@ -58,7 +59,20 @@ namespace MQTTManager
         StringUtils::InsertString(topic, TopicBuffer, sizeof(TopicBuffer), '%', Settings::Instance()->DeviceName.c_str());
         StringUtils::InsertString(payload, PayloadBuffer, sizeof(PayloadBuffer), '%', Settings::Instance()->DeviceName.c_str());
 
-        gMqttClient.publish(TopicBuffer, 1, true, PayloadBuffer);
+        // Publishing many discovery messages back-to-back can exceed the client's TCP
+        // send buffer, causing publish() to silently drop the message (it returns 0).
+        // Retry briefly instead of losing the config message.
+        constexpr uint8_t MaxPublishAttempts = 5;
+        for (uint8_t attempt = 0; attempt < MaxPublishAttempts; attempt++)
+        {
+            if (gMqttClient.publish(TopicBuffer, 1, true, PayloadBuffer) != 0)
+            {
+                return;
+            }
+            delay(20);
+        }
+
+        Logger::Warning("MQTT: Failed to publish discovery topic %s", TopicBuffer);
     }
 
     // Publishes MQTT discovery messages for Home Assistant integration
@@ -71,6 +85,7 @@ namespace MQTTManager
                 "name":"Vehicle connected",
                 "device_class":"plug",
                 "state_topic":"%/is_vehicle_connected",
+                "availability_topic":"%/status",
                 "payload_on":"1",
                 "payload_off":"0",
                 "unique_id":"%_is_vehicle_connected",
@@ -83,6 +98,7 @@ namespace MQTTManager
                 "name":"Vehicle charging",
                 "device_class":"battery_charging",
                 "state_topic":"%/is_vehicle_charging",
+                "availability_topic":"%/status",
                 "payload_on":"1",
                 "payload_off":"0",
                 "unique_id":"%_is_vehicle_charging",
@@ -96,6 +112,7 @@ namespace MQTTManager
                 "device_class":"power",
                 "state_class":"measurement",
                 "state_topic":"%/charging_power",
+                "availability_topic":"%/status",
                 "unique_id":"%_charging_power",
                 "default_entity_id":"sensor.%_charging_power",
                 "unit_of_measurement":"W",
@@ -108,6 +125,7 @@ namespace MQTTManager
                 "device_class":"current",
                 "state_class":"measurement",
                 "state_topic":"%/charging_current/phase1",
+                "availability_topic":"%/status",
                 "unique_id":"%_charging_current_phase1",
                 "default_entity_id":"sensor.%_charging_current_phase1",
                 "unit_of_measurement":"A",
@@ -120,6 +138,7 @@ namespace MQTTManager
                 "device_class":"current",
                 "state_class":"measurement",
                 "state_topic":"%/charging_current/phase2",
+                "availability_topic":"%/status",
                 "unique_id":"%_charging_current_phase2",
                 "default_entity_id":"sensor.%_charging_current_phase2",
                 "unit_of_measurement":"A",
@@ -132,6 +151,7 @@ namespace MQTTManager
                 "device_class":"current",
                 "state_class":"measurement",
                 "state_topic":"%/charging_current/phase3",
+                "availability_topic":"%/status",
                 "unique_id":"%_charging_current_phase3",
                 "default_entity_id":"sensor.%_charging_current_phase3",
                 "unit_of_measurement":"A",
@@ -144,6 +164,7 @@ namespace MQTTManager
                 "device_class":"current",
                 "state_class":"measurement",
                 "state_topic":"%/charging_current_limit",
+                "availability_topic":"%/status",
                 "unique_id":"%_charging_current_limit",
                 "default_entity_id":"sensor.%_charging_current_limit",
                 "unit_of_measurement":"A",
@@ -155,6 +176,7 @@ namespace MQTTManager
                 "name":"Energy meter",
                 "device_class":"energy",
                 "state_topic":"%/energy_meter",
+                "availability_topic":"%/status",
                 "state_class":"total_increasing",
                 "unique_id":"%_energy_meter",
                 "default_entity_id":"sensor.%_energy_meter",
@@ -168,6 +190,7 @@ namespace MQTTManager
                 "device_class":"temperature",
                 "state_class":"measurement",
                 "state_topic":"%/temperature",
+                "availability_topic":"%/status",
                 "unique_id":"%_temperature",
                 "default_entity_id":"sensor.%_temperature",
                 "unit_of_measurement":"°C",
@@ -180,6 +203,7 @@ namespace MQTTManager
                 "device_class":"voltage",
                 "state_class":"measurement",
                 "state_topic":"%/charging_voltage/phase1",
+                "availability_topic":"%/status",
                 "unique_id":"%_charging_voltage_phase1",
                 "default_entity_id":"sensor.%_charging_voltage_phase1",
                 "unit_of_measurement":"V",
@@ -192,6 +216,7 @@ namespace MQTTManager
                 "device_class":"voltage",
                 "state_class":"measurement",
                 "state_topic":"%/charging_voltage/phase2",
+                "availability_topic":"%/status",
                 "unique_id":"%_charging_voltage_phase2",
                 "default_entity_id":"sensor.%_charging_voltage_phase2",
                 "unit_of_measurement":"V",
@@ -204,6 +229,7 @@ namespace MQTTManager
                 "device_class":"voltage",
                 "state_class":"measurement",
                 "state_topic":"%/charging_voltage/phase3",
+                "availability_topic":"%/status",
                 "unique_id":"%_charging_voltage_phase3",
                 "default_entity_id":"sensor.%_charging_voltage_phase3",
                 "unit_of_measurement":"V",
@@ -215,6 +241,7 @@ namespace MQTTManager
                 "name":"Enable Charging",
                 "state_topic":"%/enable_charging",
                 "command_topic":"%/control/enable_charging",
+                "availability_topic":"%/status",
                 "unique_id":"%control_enable_charging",
                 "default_entity_id":"switch.%_control_enable_charging",
                 "payload_on":"ON",
@@ -227,6 +254,7 @@ namespace MQTTManager
                 "name":"Standby Mode",
                 "state_topic":"%/standby_enabled",
                 "command_topic":"%/control/standby",
+                "availability_topic":"%/status",
                 "unique_id":"%_control_standby",
                 "default_entity_id":"switch.%_control_standby",
                 "payload_on":"ON",
@@ -239,6 +267,7 @@ namespace MQTTManager
                 "name":"Charging Current Limit",
                 "command_topic":"%/control/charging_current_limit",
                 "state_topic":"%/charging_current_limit",
+                "availability_topic":"%/status",
                 "min":6,
                 "max":16,
                 "step":1,
@@ -360,6 +389,9 @@ namespace MQTTManager
         gMqttClient.publish(gMqttTopic.SetString("/build_date"), 0, true, __DATE__);
         gMqttClient.publish(gMqttTopic.SetString("/ip_address"), 0, true, WiFi.localIP().toString().c_str());
 
+        // Birth message: signals the device is back online (counterpart to the LWT)
+        gMqttClient.publish(AvailabilityTopic, 1, true, "online");
+
         // Publish discovery data
         PublishHomeAssistantDiscovery();
     }
@@ -412,6 +444,12 @@ namespace MQTTManager
         gMqttTopic.SetPrefix(Settings::Instance()->DeviceName.c_str());
 
         gWallbox = wallbox;
+
+        // Last Will & Testament: lets Home Assistant mark the device (and its
+        // entities via availability_topic) unavailable if the connection drops
+        // unexpectedly, instead of showing stale last-known values forever.
+        snprintf(AvailabilityTopic, sizeof(AvailabilityTopic), "%s/status", Settings::Instance()->DeviceName.c_str());
+        gMqttClient.setWill(AvailabilityTopic, 1, true, "offline");
 
         // Register event callbacks
         gMqttClient.onConnect(OnMqttConnect);

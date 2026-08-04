@@ -28,6 +28,12 @@ void HeidelbergWallbox::Init()
         // Error writing modbus register
         Logger::Error("ERROR: Could not configure standby");
     }
+    else
+    {
+        // Remember what was just written, so the reported state matches the
+        // register even if reads later fail.
+        mStandbyEnabled = Constants::HeidelbergWallbox::AllowStandby;
+    }
 
     // Disable watchdog
     Logger::Debug("Heidelberg wallbox: Setting watch dog timeout to %d s", Constants::HeidelbergWallbox::WatchdogTimeoutS);

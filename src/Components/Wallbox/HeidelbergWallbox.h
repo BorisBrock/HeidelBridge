@@ -7,6 +7,8 @@ class HeidelbergWallbox : public IWallbox
 {
 private:
     HeidelbergWallbox() {};
+    float ClampToWallboxRange(float currentLimitA);
+    bool WriteCurrentLimitRegister(float currentLimitA);
 
 public:
     static HeidelbergWallbox *Instance();

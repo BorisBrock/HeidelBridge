@@ -30,8 +30,7 @@ void HeidelbergWallbox::Init()
     }
     else
     {
-        // Remember what was just written, so the reported state matches the
-        // register even if reads later fail.
+        // Remember what was just written, so the reported state matches the register even if reads later fail.
         mStandbyEnabled = Constants::HeidelbergWallbox::AllowStandby;
     }
 

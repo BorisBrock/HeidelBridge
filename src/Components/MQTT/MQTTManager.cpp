@@ -241,7 +241,7 @@ namespace MQTTManager
                 "state_topic":"%/enable_charging",
                 "command_topic":"%/control/enable_charging",
                 "availability_topic":"%/status",
-                "unique_id":"%control_enable_charging",
+                "unique_id":"%_control_enable_charging",
                 "default_entity_id":"switch.%_control_enable_charging",
                 "payload_on":"ON",
                 "payload_off":"OFF",

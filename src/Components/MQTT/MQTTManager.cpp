@@ -62,8 +62,7 @@ namespace MQTTManager
         // Publishing many discovery messages back-to-back can exceed the client's TCP
         // send buffer, causing publish() to silently drop the message (it returns 0).
         // Retry briefly instead of losing the config message.
-        constexpr uint8_t MaxPublishAttempts = 5;
-        for (uint8_t attempt = 0; attempt < MaxPublishAttempts; attempt++)
+        for (uint8_t attempt = 0; attempt < Constants::MQTT::MaxPublishAttempts; attempt++)
         {
             if (gMqttClient.publish(TopicBuffer, 1, true, PayloadBuffer) != 0)
             {

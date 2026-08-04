@@ -7,6 +7,8 @@ class HeidelbergWallbox : public IWallbox
 {
 private:
     HeidelbergWallbox() {};
+    float ClampToWallboxRange(float currentLimitA);
+    bool WriteCurrentLimitRegister(float currentLimitA);
 
 public:
     static HeidelbergWallbox *Instance();
@@ -31,11 +33,11 @@ public:
 
 private:
     VehicleState mState{VehicleState::Disconnected};
-    float mChargingCurrentLimitA{Constants::HeidelbergWallbox::InitialChargingCurrentLimitA};
+    float mRequestedChargingCurrentLimitA{Constants::HeidelbergWallbox::InitialChargingCurrentLimitA}; // intent
+    float mObservedChargingCurrentLimitA{0.0f};                                                        // last read back
     float mFailsafeCurrentA{0.0f};
     float mLastPowerMeterValueW{0.0f};
     float mLastEnergyMeterValueWh{0.0f};
-    bool mChargingEnabled{true};
+    bool mChargingEnabled{true}; // seeded from the wallbox in Init()
     bool mStandbyEnabled{true}; // default: standby enabled
-    float mPreviousChargingCurrentLimitA{Constants::HeidelbergWallbox::InitialChargingCurrentLimitA};
 };

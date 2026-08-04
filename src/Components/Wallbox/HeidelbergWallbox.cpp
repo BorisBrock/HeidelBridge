@@ -10,6 +10,34 @@ HeidelbergWallbox *HeidelbergWallbox::Instance()
     return &instance;
 }
 
+// The wallbox accepts 0 A or 6-16 A. Below the minimum means blocked, which is
+// also what a client writing 0 to stop charging expects.
+float HeidelbergWallbox::ClampToWallboxRange(float currentLimitA)
+{
+    if (currentLimitA < Constants::HeidelbergWallbox::MinChargingCurrentA)
+    {
+        return 0.0f;
+    }
+    if (currentLimitA > Constants::HeidelbergWallbox::MaxChargingCurrentA)
+    {
+        return Constants::HeidelbergWallbox::MaxChargingCurrentA;
+    }
+    return currentLimitA;
+}
+
+// 0 A blocks charging, 6-16 A permits it
+bool HeidelbergWallbox::WriteCurrentLimitRegister(float currentLimitA)
+{
+    const uint16_t rawCurrent = static_cast<uint16_t>(currentLimitA / Constants::HeidelbergWallbox::CurrentFactor);
+    if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::MaximalCurrent, rawCurrent))
+    {
+        // Error writing modbus register
+        Logger::Error("Heidelberg wallbox: ERROR: Could not set maximum charging current");
+        return false;
+    }
+    return true;
+}
+
 void HeidelbergWallbox::Init()
 {
     uint16_t rawCurrent = static_cast<uint16_t>(Constants::HeidelbergWallbox::FailSafeCurrentA / Constants::HeidelbergWallbox::CurrentFactor);
@@ -28,6 +56,11 @@ void HeidelbergWallbox::Init()
         // Error writing modbus register
         Logger::Error("ERROR: Could not configure standby");
     }
+    else
+    {
+        // Remember what was just written, so the reported state matches the register even if reads later fail.
+        mStandbyEnabled = Constants::HeidelbergWallbox::AllowStandby;
+    }
 
     // Disable watchdog
     Logger::Debug("Heidelberg wallbox: Setting watch dog timeout to %d s", Constants::HeidelbergWallbox::WatchdogTimeoutS);
@@ -35,6 +68,30 @@ void HeidelbergWallbox::Init()
     {
         // Error writing modbus register
         Logger::Error("ERROR: Could not set watchdog timeout");
+    }
+
+    // Register 261 keeps its value when this bridge restarts, so seed our state
+    // from it rather than assuming charging is enabled.
+    uint16_t rawLimit[1];
+    if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::MaximalCurrent, 1, 0x3, rawLimit))
+    {
+        mObservedChargingCurrentLimitA = static_cast<float>(rawLimit[0] * Constants::HeidelbergWallbox::CurrentFactor);
+        mChargingEnabled = mObservedChargingCurrentLimitA >= Constants::HeidelbergWallbox::MinChargingCurrentA;
+
+        if (mChargingEnabled)
+        {
+            // Adopt what the wallbox is already applying. Clamped because the
+            // register is 16 bit and another controller may have left a larger
+            // value in it.
+            mRequestedChargingCurrentLimitA = ClampToWallboxRange(mObservedChargingCurrentLimitA);
+        }
+
+        Logger::Info("Heidelberg wallbox: seeded state from register: %f A, charging %s",
+                     mObservedChargingCurrentLimitA, mChargingEnabled ? "enabled" : "disabled");
+    }
+    else
+    {
+        Logger::Error("Heidelberg wallbox: ERROR: Could not read charging current limit during init");
     }
 }
 
@@ -68,50 +125,40 @@ VehicleState HeidelbergWallbox::GetState()
 
 bool HeidelbergWallbox::SetChargingCurrentLimit(float currentLimitA)
 {
-    if (mChargingEnabled)
-    {
-        mChargingCurrentLimitA = currentLimitA;
-        Logger::Info("Heidelberg wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
+    currentLimitA = ClampToWallboxRange(currentLimitA);
+    mRequestedChargingCurrentLimitA = currentLimitA;
 
-        uint16_t rawCurrent = static_cast<uint16_t>(mChargingCurrentLimitA / Constants::HeidelbergWallbox::CurrentFactor);
-        if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::MaximalCurrent, rawCurrent))
-        {
-            // Error writing modbus register
-            Logger::Error("Heidelberg wallbox: ERROR: Could not set maximum charging current");
-        }
-    }
-    else
+    if (!mChargingEnabled)
     {
-        mPreviousChargingCurrentLimitA = currentLimitA;
-        Logger::Info("Heidelberg wallbox: charging is disabled. current limit %f A is not applied", mChargingCurrentLimitA);
+        Logger::Info("Heidelberg wallbox: charging is disabled. current limit %f A is not applied yet", currentLimitA);
+        return true;
     }
 
-    return true;
+    Logger::Info("Heidelberg wallbox: setting charging current limit to %f A", currentLimitA);
+    return WriteCurrentLimitRegister(currentLimitA);
 }
 
 bool HeidelbergWallbox::SetChargingEnabled(bool chargingEnabled)
 {
-    bool ok = true;
+    Logger::Info("Heidelberg wallbox: %s charging", chargingEnabled ? "enabling" : "disabling");
 
-    if (!mChargingEnabled && chargingEnabled)
+    mChargingEnabled = chargingEnabled;
+
+    // Written on every call, not only on a transition: the flag is ours, the
+    // register is the wallbox's, and the two can disagree.
+    if (!chargingEnabled)
     {
-        Logger::Info("Heidelberg wallbox: enabling charging");
-
-        // Enable charging
-        mChargingEnabled = true;
-        ok = SetChargingCurrentLimit(mPreviousChargingCurrentLimitA);
-    }
-    else if (mChargingEnabled && !chargingEnabled)
-    {
-        Logger::Info("Heidelberg wallbox: disabling charging");
-
-        // Disable charging
-        mPreviousChargingCurrentLimitA = mChargingCurrentLimitA;
-        ok = SetChargingCurrentLimit(0.0f);
-        mChargingEnabled = false;
+        return WriteCurrentLimitRegister(0.0f);
     }
 
-    return ok;
+    // A setpoint below the minimum would leave charging blocked, which contradicts
+    // the request to enable it. Fall back to the default.
+    if (mRequestedChargingCurrentLimitA < Constants::HeidelbergWallbox::MinChargingCurrentA)
+    {
+        mRequestedChargingCurrentLimitA = Constants::HeidelbergWallbox::InitialChargingCurrentLimitA;
+    }
+
+    return WriteCurrentLimitRegister(mRequestedChargingCurrentLimitA);
 }
 
 bool HeidelbergWallbox::IsChargingEnabled()
@@ -167,19 +214,21 @@ bool HeidelbergWallbox::GetStandbyEnabled()
 
 float HeidelbergWallbox::GetChargingCurrentLimit()
 {
+    // Telemetry only. Must not write mRequestedChargingCurrentLimitA: a reading of
+    // 0 A would destroy the limit to apply the next time charging is enabled.
     uint16_t registerValue[1];
     if (ModbusRTU::Instance()->ReadRegisters(Constants::HeidelbergRegisters::MaximalCurrent, 1, 0x3, registerValue))
     {
-        mChargingCurrentLimitA = static_cast<float>(registerValue[0] * Constants::HeidelbergWallbox::CurrentFactor);
-        Logger::Debug("Heidelberg wallbox: Read max. charging current: %f", mChargingCurrentLimitA);
-        return mChargingCurrentLimitA;
+        mObservedChargingCurrentLimitA = static_cast<float>(registerValue[0] * Constants::HeidelbergWallbox::CurrentFactor);
+        Logger::Debug("Heidelberg wallbox: Read max. charging current: %f", mObservedChargingCurrentLimitA);
     }
     else
     {
         // Error reading modbus register
         Logger::Error("Heidelberg wallbox: ERROR: Could not read max. charging current");
-        return mChargingCurrentLimitA; // Return last valid value
     }
+
+    return mObservedChargingCurrentLimitA; // last known value if the read failed
 }
 
 float HeidelbergWallbox::GetEnergyMeterValue()

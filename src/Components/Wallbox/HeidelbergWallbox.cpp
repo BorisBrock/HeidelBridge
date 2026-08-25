@@ -128,10 +128,14 @@ bool HeidelbergWallbox::SetChargingCurrentLimit(float currentLimitA)
     currentLimitA = ClampToWallboxRange(currentLimitA);
     mRequestedChargingCurrentLimitA = currentLimitA;
 
-    if (!mChargingEnabled)
+    // The limit register is the wallbox's only on/off signal: 0 A blocks charging,
+    // at or above the minimum permits it. Clients such as evcc (Daheimladen) have
+    // no separate enable command, so a non-zero limit write must (re)enable charging.
+    const bool chargingEnabled = currentLimitA >= Constants::HeidelbergWallbox::MinChargingCurrentA;
+    if (mChargingEnabled != chargingEnabled)
     {
-        Logger::Info("Heidelberg wallbox: charging is disabled. current limit %f A is not applied yet", currentLimitA);
-        return true;
+        Logger::Info("Heidelberg wallbox: %s charging", chargingEnabled ? "enabling" : "disabling");
+        mChargingEnabled = chargingEnabled;
     }
 
     Logger::Info("Heidelberg wallbox: setting charging current limit to %f A", currentLimitA);

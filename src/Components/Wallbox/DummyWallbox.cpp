@@ -30,43 +30,39 @@ VehicleState DummyWallbox::GetState()
 
 bool DummyWallbox::SetChargingCurrentLimit(float currentLimitA)
 {
-    if (mChargingEnabled)
+    // Same semantics as the real wallbox: the limit is the on/off signal,
+    // 0 A disables charging, anything above enables it.
+    const bool chargingEnabled = currentLimitA > 0.0f;
+    if (mChargingEnabled != chargingEnabled)
     {
-        mChargingCurrentLimitA = currentLimitA;
-        Logger::Debug("Dummy wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
-    }
-    else
-    {
-        mPreviousChargingCurrentLimitA = currentLimitA;
-        Logger::Info("Dummy wallbox: charging is disabled. current limit %f A is not applied", mChargingCurrentLimitA);
+        Logger::Info("Dummy wallbox: %s charging", chargingEnabled ? "enabling" : "disabling");
+        mChargingEnabled = chargingEnabled;
     }
 
+    mChargingCurrentLimitA = currentLimitA;
+    mPreviousChargingCurrentLimitA = currentLimitA > 0.0f ? currentLimitA : mPreviousChargingCurrentLimitA;
+    Logger::Debug("Dummy wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
     return true;
 }
 
 bool DummyWallbox::SetChargingEnabled(bool chargingEnabled)
 {
-    bool ok = true;
-
-    if (!mChargingEnabled && chargingEnabled)
+    if (!chargingEnabled)
     {
-        Logger::Info("Dummy wallbox: enabling charging");
-
-        // Enable charging
-        mChargingEnabled = true;
-        ok = SetChargingCurrentLimit(mPreviousChargingCurrentLimitA);
-    }
-    else if (mChargingEnabled && !chargingEnabled)
-    {
-        Logger::Info("Dummy wallbox: disabling charging");
-
-        // Disable charging
         mPreviousChargingCurrentLimitA = mChargingCurrentLimitA;
-        ok = SetChargingCurrentLimit(0.0f);
-        mChargingEnabled = false;
+        Logger::Info("Dummy wallbox: disabling charging");
+        return SetChargingCurrentLimit(0.0f);
     }
 
-    return ok;
+    Logger::Info("Dummy wallbox: enabling charging");
+
+    // A zero setpoint would immediately disable charging again; fall back to the default.
+    if (mPreviousChargingCurrentLimitA <= 0.0f)
+    {
+        mPreviousChargingCurrentLimitA = Constants::HeidelbergWallbox::InitialChargingCurrentLimitA;
+    }
+
+    return SetChargingCurrentLimit(mPreviousChargingCurrentLimitA);
 }
 
 bool DummyWallbox::IsChargingEnabled()

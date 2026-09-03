@@ -4,6 +4,24 @@
 #include "../../Configuration/Constants.h"
 #include "HeidelbergWallbox.h"
 
+HeidelbergWallbox::HeidelbergWallbox()
+    : mEnergyCounter(mEnergyCounterStorage, EnergyCounterConfig())
+{
+    mEnergyMutex = xSemaphoreCreateMutex();
+}
+
+EnergyCounter::Config HeidelbergWallbox::EnergyCounterConfig()
+{
+    EnergyCounter::Config config;
+    config.maxPowerW = Constants::EnergyMeter::MaxPowerW;
+    config.riseToleranceWh = Constants::EnergyMeter::RiseToleranceWh;
+    config.stableWindowMs = Constants::EnergyMeter::StableWindowMs;
+    config.stableMinSamples = Constants::EnergyMeter::StableMinSamples;
+    config.persistStepWh = Constants::EnergyMeter::PersistStepWh;
+    config.minPersistIntervalMs = Constants::EnergyMeter::MinPersistIntervalMs;
+    return config;
+}
+
 HeidelbergWallbox *HeidelbergWallbox::Instance()
 {
     static HeidelbergWallbox instance;
@@ -40,6 +58,16 @@ bool HeidelbergWallbox::WriteCurrentLimitRegister(float currentLimitA)
 
 void HeidelbergWallbox::Init()
 {
+    {
+        EnergyLock lock(mEnergyMutex);
+        mEnergyCounter.Init();
+        if (mEnergyCounter.HasValue())
+        {
+            Logger::Info("Heidelberg wallbox: energy counter restored: %u Wh (offset %lld Wh)",
+                         mEnergyCounter.GetPublishedWh(), static_cast<long long>(mEnergyCounter.GetOffsetWh()));
+        }
+    }
+
     uint16_t rawCurrent = static_cast<uint16_t>(Constants::HeidelbergWallbox::FailSafeCurrentA / Constants::HeidelbergWallbox::CurrentFactor);
     Logger::Debug("Heidelberg wallbox: Initializing fail safe current with %d (raw)", rawCurrent);
     if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::FailsafeCurrent, rawCurrent))
@@ -235,27 +263,60 @@ float HeidelbergWallbox::GetChargingCurrentLimit()
     return mObservedChargingCurrentLimitA; // last known value if the read failed
 }
 
-float HeidelbergWallbox::GetEnergyMeterValue()
+// Polls the energy register. This is the only place that reads it; MQTT and Modbus TCP serve the cached counter.
+void HeidelbergWallbox::Update()
 {
     uint16_t rawEnergy[2];
 
-    if (ModbusRTU::Instance()->ReadRegisters(
+    if (!ModbusRTU::Instance()->ReadRegisters(
             Constants::HeidelbergRegisters::Energy,
             2,
             0x4,
             rawEnergy))
     {
-        uint32_t totalEnergyWh = static_cast<uint32_t>(rawEnergy[0]) << 16 | static_cast<uint32_t>(rawEnergy[1]);
-        mLastEnergyMeterValueWh = static_cast<float>(totalEnergyWh);
-
-        Logger::Debug("Heidelberg wallbox: Read energy meter value: %f Wh", mLastEnergyMeterValueWh);
-    }
-    else
-    {
         Logger::Error("Heidelberg wallbox: ERROR: Could not read energy meter value");
+        return;
     }
 
-    return mLastEnergyMeterValueWh;
+    const uint32_t rawWh = static_cast<uint32_t>(rawEnergy[0]) << 16 | static_cast<uint32_t>(rawEnergy[1]);
+    Logger::Debug("Heidelberg wallbox: Read energy meter value: %u Wh", rawWh);
+
+    EnergyLock lock(mEnergyMutex);
+    const int64_t offsetBefore = mEnergyCounter.GetOffsetWh();
+    mEnergyCounter.Update(rawWh, millis());
+    if (mEnergyCounter.GetOffsetWh() != offsetBefore)
+    {
+        Logger::Warning("Heidelberg wallbox: energy register jumped to %u Wh, bridged with offset %lld Wh (counter %u Wh)",
+                        rawWh, static_cast<long long>(mEnergyCounter.GetOffsetWh()), mEnergyCounter.GetPublishedWh());
+    }
+}
+
+float HeidelbergWallbox::GetEnergyMeterValue()
+{
+    EnergyLock lock(mEnergyMutex);
+    return static_cast<float>(mEnergyCounter.GetPublishedWh());
+}
+
+bool HeidelbergWallbox::HasEnergyMeterValue()
+{
+    EnergyLock lock(mEnergyMutex);
+    return mEnergyCounter.HasValue();
+}
+
+bool HeidelbergWallbox::GetEnergyMeterDiagnostics(int64_t &offsetWh, uint32_t &rawWh)
+{
+    EnergyLock lock(mEnergyMutex);
+    offsetWh = mEnergyCounter.GetOffsetWh();
+    rawWh = mEnergyCounter.GetLastRawWh();
+    return mEnergyCounter.HasAcceptedRaw();
+}
+
+bool HeidelbergWallbox::SetEnergyMeterValue(uint32_t energyWh)
+{
+    EnergyLock lock(mEnergyMutex);
+    const bool ok = mEnergyCounter.SetCounter(energyWh);
+    Logger::Info("Heidelberg wallbox: energy counter set to %u Wh: %s", energyWh, ok ? "ok" : "rejected");
+    return ok;
 }
 
 float HeidelbergWallbox::GetFailsafeCurrent()

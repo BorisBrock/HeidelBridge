@@ -24,6 +24,11 @@ public:
     // Prints all settings to the logger
     void Print();
 
+    // Energy counter state, kept out of WriteToPersistentMemory() so a settings save cannot overwrite it with a stale snapshot
+    bool ReadEnergyCounter(int64_t &offsetWh, uint32_t &publishedWh);
+    bool WriteEnergyOffset(int64_t offsetWh);
+    bool WriteEnergyPublished(uint32_t publishedWh);
+
 public:
     String DeviceName{};
     String WifiSsid{};

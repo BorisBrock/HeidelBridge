@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 enum VehicleState
 {
     Disconnected = 1,
@@ -16,6 +18,9 @@ public:
     // Initialization function
     virtual void Init() = 0;
 
+    // Periodic housekeeping, called from the main loop (e.g. polling the energy register)
+    virtual void Update() {}
+
     // Read functions
 
     // Returns the current state of the vehicle
@@ -24,8 +29,14 @@ public:
     // Returns the current charging current limit in Amperes
     virtual float GetChargingCurrentLimit() = 0;
 
-    // Returns the current energy meter value in kilowatt hours
+    // Returns the current energy meter value in watt hours
     virtual float GetEnergyMeterValue() = 0;
+
+    // Returns false until GetEnergyMeterValue() has a real value to report
+    virtual bool HasEnergyMeterValue() { return true; }
+
+    // Returns the offset applied to the raw energy register and the last raw value read, if the wallbox has such a correction
+    virtual bool GetEnergyMeterDiagnostics(int64_t &offsetWh, uint32_t &rawWh) { return false; }
 
     // Returns the current failsafe current in Amperes
     virtual float GetFailsafeCurrent() = 0;
@@ -59,4 +70,6 @@ public:
     // Returns if Standby is currently enabled
     virtual bool GetStandbyEnabled() = 0;
 
+    // Rebases the energy meter so that it reads energyWh from now on, false if unsupported or not ready yet
+    virtual bool SetEnergyMeterValue(uint32_t energyWh) { return false; }
 };

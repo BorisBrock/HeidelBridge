@@ -57,6 +57,27 @@ void Settings::WriteToPersistentMemory()
     gPreferences.putString("board_type", BoardType);
 }
 
+bool Settings::ReadEnergyCounter(int64_t &offsetWh, uint32_t &publishedWh)
+{
+    if (!gPreferences.isKey("energy_hwm"))
+    {
+        return false;
+    }
+    offsetWh = gPreferences.getLong64("energy_offset", 0);
+    publishedWh = gPreferences.getUInt("energy_hwm", 0);
+    return true;
+}
+
+bool Settings::WriteEnergyOffset(int64_t offsetWh)
+{
+    return gPreferences.putLong64("energy_offset", offsetWh) == sizeof(offsetWh);
+}
+
+bool Settings::WriteEnergyPublished(uint32_t publishedWh)
+{
+    return gPreferences.putUInt("energy_hwm", publishedWh) == sizeof(publishedWh);
+}
+
 // Prints all settings to the logger
 void Settings::Print()
 {

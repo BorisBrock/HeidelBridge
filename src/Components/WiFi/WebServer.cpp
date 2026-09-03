@@ -10,6 +10,9 @@
 #include "NetworkScanner.h"
 #include "../../Utils/StaticFile.h"
 #include "../Logger/Logger.h"
+#include "../Wallbox/IWallbox.h"
+
+extern IWallbox *gWallbox;
 #include "WebServer.h"
 
 // Static files
@@ -199,6 +202,19 @@ String WebServer::HandleApiRequestSettingsRead(AsyncWebServerRequest *request)
     doc["mqtt-password"] = Settings::Instance()->MqttPassword;
     doc["board-type"] = Settings::Instance()->BoardType;
 
+    // Energy counter and the correction behind it
+    if (gWallbox != nullptr && gWallbox->HasEnergyMeterValue())
+    {
+        doc["energy-counter-kwh"] = static_cast<double>(gWallbox->GetEnergyMeterValue()) / 1000.0;
+        int64_t offsetWh = 0;
+        uint32_t rawWh = 0;
+        if (gWallbox->GetEnergyMeterDiagnostics(offsetWh, rawWh))
+        {
+            doc["energy-offset-kwh"] = static_cast<double>(offsetWh) / 1000.0;
+            doc["energy-raw-kwh"] = static_cast<double>(rawWh) / 1000.0;
+        }
+    }
+
     String jsonResponse;
     serializeJson(doc, jsonResponse);
     return jsonResponse;
@@ -253,6 +269,18 @@ String WebServer::HandleApiRequestSettingsWrite(AsyncWebServerRequest *request, 
     if (doc["board-type"].is<String>())
     {
         Settings::Instance()->BoardType = doc["board-type"].as<String>();
+    }
+
+    // Only sent when the user changed it; persisted before the reply so the reboot that follows cannot lose it
+    if (doc["energy-counter-kwh"].is<double>())
+    {
+        const double kwh = doc["energy-counter-kwh"].as<double>();
+        if (kwh < 0.0 || kwh > 4000000.0 || gWallbox == nullptr ||
+            !gWallbox->SetEnergyMeterValue(static_cast<uint32_t>(kwh * 1000.0 + 0.5)))
+        {
+            Logger::Error("Rejected energy counter value %f kWh", kwh);
+            return R"({"status": "error", "message": "Energy counter could not be set, no register value accepted yet"})";
+        }
     }
 
     Settings::Instance()->WriteToPersistentMemory();

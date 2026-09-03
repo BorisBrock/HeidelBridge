@@ -323,7 +323,10 @@ namespace MQTTManager
                 gMqttClient.publish(gMqttTopic.SetString("/failsafe_current"), 0, false, String(gWallbox->GetFailsafeCurrent()).c_str());
                 break;
             case (MqttPublishedValues::EnergyMeter):
-                gMqttClient.publish(gMqttTopic.SetString("/energy_meter"), 0, false, String(gWallbox->GetEnergyMeterValue() * Constants::General::FactorWhToKWh).c_str());
+                if (gWallbox->HasEnergyMeterValue()) // nothing known yet right after boot: publish nothing rather than 0
+                {
+                    gMqttClient.publish(gMqttTopic.SetString("/energy_meter"), 0, false, String(gWallbox->GetEnergyMeterValue() * Constants::General::FactorWhToKWh).c_str());
+                }
                 break;
             case (MqttPublishedValues::ChargingCurrent):
                 float c1, c2, c3;
@@ -353,6 +356,15 @@ namespace MQTTManager
                 gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_read_errors"), 0, false, String(gStatistics.NumModbusReadErrors).c_str());
                 gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_write_errors"), 0, false, String(gStatistics.NumModbusWriteErrors).c_str());
                 gMqttClient.publish(gMqttTopic.SetString("/internal/wifi_rssi"), 0, false, String(WiFi.RSSI()).c_str());
+                {
+                    int64_t energyOffsetWh = 0;
+                    uint32_t energyRawWh = 0;
+                    if (gWallbox->GetEnergyMeterDiagnostics(energyOffsetWh, energyRawWh))
+                    {
+                        gMqttClient.publish(gMqttTopic.SetString("/internal/energy_offset_wh"), 0, false, String(static_cast<long long>(energyOffsetWh)).c_str());
+                        gMqttClient.publish(gMqttTopic.SetString("/internal/energy_raw_wh"), 0, false, String(energyRawWh).c_str());
+                    }
+                }
                 break;
 
             case (MqttPublishedValues::Discovery):

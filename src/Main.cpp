@@ -19,6 +19,7 @@
 IWallbox *gWallbox{nullptr};
 AsyncDelay gUptimeCounter(Constants::General::MillisPerSecond);
 AsyncDelay gMqttUpdater(Constants::MQTT::PublishIntervalMs);
+AsyncDelay gWallboxUpdater(Constants::EnergyMeter::PollIntervalMs);
 
 void setup()
 {
@@ -76,6 +77,7 @@ void setup()
   // Start async delays
   gUptimeCounter.Restart();
   gMqttUpdater.Restart();
+  gWallboxUpdater.Restart();
 
   Logger::Info("Setup complete");
 }
@@ -86,6 +88,12 @@ void loop()
   {
     gUptimeCounter.Restart();
     gStatistics.UptimeS++;
+  }
+
+  if (gWallboxUpdater.IsElapsed())
+  {
+    gWallboxUpdater.Restart();
+    gWallbox->Update();
   }
 
   if (Settings::Instance()->IsMqttEnabled && gMqttUpdater.IsElapsed())

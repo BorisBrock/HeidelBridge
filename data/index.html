@@ -56,6 +56,13 @@
         <input type="password" id="mqtt-password" name="mqtt-password" placeholder="Password (optional)" />
 
 
+        <h3>Energy Meter</h3>
+
+        <input type="number" id="energy-counter-kwh" name="energy-counter-kwh" step="0.01" min="0" placeholder="Counter (kWh)" />
+        <small id="energy-meter-info">The counter is kept monotonic across wallbox power cuts. Change the value only to
+            rebase it, e.g. after a wallbox swap.</small>
+
+
         <p class="spacer"></p>
 
         <button class="hb-block-button" onclick="writeSettings();">Apply and restart</button>

@@ -1,3 +1,7 @@
+// Value shown at page load; the counter is only sent when the user changed it,
+// otherwise every settings save would rebase it to a stale value.
+let loadedEnergyCounterKwh = null;
+
 document.addEventListener("DOMContentLoaded", async function () {
     try {
         // Call the API on the same server
@@ -21,6 +25,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById("mqtt-user").value = data["mqtt-user"];
         document.getElementById("mqtt-password").value = data["mqtt-password"];
         document.getElementById("board-type").value = data["board-type"] || "generic";
+        if (data["energy-counter-kwh"] !== undefined) {
+            loadedEnergyCounterKwh = data["energy-counter-kwh"].toFixed(2);
+            document.getElementById("energy-counter-kwh").value = loadedEnergyCounterKwh;
+            if (data["energy-raw-kwh"] !== undefined) {
+                document.getElementById("energy-meter-info").textContent +=
+                    ` Wallbox register: ${data["energy-raw-kwh"].toFixed(2)} kWh, offset: ${data["energy-offset-kwh"].toFixed(2)} kWh.`;
+            }
+        } else {
+            document.getElementById("energy-counter-kwh").placeholder = "No register value yet";
+            document.getElementById("energy-counter-kwh").disabled = true;
+        }
     } catch (error) {
         console.error(`Error: ${error.message}`);
     }
@@ -45,6 +60,10 @@ function writeSettings() {
         "mqtt-password": document.getElementById("mqtt-password").value,
         "board-type": document.getElementById("board-type").value
     };
+    const energyInput = document.getElementById("energy-counter-kwh");
+    if (loadedEnergyCounterKwh !== null && energyInput.value !== "" && energyInput.value !== loadedEnergyCounterKwh) {
+        data["energy-counter-kwh"] = parseFloat(energyInput.value);
+    }
     fetch("/api/settings_write", {
         method: "POST",
         headers: {
@@ -56,6 +75,12 @@ function writeSettings() {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
+            return response.json();
+        })
+        .then(result => {
+            if (result.status !== "ok") {
+                throw new Error(result.message || "Settings were rejected");
+            }
 
             // Show a success message popup
             messageBox("Success", "The device will now reboot to apply your changes.");
@@ -63,6 +88,7 @@ function writeSettings() {
         })
         .catch(error => {
             console.error(`Error: ${error.message}`);
+            messageBox("Error", error.message);
         });
 }
 

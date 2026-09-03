@@ -95,6 +95,18 @@ namespace Constants
         extern const char* LocalIpUrl;
     };
 
+    // Monotonic energy counter on top of the wallbox register, see EnergyCounter.h
+    namespace EnergyMeter
+    {
+        constexpr uint32_t PollIntervalMs = 5000;
+        constexpr uint32_t MaxPowerW = 11000;      // 3 x 16 A x 230 V, plausibility limit
+        constexpr uint32_t RiseToleranceWh = 100;  // slack on top of MaxPowerW x elapsed
+        constexpr uint32_t StableWindowMs = 30000; // a deviating register value must hold this long
+        constexpr uint8_t StableMinSamples = 3;    // ... and be seen this often before it is trusted
+        constexpr uint32_t PersistStepWh = 10;     // NVS write / publish granularity
+        constexpr uint32_t MinPersistIntervalMs = 30000; // flash wear cap: at most one NVS write per 30 s while charging
+    };
+
     namespace MQTT
     {
         constexpr uint16_t PublishIntervalMs = 500;

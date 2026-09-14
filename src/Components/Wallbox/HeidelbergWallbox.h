@@ -17,7 +17,6 @@ public:
     virtual void Init() override;
     virtual VehicleState GetState() override;
     virtual bool SetChargingCurrentLimit(float currentLimitA) override;
-    virtual bool SetChargingEnabled(bool chargingEnabled) override;
     virtual bool SetStandbyEnabled(bool standbyEnabled) override;
     virtual float GetChargingCurrentLimit() override;
     virtual float GetEnergyMeterValue() override;
@@ -26,18 +25,15 @@ public:
     virtual float GetTemperature() override;
     virtual bool GetChargingCurrents(float &c1A, float &c2A, float &c3A) override;
     virtual bool GetChargingVoltages(float &v1V, float &v2V, float &v3V) override;
-    virtual bool IsChargingEnabled() override;
     virtual bool GetStandbyEnabled() override;
 
 #pragma endregion IWallbox
 
 private:
     VehicleState mState{VehicleState::Disconnected};
-    float mRequestedChargingCurrentLimitA{Constants::HeidelbergWallbox::InitialChargingCurrentLimitA}; // intent
-    float mObservedChargingCurrentLimitA{0.0f};                                                        // last read back
+    float mObservedChargingCurrentLimitA{0.0f}; // last read back
     float mFailsafeCurrentA{0.0f};
     float mLastPowerMeterValueW{0.0f};
     float mLastEnergyMeterValueWh{0.0f};
-    bool mChargingEnabled{true}; // seeded from the wallbox in Init()
     bool mStandbyEnabled{true}; // default: standby enabled
 };

@@ -32,7 +32,6 @@ The following topics are published by HeidelBridge:
 
 The following topics are subscribed by HeidelBridge. Use these to control your wallbox:
 
-| Topic                                        | Unit | Data Type     | Description                                                             |
-| -------------------------------------------- | ---- | ------------- | ----------------------------------------------------------------------- |
-| {DeviceName}/control/charging_current_limit  | A    | Float         | Charging current limit in Ampere.                                       |
-| {DeviceName}/control/enable_charging         | -    | Bool (ON/OFF) | Enables/disables the charging.                                          |
+| Topic                                        | Unit | Data Type     | Description                                                                            |
+| -------------------------------------------- | ---- | ------------- | --------------------------------------------------------------------------------------- |
+| {DeviceName}/control/charging_current_limit  | A    | Float         | Charging current limit in Ampere. 0 disables charging; 6.0-16.0 permits it (0.1 steps). |

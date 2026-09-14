@@ -30,45 +30,20 @@ VehicleState DummyWallbox::GetState()
 
 bool DummyWallbox::SetChargingCurrentLimit(float currentLimitA)
 {
-    // Same semantics as the real wallbox: the limit is the on/off signal,
-    // 0 A disables charging, anything above enables it.
-    const bool chargingEnabled = currentLimitA > 0.0f;
-    if (mChargingEnabled != chargingEnabled)
+    // Same semantics as the real wallbox: 0 A blocks charging, at or above the
+    // minimum permits it.
+    if (currentLimitA < Constants::HeidelbergWallbox::MinChargingCurrentA)
     {
-        Logger::Info("Dummy wallbox: %s charging", chargingEnabled ? "enabling" : "disabling");
-        mChargingEnabled = chargingEnabled;
+        currentLimitA = 0.0f;
+    }
+    else if (currentLimitA > Constants::HeidelbergWallbox::MaxChargingCurrentA)
+    {
+        currentLimitA = Constants::HeidelbergWallbox::MaxChargingCurrentA;
     }
 
     mChargingCurrentLimitA = currentLimitA;
-    mPreviousChargingCurrentLimitA = currentLimitA > 0.0f ? currentLimitA : mPreviousChargingCurrentLimitA;
     Logger::Debug("Dummy wallbox: setting charging current limit to %f A", mChargingCurrentLimitA);
     return true;
-}
-
-bool DummyWallbox::SetChargingEnabled(bool chargingEnabled)
-{
-    if (!chargingEnabled)
-    {
-        mPreviousChargingCurrentLimitA = mChargingCurrentLimitA;
-        Logger::Info("Dummy wallbox: disabling charging");
-        return SetChargingCurrentLimit(0.0f);
-    }
-
-    Logger::Info("Dummy wallbox: enabling charging");
-
-    // A zero setpoint would immediately disable charging again; fall back to the default.
-    if (mPreviousChargingCurrentLimitA <= 0.0f)
-    {
-        mPreviousChargingCurrentLimitA = Constants::HeidelbergWallbox::InitialChargingCurrentLimitA;
-    }
-
-    return SetChargingCurrentLimit(mPreviousChargingCurrentLimitA);
-}
-
-bool DummyWallbox::IsChargingEnabled()
-{
-    Logger::Debug("Dummy wallbox: returning charging enabled %i", mChargingEnabled);
-    return mChargingEnabled;
 }
 
 bool DummyWallbox::SetStandbyEnabled(bool standbyEnabled)

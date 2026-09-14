@@ -24,7 +24,6 @@ namespace Constants
         constexpr float TemperatureFactor = 0.1f;
         constexpr float MinChargingCurrentA = 6.0f;
         constexpr float MaxChargingCurrentA = 16.0f;
-        constexpr float InitialChargingCurrentLimitA = MaxChargingCurrentA;
         constexpr uint8_t ModbusServerId = 1;
         constexpr uint32_t ModbusBaudrate = 19200;
         constexpr uint16_t ModbusTimeoutMs = 2000;

@@ -1,0 +1,153 @@
+alias: Wallbox Steuerung Prototyp
+description: >-
+  Steuert die Heidelberg Wallbox basierend auf PV-Überschuss und Modusauswahl,
+  ohne redundante MQTT-Befehle zu senden.
+triggers:
+  - id: modus_wechsel
+    trigger: state
+    entity_id: input_select.wallbox_modus
+  - id: zyklus
+    trigger: time_pattern
+    minutes: /1
+actions:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: input_select.wallbox_modus
+            state: Aus
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: switch.heidelbridge_control_enable_charging
+                    state: "on"
+                sequence:
+                  - action: switch.turn_off
+                    target:
+                      entity_id: switch.heidelbridge_control_enable_charging
+      - conditions:
+          - condition: state
+            entity_id: input_select.wallbox_modus
+            state: Manuell
+        sequence:
+          - stop: Manueller Modus aktiv - Automatisierung unternimmt nichts.
+      - conditions:
+          - condition: state
+            entity_id: input_select.wallbox_modus
+            state: Max
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: switch.heidelbridge_control_enable_charging
+                    state: "off"
+                sequence:
+                  - action: switch.turn_on
+                    target:
+                      entity_id: switch.heidelbridge_control_enable_charging
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: >-
+                      {{
+                      states('number.heidelbridge_control_charging_current_limit')
+                      | float(0) != 16 }}
+                sequence:
+                  - action: number.set_value
+                    target:
+                      entity_id: number.heidelbridge_control_charging_current_limit
+                    data:
+                      value: 16
+      - conditions:
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: input_select.wallbox_modus
+                state: Nur PV
+              - condition: state
+                entity_id: input_select.wallbox_modus
+                state: Min + PV
+        sequence:
+          - variables:
+              grid_power: >-
+                {{ states('sensor.smart_meter_ts_65a_3_real_power') | float(0)
+                }}
+              wb_power: "{{ states('sensor.heidelbridge_charging_power') | float(0) }}"
+              available_power: "{{ (grid_power * -1) + wb_power }}"
+              calc_amps: "{{ (available_power / 690) | round(0, 'floor') }}"
+              max_amps: "{{ [calc_amps, 16] | min }}"
+              modus: "{{ states('input_select.wallbox_modus') }}"
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ modus == 'Min + PV' }}"
+                sequence:
+                  - variables:
+                      new_limit: "{{ [max_amps, 6] | max }}"
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: >-
+                              {{
+                              states('number.heidelbridge_control_charging_current_limit')
+                              | float(0) != new_limit }}
+                        sequence:
+                          - action: number.set_value
+                            target:
+                              entity_id: >-
+                                number.heidelbridge_control_charging_current_limit
+                            data:
+                              value: "{{ new_limit }}"
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: switch.heidelbridge_control_enable_charging
+                            state: "off"
+                        sequence:
+                          - action: switch.turn_on
+                            target:
+                              entity_id: switch.heidelbridge_control_enable_charging
+              - conditions:
+                  - condition: template
+                    value_template: "{{ modus == 'Nur PV' }}"
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ max_amps >= 6 }}"
+                        sequence:
+                          - choose:
+                              - conditions:
+                                  - condition: template
+                                    value_template: >-
+                                      {{
+                                      states('number.heidelbridge_control_charging_current_limit')
+                                      | float(0) != max_amps }}
+                                sequence:
+                                  - action: number.set_value
+                                    target:
+                                      entity_id: >-
+                                        number.heidelbridge_control_charging_current_limit
+                                    data:
+                                      value: "{{ max_amps }}"
+                          - choose:
+                              - conditions:
+                                  - condition: state
+                                    entity_id: >-
+                                      switch.heidelbridge_control_enable_charging
+                                    state: "off"
+                                sequence:
+                                  - action: switch.turn_on
+                                    target:
+                                      entity_id: >-
+                                        switch.heidelbridge_control_enable_charging
+                    default:
+                      - choose:
+                          - conditions:
+                              - condition: state
+                                entity_id: switch.heidelbridge_control_enable_charging
+                                state: "on"
+                            sequence:
+                              - action: switch.turn_off
+                                target:
+                                  entity_id: switch.heidelbridge_control_enable_charging

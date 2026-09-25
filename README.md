@@ -33,7 +33,22 @@ Parts list:
 This should be enough for quickly putting together a fully functioning prototype.
 Of course a well designed PCB would be much nicer, but this is still work in progress. Once the design is ready, the schematics will be available *right here*.
 
-> *\* This project supports the classic ESP32 and the LILYGO T-CAN485 board (with on-board RS485 transceiver). The hardware type is selected in the web interface during initial setup. It has not been built/tested for newer ESP32 models like the S2 and C6.*
+> *\* This project supports the classic ESP32, the LILYGO T-CAN485 board (with on-board RS485 transceiver) and the Olimex ESP32-POE-WROVER (with on-board LAN8720 Ethernet). The hardware type is selected in the web interface during initial setup and can be changed at any time without re-flashing. It has not been built/tested for newer ESP32 models like the S2 and C6.*
+
+## Olimex ESP32-POE-WROVER Variant
+
+HeidelBridge also supports the Olimex ESP32-POE-WROVER board. Select *Olimex ESP32-POE-WROVER + MAX485 (UEXT)* in the web interface to use it. The board provides:
+
+- On-board LAN8720 Ethernet (RJ45), IP address is obtained automatically via DHCP
+- PoE power supply (no separate USB power needed)
+- A UEXT connector for the MAX485 breakout board (wiring in the [Hardware Setup guide](/docs/HardwareSetup.md#olimex-esp32-poe-wrover))
+
+The WROVER-specific LAN8720 configuration:
+
+- PHY address: 0
+- MDC: GPIO23, MDIO: GPIO18
+- PHY power: GPIO12
+- RMII clock: GPIO0 (`ETH_CLOCK_GPIO0_OUT`), since GPIO16/17 are occupied by the PSRAM on this board
 
 # Getting Started
 

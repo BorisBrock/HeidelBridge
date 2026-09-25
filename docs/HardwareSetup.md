@@ -21,9 +21,24 @@ The hardware connections are very simple:
 
 ![Hardware connections](/docs/img/hardware_connections.png)
 
+## Olimex ESP32-POE-WROVER
+
+If you use the Olimex ESP32-POE-WROVER, connect the MAX485 breakout board to the UEXT connector of the board instead of the GPIO pins:
+
+- UEXT pin 1: 3.3 V -> MAX485 VCC
+- UEXT pin 2: GND -> MAX485 GND
+- UEXT pin 3: GPIO4 -> MAX485 DI
+- UEXT pin 4: GPIO36 <- MAX485 RO
+- UEXT pin 5: GPIO33 -> MAX485 DE + RE
+- MAX485-board A terminal to Heidelberg wallbox A terminal
+- MAX485-board B terminal to Heidelberg wallbox B terminal
+
+Afterwards select *Olimex ESP32-POE-WROVER + MAX485 (UEXT)* as the hardware type in the web interface. Network connectivity is provided by the on-board LAN8720 Ethernet (RJ45); the IP address is obtained automatically via DHCP.
+
 ## Powering the ESP32
 
 The ESP32 is **not** powered by the Modbus line. You need to power it externally, usually via an USB phone charger.
+The Olimex ESP32-POE-WROVER can be powered via PoE (802.3af) instead.
 
 ## Modbus Connection
 

@@ -21,10 +21,43 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById("mqtt-user").value = data["mqtt-user"];
         document.getElementById("mqtt-password").value = data["mqtt-password"];
         document.getElementById("board-type").value = data["board-type"] || "generic";
+
+        updateBoardTypeVisibility();
     } catch (error) {
         console.error(`Error: ${error.message}`);
     }
 });
+
+function updateBoardTypeVisibility() {
+    const boardType = document.getElementById("board-type").value;
+    document.getElementById("wifi-section").style.display = boardType === "olimex" ? "none" : "block";
+    document.getElementById("ethernet-section").style.display = boardType === "olimex" ? "block" : "none";
+
+    if (boardType === "olimex") {
+        updateEthernetStatus();
+    }
+}
+
+async function updateEthernetStatus() {
+    try {
+        const response = await fetch("/api/ethernet_status");
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const status = document.getElementById("ethernet-status");
+        if (data.connected) {
+            status.textContent = `Connected - IP: ${data.ip}`;
+        } else {
+            status.textContent = "Ethernet not connected / no DHCP address";
+        }
+    } catch (error) {
+        console.error(`Ethernet status error: ${error.message}`);
+    }
+}
 
 function messageBox(title, text) {
     document.getElementById("message-box-title").textContent = title;

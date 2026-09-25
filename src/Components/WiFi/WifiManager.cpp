@@ -31,9 +31,6 @@ void WifiManager::Start()
         // Start captive portal
         StartCaptivePortal();
     }
-
-    // Start the web server
-    WebServer::Instance()->Init();
 }
 
 // Starts the captive portal

@@ -25,19 +25,27 @@
 
         <input type="text" id="device-name" name="device-name" value="HeidelBridge" />
 
-
         <h3>Hardware</h3>
 
-        <select id="board-type" name="board-type">
+        <select id="board-type" name="board-type" onchange="updateBoardTypeVisibility();">
             <option value="generic">Generic ESP32 + MAX485</option>
             <option value="lilygo">LilyGo T-CAN485</option>
+            <option value="olimex">Olimex ESP32-POE-WROVER + MAX485 (UEXT)</option>
         </select>
-        
 
-        <h3>WiFi Connection</h3>
+        <div id="wifi-section">
+            <h3>WiFi Connection</h3>
 
-        <input type="text" id="wifi-ssid" name="wifi-ssid" placeholder="Network name (SSID)" />
-        <input type="password" id="wifi-password" name="wifi-password" placeholder="Password" />
+            <input type="text" id="wifi-ssid" name="wifi-ssid" placeholder="Network name (SSID)" />
+            <input type="password" id="wifi-password" name="wifi-password" placeholder="Password" />
+        </div>
+
+        <div id="ethernet-section" style="display: none;">
+            <h3>Ethernet</h3>
+
+            <p id="ethernet-status">Loading...</p>
+            <small>LAN8720 via RJ45. IP address is obtained automatically via DHCP.</small>
+        </div>
 
 
         <h3>MQTT</h3>

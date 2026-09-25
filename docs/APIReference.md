@@ -25,10 +25,11 @@ The following topics are published by HeidelBridge:
 | {DeviceName}/charging_voltage/phase3      | V    | Float     | Momentary charging voltage on phase 3.                                  |
 | {DeviceName}/internal/uptime              | s    | Integer   | Total time this HeidelBridge has been up and running.                   |
 | {DeviceName}/internal/wifi_disconnects    | -    | Integer   | Total number of WiFi connection losses since start.                     |
+| {DeviceName}/internal/ethernet_disconnects | -    | Integer  | Total number of Ethernet link losses since start.                       |
 | {DeviceName}/internal/mqtt_disconnects    | -    | Integer   | Total number of MQTT connection losses since start.                     |
 | {DeviceName}/internal/modbus_read_errors  | -    | Integer   | Total number of Modbus RTU read errors since start.                     |
 | {DeviceName}/internal/modbus_write_errors | -    | Integer   | Total number of Modbus RTU write errors since start.                    |
-| {DeviceName}/internal/wifi_rssi           | dBm  | Integer   | Current WiFi signal strength (RSSI). Closer to 0 is better.             |
+| {DeviceName}/internal/wifi_rssi           | dBm  | Integer   | Current WiFi signal strength (RSSI). Closer to 0 is better. Only published on WiFi-based boards. |
 
 The following topics are subscribed by HeidelBridge. Use these to control your wallbox:
 

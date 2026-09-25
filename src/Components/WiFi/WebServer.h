@@ -19,6 +19,9 @@ private:
     String HandleApiRequestGetVersion();
 
     // Handles the API request
+    String HandleApiRequestGetEthernetStatus();
+
+    // Handles the API request
     String HandleApiRequestGetWifiScanStatus();
 
     // Handles the API request

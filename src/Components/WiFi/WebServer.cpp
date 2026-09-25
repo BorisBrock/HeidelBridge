@@ -10,6 +10,7 @@
 #include "NetworkScanner.h"
 #include "../../Utils/StaticFile.h"
 #include "../Logger/Logger.h"
+#include "../Network/Network.h"
 #include "WebServer.h"
 
 // Static files
@@ -80,6 +81,8 @@ void WebServer::Init()
     // Handle API requests
     gWebServer.on("/api/version", HTTP_GET, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestGetVersion()); });
+    gWebServer.on("/api/ethernet_status", HTTP_GET, [this](AsyncWebServerRequest *request)
+                  { request->send(200, "application/json", HandleApiRequestGetEthernetStatus()); });
     gWebServer.on("/api/wifi_scan_start", HTTP_POST, [this](AsyncWebServerRequest *request)
                   { request->send(200, "application/json", HandleApiRequestStartWifiScan()); });
     gWebServer.on("/api/wifi_scan_status", HTTP_GET, [this](AsyncWebServerRequest *request)
@@ -147,6 +150,28 @@ String WebServer::HandleApiRequestGetVersion()
     JsonDocument doc;
     doc["version"] = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
     doc["build_date"] = __DATE__;
+
+    String jsonResponse;
+    serializeJson(doc, jsonResponse);
+    return jsonResponse;
+}
+
+// Handles the API request
+String WebServer::HandleApiRequestGetEthernetStatus()
+{
+    Logger::Debug("Received REST API request: get Ethernet status");
+
+    JsonDocument doc;
+    if (Network::IsEthernet())
+    {
+        doc["connected"] = Network::IsConnected();
+        doc["ip"] = Network::GetLocalIP().toString();
+    }
+    else
+    {
+        doc["connected"] = false;
+        doc["ip"] = "0.0.0.0";
+    }
 
     String jsonResponse;
     serializeJson(doc, jsonResponse);
@@ -252,7 +277,15 @@ String WebServer::HandleApiRequestSettingsWrite(AsyncWebServerRequest *request, 
     }
     if (doc["board-type"].is<String>())
     {
-        Settings::Instance()->BoardType = doc["board-type"].as<String>();
+        String boardType = doc["board-type"].as<String>();
+        if (boardType == "generic" || boardType == "lilygo" || boardType == "olimex")
+        {
+            Settings::Instance()->BoardType = boardType;
+        }
+        else
+        {
+            Logger::Warning("Unknown board type '%s' rejected", boardType.c_str());
+        }
     }
 
     Settings::Instance()->WriteToPersistentMemory();

@@ -5,8 +5,8 @@
 #include "Configuration/Version.h"
 #include "Components/Logger/Logger.h"
 #include "Components/Statistics/Statistics.h"
-#include "Components/WiFi/WifiConnection.h"
-#include "Components/WiFi/WifiManager.h"
+#include "Components/Network/Network.h"
+#include "Components/WiFi/WebServer.h"
 #include "Components/Modbus/ModbusRTU.h"
 #include "Components/Modbus/ModbusTCP.h"
 #include "Components/Wallbox/DummyWallbox.h"
@@ -50,8 +50,11 @@ void setup()
   board->Print();
   board->Init();
 
-  // Make sure WiFi connection is up and running
-  WifiManager::Instance()->Start();
+  // Make sure the network connection (WiFi or Ethernet, depending on the board) is up and running
+  Network::Start();
+
+  // Start the web server
+  WebServer::Instance()->Init();
 
   // Initialize wallbox
 #ifndef DUMMY_WALLBOX
@@ -94,7 +97,7 @@ void loop()
     MQTTManager::Update();
   }
 
-  WifiManager::Instance()->Update();
+  Network::Update();
 
   yield();
 }

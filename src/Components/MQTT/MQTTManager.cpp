@@ -12,6 +12,7 @@ extern "C"
 #include "../../Configuration/Constants.h"
 #include "../../Configuration/Settings.h"
 #include "../Wallbox/IWallbox.h"
+#include "../Network/Network.h"
 #include "../../Utils/PrefixedString.h"
 #include "../../Utils/StringUtils.h"
 #include "MQTTManager.h"
@@ -338,10 +339,14 @@ namespace MQTTManager
 
             case (MqttPublishedValues::Internals):
                 gMqttClient.publish(gMqttTopic.SetString("/internal/wifi_disconnects"), 0, false, String(gStatistics.NumWifiDisconnects).c_str());
+                gMqttClient.publish(gMqttTopic.SetString("/internal/ethernet_disconnects"), 0, false, String(gStatistics.NumEthernetDisconnects).c_str());
                 gMqttClient.publish(gMqttTopic.SetString("/internal/mqtt_disconnects"), 0, false, String(gStatistics.NumMqttDisconnects).c_str());
                 gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_read_errors"), 0, false, String(gStatistics.NumModbusReadErrors).c_str());
                 gMqttClient.publish(gMqttTopic.SetString("/internal/modbus_write_errors"), 0, false, String(gStatistics.NumModbusWriteErrors).c_str());
-                gMqttClient.publish(gMqttTopic.SetString("/internal/wifi_rssi"), 0, false, String(WiFi.RSSI()).c_str());
+                if (!Network::IsEthernet())
+                {
+                    gMqttClient.publish(gMqttTopic.SetString("/internal/wifi_rssi"), 0, false, String(WiFi.RSSI()).c_str());
+                }
                 break;
 
             case (MqttPublishedValues::Discovery):
@@ -373,7 +378,7 @@ namespace MQTTManager
         String versionString = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
         gMqttClient.publish(gMqttTopic.SetString("/version"), 0, true, versionString.c_str());
         gMqttClient.publish(gMqttTopic.SetString("/build_date"), 0, true, __DATE__);
-        gMqttClient.publish(gMqttTopic.SetString("/ip_address"), 0, true, WiFi.localIP().toString().c_str());
+        gMqttClient.publish(gMqttTopic.SetString("/ip_address"), 0, true, Network::GetLocalIP().toString().c_str());
 
         // Birth message: signals the device is back online (counterpart to the LWT)
         gMqttClient.publish(AvailabilityTopic, 1, true, "online");

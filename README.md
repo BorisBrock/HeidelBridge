@@ -6,6 +6,7 @@
 <h1 align="center">Heidel<span style="color:#646bafff">Bridge</span></h1>
 
 ![PlatformIO CI Build](https://github.com/BorisBrock/Heidelbridge/actions/workflows/build.yml/badge.svg)
+![PlatformIO CI Test](https://github.com/BorisBrock/Heidelbridge/actions/workflows/test.yml/badge.svg)
 ![Flawfinder Code Analysis](https://github.com/BorisBrock/Heidelbridge/actions/workflows/flawfinder.yml/badge.svg)
 ![Cppcheck Code Analysis](https://github.com/BorisBrock/Heidelbridge/actions/workflows/cppcheck.yml/badge.svg)
 

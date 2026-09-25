@@ -1,0 +1,9 @@
+{
+  "name": "mocks",
+  "version": "1.0.0",
+  "description": "Mock implementations of the Arduino and Modbus dependencies for host-based unit tests",
+  "frameworks": [],
+  "build": {
+    "srcDir": "src"
+  }
+}

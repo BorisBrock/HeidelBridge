@@ -235,19 +235,6 @@ namespace MQTTManager
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
 
         PublishHomeAssistantDiscoveryTopic(
-            "homeassistant/switch/%/control_enable_charging/config",
-            R"({
-                "name":"Enable charging",
-                "state_topic":"%/enable_charging",
-                "command_topic":"%/control/enable_charging",
-                "availability_topic":"%/status",
-                "unique_id":"%_control_enable_charging",
-                "default_entity_id":"switch.%_control_enable_charging",
-                "payload_on":"ON",
-                "payload_off":"OFF",
-                "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
-
-        PublishHomeAssistantDiscoveryTopic(
             "homeassistant/switch/%/control_standby/config",
             R"({
                 "name":"Standby mode",
@@ -267,9 +254,9 @@ namespace MQTTManager
                 "command_topic":"%/control/charging_current_limit",
                 "state_topic":"%/charging_current_limit",
                 "availability_topic":"%/status",
-                "min":6,
+                "min":0,
                 "max":16,
-                "step":1,
+                "step":0.1,
                 "unit_of_measurement":"A",
                 "unique_id":"%_control_charging_current_limit",
                 "default_entity_id":"number.%_control_charging_current_limit",
@@ -309,8 +296,10 @@ namespace MQTTManager
             case (MqttPublishedValues::ChargingCurrentLimit):
             {
                 float chargingCurrentLimit = gWallbox->GetChargingCurrentLimit();
-                // 0 A is a valid reading (charging blocked/disabled), not just 6-16 A. Only reject out-of-range garbage.
-                if (chargingCurrentLimit == 0.0f || (chargingCurrentLimit >= 6.0f && chargingCurrentLimit <= 16.0f))
+                // 0 A is a valid reading (charging blocked), not just min-max A. Only reject out-of-range garbage.
+                if (chargingCurrentLimit == 0.0f ||
+                    (chargingCurrentLimit >= Constants::HeidelbergWallbox::MinChargingCurrentA &&
+                     chargingCurrentLimit <= Constants::HeidelbergWallbox::MaxChargingCurrentA))
                 {
                     gMqttClient.publish(gMqttTopic.SetString("/charging_current_limit"), 0, false, String(chargingCurrentLimit).c_str());
                 }
@@ -366,9 +355,6 @@ namespace MQTTManager
             // These values are published every cycle
             gMqttClient.publish(gMqttTopic.SetString("/internal/uptime"), 0, false, String(gStatistics.UptimeS).c_str());
 
-            gMqttClient.publish(gMqttTopic.SetString("/enable_charging"), 0, true,
-                                gWallbox->IsChargingEnabled() ? "ON" : "OFF");
-
             gMqttClient.publish(gMqttTopic.SetString("/standby_enabled"), 0, true,
                                 gWallbox->GetStandbyEnabled() ? "ON" : "OFF");
         }
@@ -381,7 +367,6 @@ namespace MQTTManager
 
         // Subscribe to control topics
         gMqttClient.subscribe(gMqttTopic.SetString("/control/charging_current_limit"), 2);
-        gMqttClient.subscribe(gMqttTopic.SetString("/control/enable_charging"), 2);
         gMqttClient.subscribe(gMqttTopic.SetString("/control/standby"), 2);
 
         // Publish version information
@@ -412,14 +397,6 @@ namespace MQTTManager
             float current = String(payload, len).toFloat();
             Logger::Trace("Received MQTT control command: charging current limit = %f\n", current);
             gWallbox->SetChargingCurrentLimit(current);
-        }
-        else if (strcmp(gMqttTopic.SetString("/control/enable_charging"), topic) == 0)
-        {
-            String cmd(payload, len);
-            cmd.trim();
-            Logger::Trace("Received MQTT control command: enable_charging = %s", cmd.c_str());
-            bool enableCharging = cmd.equalsIgnoreCase("ON");
-            gWallbox->SetChargingEnabled(enableCharging);
         }
         else if (strcmp(gMqttTopic.SetString("/control/standby"), topic) == 0)
         {

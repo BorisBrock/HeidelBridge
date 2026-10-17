@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <cmath>
 #include "../Logger/Logger.h"
 #include "../Modbus/ModbusRTU.h"
 #include "../../Configuration/Constants.h"
@@ -28,7 +29,8 @@ float HeidelbergWallbox::ClampToWallboxRange(float currentLimitA)
 // 0 A blocks charging, 6-16 A permits it
 bool HeidelbergWallbox::WriteCurrentLimitRegister(float currentLimitA)
 {
-    const uint16_t rawCurrent = static_cast<uint16_t>(currentLimitA / Constants::HeidelbergWallbox::CurrentFactor);
+    // Round to the nearest register step; truncating would turn e.g. 6.2 A into 6.1 A
+    const uint16_t rawCurrent = static_cast<uint16_t>(lroundf(currentLimitA / Constants::HeidelbergWallbox::CurrentFactor));
     if (!ModbusRTU::Instance()->WriteHoldRegister16(Constants::HeidelbergRegisters::MaximalCurrent, rawCurrent))
     {
         // Error writing modbus register
@@ -114,6 +116,13 @@ VehicleState HeidelbergWallbox::GetState()
 
 bool HeidelbergWallbox::SetChargingCurrentLimit(float currentLimitA)
 {
+    // NaN passes every range check, so it must be rejected before clamping
+    if (!std::isfinite(currentLimitA))
+    {
+        Logger::Error("Heidelberg wallbox: ERROR: Ignoring invalid charging current limit");
+        return false;
+    }
+
     // The limit register is the wallbox's only on/off signal: 0 A blocks charging,
     // at or above the minimum permits it.
     currentLimitA = ClampToWallboxRange(currentLimitA);

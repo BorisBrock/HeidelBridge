@@ -6,6 +6,7 @@ extern "C"
 #include "freertos/timers.h"
 }
 #include <AsyncMqttClient.h>
+#include <atomic>
 #include "../Logger/Logger.h"
 #include "../Statistics/Statistics.h"
 #include "../../Configuration/Version.h"
@@ -14,6 +15,8 @@ extern "C"
 #include "../Wallbox/IWallbox.h"
 #include "../../Utils/PrefixedString.h"
 #include "../../Utils/StringUtils.h"
+#include "../../Utils/PendingCommand.h"
+#include "MqttCommandParser.h"
 #include "MQTTManager.h"
 
 namespace MQTTManager
@@ -26,7 +29,17 @@ namespace MQTTManager
     char TopicBuffer[128];
     char PayloadBuffer[1024];
     char AvailabilityTopic[128];
-    PrefixedString gMqttTopic(128);
+    PrefixedString gMqttTopic(128); // main loop only, never touch it from MQTT callbacks
+
+    // The MQTT callbacks run in the network task, concurrently with the main loop.
+    // They must not use the shared buffers above or talk to the wallbox (a Modbus
+    // transfer can block for seconds). They only read these topics, which are
+    // fixed after Init(), and hand their work to the main loop via the flags below.
+    char ChargingCurrentLimitControlTopic[128];
+    char StandbyControlTopic[128];
+    std::atomic<bool> gConnectPending{false};
+    PendingCommand<float> gPendingChargingCurrentLimit;
+    PendingCommand<bool> gPendingStandby;
 
     constexpr uint16_t NumMqttPublishedValues = 10;
     enum MqttPublishedValues
@@ -360,14 +373,13 @@ namespace MQTTManager
         }
     }
 
-    // Callback for MQTT connection
-    void OnMqttConnect(bool sessionPresent)
+    // Subscribes and publishes the per-connection messages. Runs in the main loop
+    // after OnMqttConnect() flagged a new connection.
+    void HandleConnect()
     {
-        Logger::Info("Connected to MQTT");
-
         // Subscribe to control topics
-        gMqttClient.subscribe(gMqttTopic.SetString("/control/charging_current_limit"), 2);
-        gMqttClient.subscribe(gMqttTopic.SetString("/control/standby"), 2);
+        gMqttClient.subscribe(ChargingCurrentLimitControlTopic, 2);
+        gMqttClient.subscribe(StandbyControlTopic, 2);
 
         // Publish version information
         String versionString = String(Version::Major) + "." + String(Version::Minor) + "." + String(Version::Patch);
@@ -382,6 +394,13 @@ namespace MQTTManager
         PublishHomeAssistantDiscovery();
     }
 
+    // Callback for MQTT connection (network task)
+    void OnMqttConnect(bool sessionPresent)
+    {
+        Logger::Info("Connected to MQTT");
+        gConnectPending = true;
+    }
+
     // Callback for MQTT disconnection
     void OnMqttDisconnect(AsyncMqttClientDisconnectReason reason)
     {
@@ -389,22 +408,53 @@ namespace MQTTManager
         gStatistics.NumMqttDisconnects++;
     }
 
-    // Callback for MQTT messages
+    // Callback for MQTT messages (network task). Only validates and queues the
+    // command; ProcessEvents() applies it from the main loop.
     void OnMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total)
     {
-        if (strcmp(gMqttTopic.SetString("/control/charging_current_limit"), topic) == 0)
+        const bool isChargingCurrentLimit = strcmp(ChargingCurrentLimitControlTopic, topic) == 0;
+        const bool isStandby = strcmp(StandbyControlTopic, topic) == 0;
+        if (!isChargingCurrentLimit && !isStandby)
         {
-            float current = String(payload, len).toFloat();
-            Logger::Trace("Received MQTT control command: charging current limit = %f\n", current);
-            gWallbox->SetChargingCurrentLimit(current);
+            return;
         }
-        else if (strcmp(gMqttTopic.SetString("/control/standby"), topic) == 0)
+
+        // Control payloads are tiny; a payload split into chunks is not a valid command
+        if (index != 0 || len != total)
         {
-            String cmd(payload, len);
-            cmd.trim();
-            Logger::Trace("Received MQTT control command: standby = %s", cmd.c_str());
-            bool enableStandby = cmd.equalsIgnoreCase("ON");
-            gWallbox->SetStandbyEnabled(enableStandby);
+            Logger::Warning("MQTT: Ignoring fragmented control message on %s", topic);
+            return;
+        }
+
+        // A retained command would be replayed on every reconnect and reboot,
+        // re-applying a setpoint that may be long outdated
+        if (properties.retain)
+        {
+            Logger::Warning("MQTT: Ignoring retained control message on %s", topic);
+            return;
+        }
+
+        if (isChargingCurrentLimit)
+        {
+            float current = 0.0f;
+            if (!MqttCommandParser::ParseChargingCurrent(payload, len, current))
+            {
+                Logger::Warning("MQTT: Ignoring invalid charging current limit payload");
+                return;
+            }
+            Logger::Trace("Received MQTT control command: charging current limit = %f", current);
+            gPendingChargingCurrentLimit.Set(current);
+        }
+        else
+        {
+            bool enableStandby = false;
+            if (!MqttCommandParser::ParseStandby(payload, len, enableStandby))
+            {
+                Logger::Warning("MQTT: Ignoring invalid standby payload");
+                return;
+            }
+            Logger::Trace("Received MQTT control command: standby = %d", enableStandby);
+            gPendingStandby.Set(enableStandby);
         }
     }
 
@@ -427,6 +477,8 @@ namespace MQTTManager
         // entities via availability_topic) unavailable if the connection drops
         // unexpectedly, instead of showing stale last-known values forever.
         snprintf(AvailabilityTopic, sizeof(AvailabilityTopic), "%s/status", Settings::Instance()->DeviceName.c_str());
+        snprintf(ChargingCurrentLimitControlTopic, sizeof(ChargingCurrentLimitControlTopic), "%s/control/charging_current_limit", Settings::Instance()->DeviceName.c_str());
+        snprintf(StandbyControlTopic, sizeof(StandbyControlTopic), "%s/control/standby", Settings::Instance()->DeviceName.c_str());
         gMqttClient.setWill(AvailabilityTopic, 1, true, "offline");
 
         // Register event callbacks
@@ -457,6 +509,33 @@ namespace MQTTManager
 
         // Publish data set
         PublishStatusMessages();
+    }
+
+    // Handles work queued by the MQTT callbacks
+    void ProcessEvents()
+    {
+        if (gConnectPending.exchange(false) && gMqttClient.connected())
+        {
+            HandleConnect();
+        }
+
+        float currentLimitA = 0.0f;
+        if (gPendingChargingCurrentLimit.Take(currentLimitA))
+        {
+            if (!gWallbox->SetChargingCurrentLimit(currentLimitA))
+            {
+                Logger::Error("MQTT: Could not apply charging current limit %f A", currentLimitA);
+            }
+        }
+
+        bool standbyEnabled = false;
+        if (gPendingStandby.Take(standbyEnabled))
+        {
+            if (!gWallbox->SetStandbyEnabled(standbyEnabled))
+            {
+                Logger::Error("MQTT: Could not apply standby = %d", standbyEnabled);
+            }
+        }
     }
 
     // Checks if MQTT is actually connected

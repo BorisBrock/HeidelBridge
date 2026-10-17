@@ -35,3 +35,9 @@ The following topics are subscribed by HeidelBridge. Use these to control your w
 | Topic                                        | Unit | Data Type     | Description                                                                            |
 | -------------------------------------------- | ---- | ------------- | --------------------------------------------------------------------------------------- |
 | {DeviceName}/control/charging_current_limit  | A    | Float         | Charging current limit in Ampere. 0 disables charging; 6.0-16.0 permits it (0.1 steps). |
+| {DeviceName}/control/standby                 | -    | String        | `ON` allows the wallbox to enter standby, `OFF` prevents it.                            |
+
+Control messages are handled strictly so that a malformed or stale message never changes the charging state:
+- The charging current limit must be a plain decimal number (e.g. `0`, `6`, `10.5`). Values are rounded to the nearest 0.1 A, values below 6.0 block charging and values above 16.0 are capped at 16.0. Anything else (text, negative numbers, `nan`, JSON, ...) is ignored.
+- The standby command must be `ON` or `OFF` (case-insensitive). Anything else is ignored.
+- Retained control messages are ignored. Publish control commands without the retain flag, otherwise an outdated setpoint would be re-applied on every reconnect.

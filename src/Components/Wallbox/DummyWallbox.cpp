@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <cmath>
 #include "../Logger/Logger.h"
 #include "../../Configuration/Constants.h"
 #include "DummyWallbox.h"
@@ -30,6 +31,12 @@ VehicleState DummyWallbox::GetState()
 
 bool DummyWallbox::SetChargingCurrentLimit(float currentLimitA)
 {
+    if (!std::isfinite(currentLimitA))
+    {
+        Logger::Error("Dummy wallbox: ignoring invalid charging current limit");
+        return false;
+    }
+
     // Same semantics as the real wallbox: 0 A blocks charging, at or above the
     // minimum permits it.
     if (currentLimitA < Constants::HeidelbergWallbox::MinChargingCurrentA)

@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <cmath>
+#include <cstdlib>
 #include <unity.h>
 
 #include "Components/Wallbox/DummyWallbox.h"
@@ -50,6 +52,41 @@ void test_SetChargingCurrentLimit_WithinRange_WritesScaledValue(void)
 {
     TEST_ASSERT_TRUE(HeidelbergWallbox::Instance()->SetChargingCurrentLimit(10.5f));
     TEST_ASSERT_EQUAL_UINT16(105, MockModbus::GetRegister(Constants::HeidelbergRegisters::MaximalCurrent));
+}
+
+void test_SetChargingCurrentLimit_RoundsToNearestStep(void)
+{
+    // Every 0.1 A step must land on its own register value; truncation used
+    // to turn e.g. 6.2 A into 61 (6.1 A).
+    for (uint16_t raw = 60; raw <= 160; raw++)
+    {
+        char text[8];
+        snprintf(text, sizeof(text), "%u.%u", raw / 10, raw % 10);
+        TEST_ASSERT_TRUE(HeidelbergWallbox::Instance()->SetChargingCurrentLimit(strtof(text, nullptr)));
+        TEST_ASSERT_EQUAL_UINT16_MESSAGE(raw, MockModbus::GetRegister(Constants::HeidelbergRegisters::MaximalCurrent), text);
+    }
+
+    TEST_ASSERT_TRUE(HeidelbergWallbox::Instance()->SetChargingCurrentLimit(10.26f));
+    TEST_ASSERT_EQUAL_UINT16(103, MockModbus::GetRegister(Constants::HeidelbergRegisters::MaximalCurrent));
+}
+
+void test_SetChargingCurrentLimit_NonFinite_IsRejectedWithoutWrite(void)
+{
+    MockModbus::SetRegister(Constants::HeidelbergRegisters::MaximalCurrent, 120);
+    const uint32_t writesBefore = MockModbus::GetWriteCount(Constants::HeidelbergRegisters::MaximalCurrent);
+
+    TEST_ASSERT_FALSE(HeidelbergWallbox::Instance()->SetChargingCurrentLimit(NAN));
+    TEST_ASSERT_FALSE(HeidelbergWallbox::Instance()->SetChargingCurrentLimit(INFINITY));
+    TEST_ASSERT_FALSE(HeidelbergWallbox::Instance()->SetChargingCurrentLimit(-INFINITY));
+
+    TEST_ASSERT_EQUAL(writesBefore, MockModbus::GetWriteCount(Constants::HeidelbergRegisters::MaximalCurrent));
+    TEST_ASSERT_EQUAL_UINT16(120, MockModbus::GetRegister(Constants::HeidelbergRegisters::MaximalCurrent));
+}
+
+void test_SetChargingCurrentLimit_Negative_BlocksCharging(void)
+{
+    TEST_ASSERT_TRUE(HeidelbergWallbox::Instance()->SetChargingCurrentLimit(-3.0f));
+    TEST_ASSERT_EQUAL_UINT16(0, MockModbus::GetRegister(Constants::HeidelbergRegisters::MaximalCurrent));
 }
 
 void test_SetChargingCurrentLimit_WriteFails_ReturnsFalse(void)
@@ -237,6 +274,15 @@ void test_DummyWallbox_SetChargingCurrentLimit_ClampsToWallboxRange(void)
     TEST_ASSERT_FLOAT_WITHIN(0.001f, 0.0f, wallbox->GetChargingCurrentLimit());
 }
 
+void test_DummyWallbox_SetChargingCurrentLimit_NonFinite_KeepsLimit(void)
+{
+    auto *wallbox = DummyWallbox::Instance();
+    TEST_ASSERT_TRUE(wallbox->SetChargingCurrentLimit(12.0f));
+
+    TEST_ASSERT_FALSE(wallbox->SetChargingCurrentLimit(NAN));
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 12.0f, wallbox->GetChargingCurrentLimit());
+}
+
 void test_DummyWallbox_StateFollowsChargingCurrentLimit(void)
 {
     auto *wallbox = DummyWallbox::Instance();
@@ -313,6 +359,9 @@ int main(int argc, char *argv[])
     RUN_TEST(test_SetChargingCurrentLimit_BelowMinimum_BlocksCharging);
     RUN_TEST(test_SetChargingCurrentLimit_AboveMaximum_ClampsToMaximum);
     RUN_TEST(test_SetChargingCurrentLimit_WithinRange_WritesScaledValue);
+    RUN_TEST(test_SetChargingCurrentLimit_RoundsToNearestStep);
+    RUN_TEST(test_SetChargingCurrentLimit_NonFinite_IsRejectedWithoutWrite);
+    RUN_TEST(test_SetChargingCurrentLimit_Negative_BlocksCharging);
     RUN_TEST(test_SetChargingCurrentLimit_WriteFails_ReturnsFalse);
     RUN_TEST(test_GetState_MapsRegisterToVehicleState);
     RUN_TEST(test_GetState_ReadFails_KeepsLastKnownState);
@@ -334,6 +383,7 @@ int main(int argc, char *argv[])
     // DummyWallbox
     RUN_TEST(test_DummyWallbox_DefaultState);
     RUN_TEST(test_DummyWallbox_SetChargingCurrentLimit_ClampsToWallboxRange);
+    RUN_TEST(test_DummyWallbox_SetChargingCurrentLimit_NonFinite_KeepsLimit);
     RUN_TEST(test_DummyWallbox_StateFollowsChargingCurrentLimit);
     RUN_TEST(test_DummyWallbox_ChargingPower_MatchesThreePhaseFormula);
     RUN_TEST(test_DummyWallbox_EnergyAccumulatesOnlyWhileCharging);

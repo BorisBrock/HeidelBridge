@@ -1,6 +1,6 @@
 {
   "name": "HeidelBridge",
-  "version": "4.2.1",
+  "version": "5.0.0",
   "builds": [
     {
       "chipFamily": "ESP32",

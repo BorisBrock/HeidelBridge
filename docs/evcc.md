@@ -3,6 +3,9 @@
 > [!IMPORTANT]
 > Please make sure that you set up your HeidelBridge **before** adding it to evcc. Evcc won't start up, if it can't find your HeidelBridge! 
 
+> [!IMPORTANT]
+> evcc needs a [sponsor token](https://docs.evcc.io/docs/sponsorship) to use HeidelBridge. Without one, evcc reads the station ID, finds `heidelbridge` and refuses to start with `sponsorship required`.
+
 Adding your HeidelBridge to evcc is very straight forward.
 Start by defining a new charger:
 

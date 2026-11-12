@@ -6,6 +6,14 @@ description: >-
   0 A stoppt das Laden, 6.0-16.0 A geben es frei - es gibt keinen separaten
   Ein/Aus-Schalter mehr.
 mode: restart
+variables:
+  # Watts per ampere of charging current: 230 V times the number of phases the
+  # car charges on. 690 for three-phase, 230 for a single-phase installation
+  # or a car with a single-phase on-board charger.
+  watts_per_amp: 690
+  # Highest current your installation allows (wallbox hardware setting, fuse,
+  # cable), at most 16.
+  max_current: 16
 triggers:
   - id: modus_wechsel
     trigger: state
@@ -50,13 +58,13 @@ actions:
                     value_template: >-
                       {{
                       states('number.heidelbridge_control_charging_current_limit')
-                      | float(0) != 16 }}
+                      | float(0) != max_current }}
                 sequence:
                   - action: number.set_value
                     target:
                       entity_id: number.heidelbridge_control_charging_current_limit
                     data:
-                      value: 16
+                      value: "{{ max_current }}"
       - conditions:
           - condition: or
             conditions:
@@ -79,8 +87,8 @@ actions:
                 }}
               wb_power: "{{ states('sensor.heidelbridge_charging_power') | float(0) }}"
               available_power: "{{ (grid_power * -1) + wb_power }}"
-              calc_amps: "{{ (available_power / 690) | round(1, 'floor') }}"
-              max_amps: "{{ [calc_amps, 16] | min }}"
+              calc_amps: "{{ (available_power / watts_per_amp) | round(1, 'floor') }}"
+              max_amps: "{{ [calc_amps, max_current] | min }}"
               modus: "{{ states('input_select.wallbox_modus') }}"
           - choose:
               - conditions:

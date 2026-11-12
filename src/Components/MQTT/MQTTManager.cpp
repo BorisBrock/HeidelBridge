@@ -276,6 +276,15 @@ namespace MQTTManager
                 "device":{"identifiers":["%"],"name":"%","model":"EnergyControl","manufacturer":"Heidelberg"}})");
     }
 
+    // 5.0.0 removed the "Enable charging" switch. Its discovery config and state
+    // were retained, so Home Assistant kept showing a dead switch after the update.
+    // Empty retained payloads delete them on the broker and remove the entity.
+    void RemoveObsoleteHomeAssistantEntities()
+    {
+        PublishHomeAssistantDiscoveryTopic("homeassistant/switch/%/control_enable_charging/config", "");
+        gMqttClient.publish(gMqttTopic.SetString("/enable_charging"), 1, true, "");
+    }
+
     // Publishes various MQTT status messages based on the current value index.
     // This function cycles through different types of data (e.g., vehicle state, charging current, temperature)
     // and publishes the corresponding values to the MQTT broker. It ensures that all relevant data points
@@ -392,6 +401,7 @@ namespace MQTTManager
 
         // Publish discovery data
         PublishHomeAssistantDiscovery();
+        RemoveObsoleteHomeAssistantEntities();
     }
 
     // Callback for MQTT connection (network task)

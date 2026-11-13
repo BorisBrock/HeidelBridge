@@ -48,10 +48,17 @@ namespace ModbusTCP
 
         uint16_t words[DaheimladenRegisterMap::MaxReadWords];
         const String serial = DeviceInfo::GetDeviceSerialNumber();
-        if (!DaheimladenRegisterMap::Read(*gWallbox, serial.c_str(), startAddress, numWords, words))
+        switch (DaheimladenRegisterMap::Read(*gWallbox, serial.c_str(), startAddress, numWords, words))
         {
+        case DaheimladenRegisterMap::ReadResult::Ok:
+            break;
+        case DaheimladenRegisterMap::ReadResult::UnmappedAddress:
             Logger::Error(" -> Responding with error ILLEGAL_DATA_ADDRESS");
             response.setError(request.getServerID(), fc, Modbus::Error::ILLEGAL_DATA_ADDRESS);
+            return response;
+        case DaheimladenRegisterMap::ReadResult::ValueUnavailable:
+            Logger::Warning(" -> Value not available yet, responding with error SERVER_DEVICE_BUSY");
+            response.setError(request.getServerID(), fc, Modbus::Error::SERVER_DEVICE_BUSY);
             return response;
         }
 

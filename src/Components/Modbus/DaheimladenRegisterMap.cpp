@@ -10,6 +10,7 @@ namespace DaheimladenRegisterMap
         constexpr uint16_t MaxValueWords = 16;
 
         using Fill = void (*)(IWallbox &wallbox, const char *stationId, uint16_t *words);
+        using IsAvailable = bool (*)(IWallbox &wallbox);
 
         // A value in the register map. Like on a Daheimladen wallbox, every Uint16 value is
         // followed by an unused register, so consecutive values form one contiguous block.
@@ -18,6 +19,7 @@ namespace DaheimladenRegisterMap
             uint16_t address;
             uint16_t numWords;
             Fill fill;
+            IsAvailable isAvailable; // nullptr (left out of the initializer): always available
         };
 
         uint16_t ToCurrent(float currentA)
@@ -54,7 +56,10 @@ namespace DaheimladenRegisterMap
              { PutUint32(words, static_cast<uint32_t>(wallbox.GetChargingPower())); }},
             {Constants::DaheimladenRegisters::EnergyMeter, 2,
              [](IWallbox &wallbox, const char *, uint16_t *words)
-             { PutUint32(words, static_cast<uint32_t>(wallbox.GetEnergyMeterValue() * Constants::DaheimladenWallbox::EnergyFactor)); }},
+             { PutUint32(words, static_cast<uint32_t>(wallbox.GetEnergyMeterValue() * Constants::DaheimladenWallbox::EnergyFactor)); },
+             // Right after the first boot the energy counter has no baseline yet: refuse rather than report 0
+             [](IWallbox &wallbox)
+             { return wallbox.HasEnergyMeterValue(); }},
             {Constants::DaheimladenRegisters::EvseMaxCurrent, 2,
              [](IWallbox &, const char *, uint16_t *words)
              { words[0] = ToCurrent(Constants::HeidelbergWallbox::MaxChargingCurrentA); }},
@@ -95,6 +100,12 @@ namespace DaheimladenRegisterMap
              }},
         };
 
+        bool Overlaps(const Value &value, uint32_t start, uint32_t end)
+        {
+            const uint32_t valueEnd = static_cast<uint32_t>(value.address) + value.numWords;
+            return valueEnd > start && value.address < end;
+        }
+
         bool IsMapped(uint32_t address)
         {
             for (const Value &value : Values)
@@ -106,22 +117,28 @@ namespace DaheimladenRegisterMap
         }
     }
 
-    bool Read(IWallbox &wallbox, const char *stationId, uint16_t start, uint16_t count, uint16_t *out)
+    ReadResult Read(IWallbox &wallbox, const char *stationId, uint16_t start, uint16_t count, uint16_t *out)
     {
         const uint32_t end = static_cast<uint32_t>(start) + count;
         for (uint32_t address = start; address < end; ++address)
         {
             if (!IsMapped(address))
-                return false;
+                return ReadResult::UnmappedAddress;
+        }
+
+        for (const Value &value : Values)
+        {
+            if (Overlaps(value, start, end) && value.isAvailable != nullptr && !value.isAvailable(wallbox))
+                return ReadResult::ValueUnavailable;
         }
 
         // Each value is read from the wallbox once, even if the request covers it only partly
         for (const Value &value : Values)
         {
-            const uint32_t valueEnd = static_cast<uint32_t>(value.address) + value.numWords;
-            if (valueEnd <= start || value.address >= end)
+            if (!Overlaps(value, start, end))
                 continue;
 
+            const uint32_t valueEnd = static_cast<uint32_t>(value.address) + value.numWords;
             uint16_t words[MaxValueWords] = {};
             value.fill(wallbox, stationId, words);
             const uint32_t from = value.address > start ? value.address : start;
@@ -129,6 +146,6 @@ namespace DaheimladenRegisterMap
             for (uint32_t address = from; address < to; ++address)
                 out[address - start] = words[address - value.address];
         }
-        return true;
+        return ReadResult::Ok;
     }
 };

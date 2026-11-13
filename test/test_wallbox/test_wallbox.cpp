@@ -137,9 +137,18 @@ void test_GetChargingCurrentLimit_ReadFails_ReturnsLastKnownValue(void)
 
 void test_GetEnergyMeterValue_CombinesTwoRegisters(void)
 {
+    auto *wallbox = HeidelbergWallbox::Instance();
     MockModbus::SetRegister(Constants::HeidelbergRegisters::Energy, 1);
     MockModbus::SetRegister(Constants::HeidelbergRegisters::Energy + 1, 0xFFFE);
-    TEST_ASSERT_FLOAT_WITHIN(0.001f, 131070.0f, HeidelbergWallbox::Instance()->GetEnergyMeterValue());
+
+    // With nothing persisted, the register becomes the baseline once it has held for the confirmation window
+    // (each mock millis() call advances one millisecond)
+    for (int i = 0; i < 100000 && !wallbox->HasEnergyMeterValue(); i++)
+    {
+        wallbox->Update();
+    }
+    TEST_ASSERT_TRUE(wallbox->HasEnergyMeterValue());
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 131070.0f, wallbox->GetEnergyMeterValue());
 }
 
 void test_GetFailsafeCurrent_ReadsAndScalesRegister(void)

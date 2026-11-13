@@ -5,6 +5,7 @@
 #include "../../Configuration/Constants.h"
 #include "../Wallbox/IWallbox.h"
 #include "../../Utils/DeviceInfo.h"
+#include "DaheimladenRegisterMap.h"
 #include "ModbusTCP.h"
 
 namespace ModbusTCP
@@ -27,7 +28,7 @@ namespace ModbusTCP
         return ModbusMessage{};
     }
 
-    // Reads a single holding register
+    // Reads one or more consecutive holding registers
     ModbusMessage ReadHoldRegister(ModbusMessage request)
     {
         uint8_t fc = request.getFunctionCode();
@@ -37,138 +38,26 @@ namespace ModbusTCP
         request.get(4, numWords);
         Logger::Trace("ModbusTCP request received: READ_HOLD_REGISTER %d words at reg. %d", numWords, startAddress);
 
-        // Respond properly
         ModbusMessage response;
-        uint8_t responseLengthBytes = 0;
-        switch (startAddress)
+        if (numWords == 0 || numWords > DaheimladenRegisterMap::MaxReadWords)
         {
-        case (Constants::DaheimladenRegisters::Status):
-        {
-            Logger::Trace(" -> Responding with wallbox status");
-            responseLengthBytes = 2;
-            const uint16_t rawState = static_cast<uint16_t>(gWallbox->GetState());
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            response.add(rawState);
-            break;
+            Logger::Error(" -> Responding with error ILLEGAL_DATA_VALUE");
+            response.setError(request.getServerID(), fc, Modbus::Error::ILLEGAL_DATA_VALUE);
+            return response;
         }
-        case (Constants::DaheimladenRegisters::LimitChargingCurrent):
-        {
-            Logger::Trace(" -> Responding with charging current limit");
-            responseLengthBytes = 2;
-            uint16_t rawCurrent = static_cast<uint16_t>(gWallbox->GetChargingCurrentLimit() * Constants::DaheimladenWallbox::CurrentFactor);
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            response.add(rawCurrent);
-            break;
-        }
-        case (Constants::DaheimladenRegisters::ConnectionTimeoutTime):
-        {
-            Logger::Trace(" -> Responding with connection timeout time");
-            responseLengthBytes = 2;
-            const uint16_t dummyValue = 60;
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            response.add(dummyValue);
-            break;
-        }
-        case (Constants::DaheimladenRegisters::EnergyMeter):
-        {
-            Logger::Trace(" -> Responding with energy meter value");
-            responseLengthBytes = 4;
-            const uint32_t rawEnergy01kWh = static_cast<uint32_t>(gWallbox->GetEnergyMeterValue() * Constants::DaheimladenWallbox::EnergyFactor);
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            response.add(rawEnergy01kWh);
-            break;
-        }
-        case (Constants::DaheimladenRegisters::MaxChargingCurrentAfterConnectionLoss):
-        {
-            Logger::Trace(" -> Responding with connection loss current");
-            responseLengthBytes = 2;
-            uint16_t rawCurrent = static_cast<uint16_t>(gWallbox->GetFailsafeCurrent() * Constants::DaheimladenWallbox::CurrentFactor);
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            response.add(rawCurrent);
-            break;
-        }
-        case (Constants::DaheimladenRegisters::TotalChargingPower):
-        {
-            Logger::Trace(" -> Responding with total charging power");
-            responseLengthBytes = 4;
-            const uint32_t powerW = static_cast<uint32_t>(gWallbox->GetChargingPower());
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            response.add(powerW);
-            break;
-        }
-        case (Constants::DaheimladenRegisters::ChargeCurrents):
-        {
-            Logger::Trace(" -> Responding with charging currents");
-            responseLengthBytes = 10;
 
-            float c1, c2, c3;
-            gWallbox->GetChargingCurrents(c1, c2, c3);
-            uint16_t rawCurrent1 = static_cast<uint16_t>(c1 * Constants::DaheimladenWallbox::CurrentFactor);
-            uint16_t rawCurrent2 = static_cast<uint16_t>(c2 * Constants::DaheimladenWallbox::CurrentFactor);
-            uint16_t rawCurrent3 = static_cast<uint16_t>(c3 * Constants::DaheimladenWallbox::CurrentFactor);
-
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            response.add(rawCurrent1);
-            response.add(uint16_t(0)); // filler
-            response.add(rawCurrent2);
-            response.add(uint16_t(0)); // filler
-            response.add(rawCurrent3);
-            break;
-        }
-        case (Constants::DaheimladenRegisters::ChargeVoltages):
-        {
-            Logger::Trace(" -> Responding with charging voltages");
-            responseLengthBytes = 10;
-
-            float v1, v2, v3;
-            gWallbox->GetChargingVoltages(v1, v2, v3);
-            uint16_t rawVoltage1 = static_cast<uint16_t>(v1 * Constants::DaheimladenWallbox::VoltageFactor);
-            uint16_t rawVoltage2 = static_cast<uint16_t>(v2 * Constants::DaheimladenWallbox::VoltageFactor);
-            uint16_t rawVoltage3 = static_cast<uint16_t>(v3 * Constants::DaheimladenWallbox::VoltageFactor);
-
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            response.add(rawVoltage1);
-            response.add(uint16_t(0)); // filler
-            response.add(rawVoltage2);
-            response.add(uint16_t(0)); // filler
-            response.add(rawVoltage3);
-            break;
-        }
-        case (Constants::DaheimladenRegisters::RfidStationId):
-        {
-            Logger::Trace(" -> Responding with station serial number");
-            responseLengthBytes = 32;
-            const String serial = DeviceInfo::GetDeviceSerialNumber();
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            for (uint i = 0; i < 16; ++i)
-            {
-                const size_t charIndex = i * 2;
-                const uint8_t highByte = charIndex < serial.length() ? static_cast<uint8_t>(serial[charIndex]) : 0;
-                const uint8_t lowByte = (charIndex + 1) < serial.length() ? static_cast<uint8_t>(serial[charIndex + 1]) : 0;
-                const uint16_t reg = (static_cast<uint16_t>(highByte) << 8) | lowByte;
-                response.add(reg);
-            }
-            break;
-        }
-        case (Constants::DaheimladenRegisters::RfidCardId):
-        {
-            // Not supported: this would represent the currently scanned RFID card, not a fixed device property
-            Logger::Trace(" -> Responding with RFID card ID (not supported, returning empty)");
-            responseLengthBytes = 32;
-            const uint16_t dummyValue = 0;
-            response.add(request.getServerID(), fc, responseLengthBytes);
-            for (uint i = 0; i < 16; ++i)
-                response.add(dummyValue);
-            break;
-        }
-        default:
+        uint16_t words[DaheimladenRegisterMap::MaxReadWords];
+        const String serial = DeviceInfo::GetDeviceSerialNumber();
+        if (!DaheimladenRegisterMap::Read(*gWallbox, serial.c_str(), startAddress, numWords, words))
         {
             Logger::Error(" -> Responding with error ILLEGAL_DATA_ADDRESS");
             response.setError(request.getServerID(), fc, Modbus::Error::ILLEGAL_DATA_ADDRESS);
-            break;
-        }
+            return response;
         }
 
+        response.add(request.getServerID(), fc, static_cast<uint8_t>(numWords * 2));
+        for (uint16_t i = 0; i < numWords; ++i)
+            response.add(words[i]);
         return response;
     }
 

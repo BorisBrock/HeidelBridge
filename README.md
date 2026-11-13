@@ -49,6 +49,7 @@ Heidelbridge supports OTA (Over The Air) updates. That means that you can update
 
 Adding your HeidelBridge to evcc is very straight forward.
 See [these instructions](/docs/evcc.md) for details.
+evcc only accepts HeidelBridge with an [evcc sponsor token](https://docs.evcc.io/docs/sponsorship). Without one, evcc refuses to start with `sponsorship required`.
 
 # Using HeidelBridge With Home Assistant
 

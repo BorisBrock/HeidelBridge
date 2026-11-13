@@ -64,6 +64,9 @@ namespace Constants
         constexpr uint16_t ChargeCurrents = 6;
         constexpr uint16_t ChargeVoltages = 109;
         constexpr uint16_t MaxChargingCurrentAfterConnectionLoss = 87;
+        constexpr uint16_t EvseMaxCurrent = 32;
+        constexpr uint16_t EvseMinCurrent = 34;
+        constexpr uint16_t CableMaxCurrent = 36;
         constexpr uint16_t RfidStationId = 38;
         constexpr uint16_t RfidCardId = 54;
     };
